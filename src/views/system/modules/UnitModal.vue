@@ -16,12 +16,21 @@
       style="top: 100px; height: 55%"
     >
       <template slot="footer">
-        <a-button key="back" v-if="isReadOnly" @click="handleCancel"> 关闭 </a-button>
+        <a-button key="back" v-if="isReadOnly" @click="handleCancel">
+          关闭
+        </a-button>
       </template>
       <a-spin :spinning="confirmLoading">
         <a-form :form="form" id="unitModal">
-          <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="基本单位">
-            <a-input placeholder="请输入基本单位(小单位)" v-decorator.trim="['basicUnit', validatorRules.basicUnit]" />
+          <a-form-item
+            :labelCol="labelCol"
+            :wrapperCol="wrapperCol"
+            label="基本单位"
+          >
+            <a-input
+              placeholder="请输入基本单位(小单位)"
+              v-decorator.trim="['basicUnit', validatorRules.basicUnit]"
+            />
           </a-form-item>
         </a-form>
         <!-- <a-form :form="form">
@@ -50,17 +59,17 @@
   </div>
 </template>
 <script>
-import pick from 'lodash.pick'
-import { addUnit, editUnit, checkUnit } from '@/api/api'
-import { autoJumpNextInput } from '@/utils/util'
-import { isDecimalThree } from '@/utils/validate'
-import { mixinDevice } from '@/utils/mixin'
+import pick from "lodash.pick";
+import { addUnit, editUnit, checkUnit } from "@/api/api";
+import { autoJumpNextInput } from "@/utils/util";
+import { isDecimalThree } from "@/utils/validate";
+import { mixinDevice } from "@/utils/mixin";
 export default {
-  name: 'UnitModal',
+  name: "UnitModal",
   mixins: [mixinDevice],
   data() {
     return {
-      title: '操作',
+      title: "操作",
       visible: false,
       model: {},
       isReadOnly: false,
@@ -77,58 +86,67 @@ export default {
       validatorRules: {
         basicUnit: {
           rules: [
-            { required: true, message: '请输入基本单位!' },
-            { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' },
+            { required: true, message: "请输入基本单位!" },
+            {
+              min: 1,
+              max: 10,
+              message: "长度在 1 到 10 个字符",
+              trigger: "blur",
+            },
           ],
         },
-        otherUnit: {
-          rules: [
-            { required: true, message: '请输入副单位!' },
-            { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' },
-          ],
-        },
+        // otherUnit: {
+        //   rules: [
+        //     { required: true, message: '请输入副单位!' },
+        //     { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' },
+        //   ],
+        // },
         ratio: {
-          rules: [{ required: true, message: '请输入比例!' }, { validator: this.validateRatio }],
+          rules: [
+            { required: true, message: "请输入比例!" },
+            { validator: this.validateRatio },
+          ],
         },
       },
-    }
+    };
   },
   created() {},
   methods: {
     add() {
-      this.edit({})
+      this.edit({});
     },
     edit(record) {
-      this.form.resetFields()
-      this.model = Object.assign({}, record)
-      this.visible = true
+      this.form.resetFields();
+      this.model = Object.assign({}, record);
+      this.visible = true;
       this.$nextTick(() => {
         this.form.setFieldsValue(
           pick(
             this.model,
-            'basicUnit',
-            'otherUnit',
-            'ratio',
-            'otherUnitTwo',
-            'ratioTwo',
-            'otherUnitThree',
-            'ratioThree'
+            "basicUnit",
+            "otherUnit",
+            "ratio",
+            "otherUnitTwo",
+            "ratioTwo",
+            "otherUnitThree",
+            "ratioThree"
           )
-        )
-        autoJumpNextInput('unitModal')
-      })
+        );
+        autoJumpNextInput("unitModal");
+      });
     },
     close() {
-      this.$emit('close')
-      this.visible = false
+      this.$emit("close");
+      this.visible = false;
     },
     handleOk() {
-      const that = this
+      const that = this;
       // 触发表单验证
       this.form.validateFields((err, values) => {
         if (!err) {
-          that.confirmLoading = true
-          let formData = Object.assign(this.model, values)
+          that.confirmLoading = true;
+          let formData = Object.assign(this.model, values);
+          /*
           if (!formData.otherUnit) {
             that.$message.warning('抱歉，副单位不能为空！')
             that.confirmLoading = false
@@ -190,38 +208,39 @@ export default {
             that.confirmLoading = false
             return
           }
-          let obj
+          */
+          let obj;
           if (!this.model.id) {
-            obj = addUnit(formData)
+            obj = addUnit(formData);
           } else {
-            obj = editUnit(formData)
+            obj = editUnit(formData);
           }
           obj
             .then((res) => {
               if (res.code === 200) {
-                that.$emit('ok')
+                that.$emit("ok");
               } else {
-                that.$message.warning(res.data.message)
+                that.$message.warning(res.data.message);
               }
             })
             .finally(() => {
-              that.confirmLoading = false
-              that.close()
-            })
+              that.confirmLoading = false;
+              that.close();
+            });
         }
-      })
+      });
     },
     handleCancel() {
-      this.close()
+      this.close();
     },
     validateRatio(rule, value, callback) {
       if (value > 1) {
-        callback()
+        callback();
       } else {
-        callback('比例必须大于1')
+        callback("比例必须大于1");
       }
     },
   },
-}
+};
 </script>
 <style scoped></style>
