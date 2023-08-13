@@ -39,7 +39,7 @@ jobs:
         run: yarn run build
 
       - name: 镜像构建
-        run: docker build . --file Dockerfile erp-web:v1.0.0
+        run: docker build -t erp-web:v1.0.0 .
 
       - name: 镜像打包
         run: docker save -o erp-web:v1.0.0 erp-web.tar
