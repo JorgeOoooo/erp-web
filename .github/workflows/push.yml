@@ -1,0 +1,51 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+# workflow名称。省略的话，默认为当前workflow文件名
+name: Node.js Build CI
+
+# 触发workflow的条件
+on:
+  # 只有main分支发生push事件时，才会触发workflow
+  push:
+    branches: [dev]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ""
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
+# jobs表示执行的一项或多项任务
+jobs:
+  # 任务的job_id，具体名称自定义，这里build代表打包
+  build:
+    # runs-on字段指定运行所需要的虚拟机环境。注意：这个是必填字段
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v3
+
+      - name: 配置node环境
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: 拉取依赖
+        run: npm install
+
+      - name: 代码构建
+        run: npm run build
+
+      - name: 镜像构建
+        run: docker build . --file Dockerfile erp-web:v1.0.0
+
+      - name: 镜像打包
+        run: docker save -o erp-web:v1.0.0 erp-web.tar
+
+      - name: 上传镜像包到服务器中
+        run: sshpass -p ${{secrets.REMOTE_PWD}} scp -r -o StrictHostKeyChecking=no ./erp-web.tar root@${{secrets.REMOTE_IP}}:/www/wwwroot/web-image
+
+      - name:
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker import -i erp-web.tar erp-web:v1.0.0 && sudo docker stop erp-web:v1.0.0 && sudo docker kill erp-web:v1.0.0 && docker run erp-web:v1.0.0"

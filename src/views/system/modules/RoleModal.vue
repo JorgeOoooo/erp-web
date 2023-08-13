@@ -56,7 +56,7 @@
               />
             </a-tooltip>
           </a-form-item>
-          <a-form-item
+          <!-- <a-form-item
             :labelCol="labelCol"
             :wrapperCol="wrapperCol"
             label="价格屏蔽"
@@ -75,7 +75,7 @@
                 style="width: 6%; padding-left: 5px; font-size: 18px"
               />
             </a-tooltip>
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item
             :labelCol="labelCol"
             :wrapperCol="wrapperCol"
