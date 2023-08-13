@@ -33,7 +33,7 @@ jobs:
           node-version: 14
 
       - name: 拉取依赖
-        run: rm -rf node_modules/ package-lock.json && yarn install --registry https://registry.npm.taobao.org
+        run: rm -rf node_modules/ package-lock.json && yarn cache clean && yarn install --registry https://registry.npm.taobao.org
 
       - name: 代码构建
         run: yarn run build
