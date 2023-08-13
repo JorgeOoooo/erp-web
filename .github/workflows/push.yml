@@ -36,7 +36,7 @@ jobs:
         run: npm install --registry https://registry.npm.taobao.org
 
       - name: 代码构建
-        run: yarn run build
+        run: npm run build
 
       - name: 镜像构建
         run: docker build . --file Dockerfile erp-web:v1.0.0
