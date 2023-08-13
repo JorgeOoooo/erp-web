@@ -42,7 +42,7 @@ jobs:
         run: docker build -t erp-web:v1.0.0 .
 
       - name: 镜像打包
-        run: docker save -o erp-web:v1.0.0 erp-web.tar
+        run: docker save -o erp-web.tar erp-web:v1.0.0
 
       - name: 上传镜像包到服务器中
         run: sshpass -p ${{secrets.REMOTE_PWD}} scp -r -o StrictHostKeyChecking=no ./erp-web.tar root@${{secrets.REMOTE_IP}}:/www/wwwroot/web-image
