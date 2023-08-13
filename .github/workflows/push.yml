@@ -36,7 +36,7 @@ jobs:
         run: rm -rf node_modules/ package-lock.json && npm install --registry https://registry.npm.taobao.org
 
       - name: 代码构建
-        run: npm run build
+        run: yarn run build
 
       - name: 镜像构建
         run: docker build . --file Dockerfile erp-web:v1.0.0
