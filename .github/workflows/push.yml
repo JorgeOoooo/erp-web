@@ -39,13 +39,19 @@ jobs:
         run: yarn run build
 
       - name: 镜像构建
-        run: docker build -t erp-web:v1.0.0 .
+        run: docker build -t erp-web:1.0.0 .
 
       - name: 镜像打包
-        run: docker save -o erp-web.tar erp-web:v1.0.0
+        run: docker save -o erp-web.tar erp-web:1.0.0
 
-      - name: 上传镜像包到服务器中
+      - name: 上传镜像包到服务器
         run: sshpass -p ${{secrets.REMOTE_PWD}} scp -r -o StrictHostKeyChecking=no ./erp-web.tar root@${{secrets.REMOTE_IP}}:/www/wwwroot/web-image
 
-      - name:
-        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker import -i erp-web.tar erp-web:v1.0.0 && sudo docker stop erp-web:v1.0.0 && sudo docker kill erp-web:v1.0.0 && sudo docker run erp-web:v1.0.0"
+      - name: 导入镜像
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker load -i erp-web.tar"
+
+      - name: 关闭容器
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker stop erp-web:1.0.0 && sudo docker kill erp-web:1.0.0"
+
+      - name: 启动容器
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker run erp-web:1.0.0"
