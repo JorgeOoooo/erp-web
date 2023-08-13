@@ -33,7 +33,7 @@ jobs:
           node-version: 14
 
       - name: 拉取依赖
-        run: npm install
+        run: npm install --registry https://registry.npm.taobao.org
 
       - name: 代码构建
         run: npm run build
@@ -48,4 +48,4 @@ jobs:
         run: sshpass -p ${{secrets.REMOTE_PWD}} scp -r -o StrictHostKeyChecking=no ./erp-web.tar root@${{secrets.REMOTE_IP}}:/www/wwwroot/web-image
 
       - name:
-        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker import -i erp-web.tar erp-web:v1.0.0 && sudo docker stop erp-web:v1.0.0 && sudo docker kill erp-web:v1.0.0 && docker run erp-web:v1.0.0"
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker import -i erp-web.tar erp-web:v1.0.0 && sudo docker stop erp-web:v1.0.0 && sudo docker kill erp-web:v1.0.0 && sudo docker run erp-web:v1.0.0"
