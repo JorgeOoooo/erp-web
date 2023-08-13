@@ -1,5 +1,5 @@
-import api from './index'
-import { axios } from '@/utils/request'
+import api from "./index";
+import { axios } from "@/utils/request";
 
 /**
  * login func
@@ -14,15 +14,15 @@ import { axios } from '@/utils/request'
  */
 export function login(parameter) {
   return axios({
-    url: '/user/login',
-    method: 'post',
-    data: parameter
-  })
+    url: "/user/login",
+    method: "post",
+    data: parameter,
+  });
 }
 
 export function logout() {
   return axios({
-    url: '/user/logout',
-    method: 'get'
-  })
+    url: "/user/logout",
+    method: "get",
+  });
 }

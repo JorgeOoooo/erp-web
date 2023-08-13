@@ -3,8 +3,7 @@
     <a-col :md="24">
       <a-card :style="cardStyle" :bordered="false">
         <!-- 查询区域 -->
-        <div class="table-page-search-wrapper">
-          <!-- 搜索区域 -->
+        <!-- <div class="table-page-search-wrapper">
           <a-form layout="inline" @keyup.enter.native="searchQuery">
             <a-row :gutter="24">
               <a-col :md="6" :sm="24">
@@ -32,7 +31,7 @@
               </span>
             </a-row>
           </a-form>
-        </div>
+        </div> -->
         <!-- 操作按钮区域 -->
         <div class="table-operator" style="margin-top: 5px">
           <a-button
@@ -151,7 +150,7 @@ export default {
           align: "center",
           scopedSlots: { customRender: "action" },
         },
-        { title: "计量单位", align: "left", dataIndex: "name", width: 200 },
+        // { title: "计量单位", align: "left", dataIndex: "name", width: 200 },
         { title: "基本单位", align: "left", dataIndex: "basicUnit", width: 80 },
         // { title: '副单位', align:"left", dataIndex: 'otherUnit', width:100,
         //   customRender:function (t,r,index) {
@@ -178,13 +177,13 @@ export default {
         //     }
         //   }
         // },
-        {
-          title: "状态",
-          dataIndex: "enabled",
-          width: 60,
-          align: "center",
-          scopedSlots: { customRender: "customRenderFlag" },
-        },
+        // {
+        //   title: "状态",
+        //   dataIndex: "enabled",
+        //   width: 60,
+        //   align: "center",
+        //   scopedSlots: { customRender: "customRenderFlag" },
+        // },
       ],
       url: {
         list: "/unit/list",

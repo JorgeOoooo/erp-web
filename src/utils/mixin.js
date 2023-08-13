@@ -7,41 +7,41 @@ import { mapState } from "vuex";
 const mixin = {
   computed: {
     ...mapState({
-      layoutMode: state => state.app.layout,
-      navTheme: state => state.app.theme,
-      primaryColor: state => state.app.color,
-      colorWeak: state => state.app.weak,
-      multipage: state => state.app.multipage,//多页签设置
-      fixedHeader: state => state.app.fixedHeader,
-      fixSiderbar: state => state.app.fixSiderbar,
-      contentWidth: state => state.app.contentWidth,
-      autoHideHeader: state => state.app.autoHideHeader,
-      sidebarOpened: state => state.app.sidebar.opened
-    })
-  }
-}
+      layoutMode: (state) => state.app.layout,
+      navTheme: (state) => state.app.theme,
+      primaryColor: (state) => state.app.color,
+      colorWeak: (state) => state.app.weak,
+      multipage: (state) => state.app.multipage, //多页签设置
+      fixedHeader: (state) => state.app.fixedHeader,
+      fixSiderbar: (state) => state.app.fixSiderbar,
+      contentWidth: (state) => state.app.contentWidth,
+      autoHideHeader: (state) => state.app.autoHideHeader,
+      sidebarOpened: (state) => state.app.sidebar.opened,
+    }),
+  },
+};
 
 const mixinDevice = {
   computed: {
     ...mapState({
-      device: state => state.app.device,
-    })
+      device: (state) => state.app.device,
+    }),
   },
   methods: {
-    isMobile () {
-      return this.device === 'mobile'
+    isMobile() {
+      return this.device === "mobile";
     },
-    isDesktop () {
-      return this.device === 'desktop'
+    isDesktop() {
+      return this.device === "desktop";
     },
-    wrapClassNameInfo () {
-      if(this.device === 'desktop') {
-        return 'ant-modal-cust-warp depot-mask'
+    wrapClassNameInfo() {
+      if (this.device === "desktop") {
+        return "ant-modal-cust-warp depot-mask";
       } else {
-        return 'ant-modal-cust-warp'
+        return "ant-modal-cust-warp";
       }
-    }
-  }
-}
+    },
+  },
+};
 
-export { mixin, mixinDevice }
+export { mixin, mixinDevice };

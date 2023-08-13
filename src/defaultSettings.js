@@ -14,10 +14,10 @@
  */
 
 export default {
-  primaryColor: '#1890FF', // primary color of ant design
-  navTheme: 'light', // theme for nav menu
-  layout: 'sidemenu', // nav menu position: sidemenu or topmenu
-  contentWidth: 'Fixed', // layout of content: Fluid or Fixed, only works when layout is topmenu
+  primaryColor: "#1890FF", // primary color of ant design
+  navTheme: "light", // theme for nav menu
+  layout: "sidemenu", // nav menu position: sidemenu or topmenu
+  contentWidth: "Fixed", // layout of content: Fluid or Fixed, only works when layout is topmenu
   fixedHeader: true, // sticky header
   fixSiderbar: true, // sticky siderbar
   autoHideHeader: false, //  auto hide header
@@ -25,8 +25,8 @@ export default {
   multipage: true, //默认多页签模式
   // vue-ls options
   storageOptions: {
-    namespace: 'pro__', // key prefix
-    name: 'ls', // name variable Vue.[ls] or this.[$ls],
-    storage: 'local', // storage name session, local, memory
-  }
-}
+    namespace: "pro__", // key prefix
+    name: "ls", // name variable Vue.[ls] or this.[$ls],
+    storage: "local", // storage name session, local, memory
+  },
+};

@@ -1,26 +1,26 @@
 const FormTypes = {
-  normal: 'normal',
-  input: 'input',
-  inputNumber: 'inputNumber',
-  checkbox: 'checkbox',
-  select: 'select',
-  date: 'date',
-  datetime: 'datetime',
-  upload: 'upload',
-  file: 'file',
-  image: 'image',
-  popup:'popup',
-  popupJsh:'popupJsh',
-  list_multi:"list_multi",
-  sel_search:"sel_search",
-  radio:'radio',
-  checkbox_meta:"checkbox_meta",
-  input_pop:'input_pop',
-  slot: 'slot',
-  hidden: 'hidden'
-}
-const VALIDATE_NO_PASSED = Symbol()
-export { FormTypes, VALIDATE_NO_PASSED }
+  normal: "normal",
+  input: "input",
+  inputNumber: "inputNumber",
+  checkbox: "checkbox",
+  select: "select",
+  date: "date",
+  datetime: "datetime",
+  upload: "upload",
+  file: "file",
+  image: "image",
+  popup: "popup",
+  popupJsh: "popupJsh",
+  list_multi: "list_multi",
+  sel_search: "sel_search",
+  radio: "radio",
+  checkbox_meta: "checkbox_meta",
+  input_pop: "input_pop",
+  slot: "slot",
+  hidden: "hidden",
+};
+const VALIDATE_NO_PASSED = Symbol();
+export { FormTypes, VALIDATE_NO_PASSED };
 
 /**
  * 获取指定的 $refs 对象
@@ -31,16 +31,16 @@ export { FormTypes, VALIDATE_NO_PASSED }
 export function getRefPromise(vm, name) {
   return new Promise((resolve) => {
     (function next() {
-      let ref = vm.$refs[name]
+      let ref = vm.$refs[name];
       if (ref) {
-        resolve(ref)
+        resolve(ref);
       } else {
         setTimeout(() => {
-          next()
-        }, 10)
+          next();
+        }, 10);
       }
-    })()
-  })
+    })();
+  });
 }
 
 /**
@@ -51,28 +51,29 @@ export function getRefPromise(vm, name) {
  * @author sunjianlei
  */
 export function validateFormAndTables(form, cases) {
-
-  if (!(form && typeof form.validateFields === 'function')) {
-    throw `form 参数需要的是一个form对象，而传入的却是${typeof form}`
+  if (!(form && typeof form.validateFields === "function")) {
+    throw `form 参数需要的是一个form对象，而传入的却是${typeof form}`;
   }
 
-  let options = {}
+  let options = {};
   return new Promise((resolve, reject) => {
     // 验证主表表单
     form.validateFields((err, values) => {
-      err ? reject({ error: VALIDATE_NO_PASSED }) : resolve(values)
-    })
-  }).then(values => {
-    Object.assign(options, { formValue: values })
-    // 验证所有子表的表单
-    return validateTables(cases)
-  }).then(all => {
-    Object.assign(options, { tablesValue: all })
-    return Promise.resolve(options)
-  }).catch(error => {
-    return Promise.reject(error)
+      err ? reject({ error: VALIDATE_NO_PASSED }) : resolve(values);
+    });
   })
-
+    .then((values) => {
+      Object.assign(options, { formValue: values });
+      // 验证所有子表的表单
+      return validateTables(cases);
+    })
+    .then((all) => {
+      Object.assign(options, { tablesValue: all });
+      return Promise.resolve(options);
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
 }
 
 /**
@@ -83,33 +84,34 @@ export function validateFormAndTables(form, cases) {
  */
 export function validateTables(cases, deleteTempId) {
   if (!(cases instanceof Array)) {
-    throw `'validateTables'函数的'cases'参数需要的是一个数组，而传入的却是${typeof cases}`
+    throw `'validateTables'函数的'cases'参数需要的是一个数组，而传入的却是${typeof cases}`;
   }
   return new Promise((resolve, reject) => {
-    let tables = []
+    let tables = [];
     let index = 0;
-    if(!cases || cases.length==0){
-      resolve()
+    if (!cases || cases.length == 0) {
+      resolve();
     }
     (function next() {
-      let vm = cases[index]
-      vm.getAll(true, deleteTempId).then(all => {
-        tables[index] = all
-        // 判断校验是否全部完成，完成返回成功，否则继续进行下一步校验
-        if (++index === cases.length) {
-          resolve(tables)
-        } else (
-          next()
-        )
-      }, error => {
-        // 出现未验证通过的表单，不再进行下一步校验，直接返回失败并跳转到该表格
-        if (error === VALIDATE_NO_PASSED) {
-          reject({ error: VALIDATE_NO_PASSED, index })
+      let vm = cases[index];
+      vm.getAll(true, deleteTempId).then(
+        (all) => {
+          tables[index] = all;
+          // 判断校验是否全部完成，完成返回成功，否则继续进行下一步校验
+          if (++index === cases.length) {
+            resolve(tables);
+          } else next();
+        },
+        (error) => {
+          // 出现未验证通过的表单，不再进行下一步校验，直接返回失败并跳转到该表格
+          if (error === VALIDATE_NO_PASSED) {
+            reject({ error: VALIDATE_NO_PASSED, index });
+          }
+          reject(error);
         }
-        reject(error)
-      })
-    })()
-  })
+      );
+    })();
+  });
 }
 
 /**
@@ -120,22 +122,25 @@ export function validateTables(cases, deleteTempId) {
  * @author sunjianlei
  */
 export function getListData(form, cases) {
-  let options = {}
+  let options = {};
   return new Promise((resolve, reject) => {
     // 验证主表表单
-    form.validateFields(['number'],(err, values) => {
-      err ? reject({ error: VALIDATE_NO_PASSED }) : resolve(values)
-    })
-  }).then(values => {
-    Object.assign(options, { formValue: values })
-    // 验证所有子表的表单
-    return getListTables(cases)
-  }).then(all => {
-    Object.assign(options, { tablesValue: all })
-    return Promise.resolve(options)
-  }).catch(error => {
-    return Promise.reject(error)
+    form.validateFields(["number"], (err, values) => {
+      err ? reject({ error: VALIDATE_NO_PASSED }) : resolve(values);
+    });
   })
+    .then((values) => {
+      Object.assign(options, { formValue: values });
+      // 验证所有子表的表单
+      return getListTables(cases);
+    })
+    .then((all) => {
+      Object.assign(options, { tablesValue: all });
+      return Promise.resolve(options);
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
 }
 
 /**
@@ -146,31 +151,32 @@ export function getListData(form, cases) {
  */
 export function getListTables(cases, deleteTempId) {
   if (!(cases instanceof Array)) {
-    throw `'validateTables'函数的'cases'参数需要的是一个数组，而传入的却是${typeof cases}`
+    throw `'validateTables'函数的'cases'参数需要的是一个数组，而传入的却是${typeof cases}`;
   }
   return new Promise((resolve, reject) => {
-    let tables = []
+    let tables = [];
     let index = 0;
-    if(!cases || cases.length==0){
-      resolve()
+    if (!cases || cases.length == 0) {
+      resolve();
     }
     (function next() {
-      let vm = cases[index]
-      vm.getAll(false, deleteTempId).then(all => {
-        tables[index] = all
-        // 判断校验是否全部完成，完成返回成功，否则继续进行下一步校验
-        if (++index === cases.length) {
-          resolve(tables)
-        } else (
-          next()
-        )
-      }, error => {
-        // 出现未验证通过的表单，不再进行下一步校验，直接返回失败并跳转到该表格
-        if (error === VALIDATE_NO_PASSED) {
-          reject({ error: VALIDATE_NO_PASSED, index })
+      let vm = cases[index];
+      vm.getAll(false, deleteTempId).then(
+        (all) => {
+          tables[index] = all;
+          // 判断校验是否全部完成，完成返回成功，否则继续进行下一步校验
+          if (++index === cases.length) {
+            resolve(tables);
+          } else next();
+        },
+        (error) => {
+          // 出现未验证通过的表单，不再进行下一步校验，直接返回失败并跳转到该表格
+          if (error === VALIDATE_NO_PASSED) {
+            reject({ error: VALIDATE_NO_PASSED, index });
+          }
+          reject(error);
         }
-        reject(error)
-      })
-    })()
-  })
+      );
+    })();
+  });
 }

@@ -11,38 +11,39 @@
 
 <script>
 export default {
-    data() {
-      return {
-        name: '',
-        breadList: [],
-      }
-    },
-  created () {
-    this.getBreadcrumb()
+  data() {
+    return {
+      name: "",
+      breadList: [],
+    };
+  },
+  created() {
+    this.getBreadcrumb();
   },
   methods: {
     getBreadcrumb() {
+      console.log("this.$route.matched", this.$route.matched);
 
-      console.log('this.$route.matched', this.$route.matched)
+      this.breadList = [];
+      this.breadList.push({
+        name: "首页",
+        path: "/dashboard/analysis",
+        meta: { title: "首页" },
+      });
 
-      this.breadList = []
-      this.breadList.push({ name: '首页', path: '/dashboard/analysis', meta: { title: '首页' } })
-
-      this.name = this.$route.name
+      this.name = this.$route.name;
       this.$route.matched.forEach((item) => {
         // item.meta.name === 'dashboard' ? item.path = '/dashboard' : this.$route.path === item.path
-          this.breadList.push(item)
-      })
-    }
+        this.breadList.push(item);
+      });
+    },
   },
   watch: {
     $route() {
-      this.getBreadcrumb()
-    }
-  }
-}
+      this.getBreadcrumb();
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

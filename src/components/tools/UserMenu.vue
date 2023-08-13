@@ -1,8 +1,17 @@
 <template>
   <div class="user-wrapper" :class="theme">
     <span class="action" v-if="showAd">
-      <a v-if="theme === 'light'" class="ad_title" target="_blank" :href="payFeeUrl">
-        <a-icon type="cloud" theme="filled" style="color: yellow; font-size: 16px; line-height: 16px" />
+      <a
+        v-if="theme === 'light'"
+        class="ad_title"
+        target="_blank"
+        :href="payFeeUrl"
+      >
+        <a-icon
+          type="cloud"
+          theme="filled"
+          style="color: yellow; font-size: 16px; line-height: 16px"
+        />
         <span> 华夏ERP网络版100元1年</span>
       </a>
     </span>
@@ -34,9 +43,12 @@
         @change="searchMethods"
         @blur="hiddenClick"
       >
-        <a-select-option v-for="(site, index) in searchMenuOptions" :key="index" :value="site.id">{{
-          site.text
-        }}</a-select-option>
+        <a-select-option
+          v-for="(site, index) in searchMenuOptions"
+          :key="index"
+          :value="site.id"
+          >{{ site.text }}</a-select-option
+        >
       </a-select>
     </component>
     <!-- update-end author:sunjianlei date:20200219 for: 菜单搜索改为动态组件，在手机端呈现出弹出框 -->
@@ -52,7 +64,10 @@
     </span> -->
     <header-notice class="action" />
     <a-dropdown>
-      <span v-if="isDesktop()" class="action ant-dropdown-link user-dropdown-menu">
+      <span
+        v-if="isDesktop()"
+        class="action ant-dropdown-link user-dropdown-menu"
+      >
         <span>欢迎您，{{ nickname() }}</span>
       </span>
       <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
@@ -73,35 +88,43 @@
       </a>
     </span>
     <user-password ref="userPassword"></user-password>
-    <depart-select ref="departSelect" :closable="true" title="部门切换"></depart-select>
-    <setting-drawer ref="settingDrawer" :closable="true" title="系统设置"></setting-drawer>
+    <depart-select
+      ref="departSelect"
+      :closable="true"
+      title="部门切换"
+    ></depart-select>
+    <setting-drawer
+      ref="settingDrawer"
+      :closable="true"
+      title="系统设置"
+    ></setting-drawer>
   </div>
 </template>
 
 <script>
-import HeaderNotice from './HeaderNotice'
-import UserPassword from './UserPassword'
-import SettingDrawer from '@/components/setting/SettingDrawer'
-import DepartSelect from './DepartSelect'
-import { mapActions, mapGetters, mapState } from 'vuex'
-import { mixinDevice } from '@/utils/mixin.js'
-import { getFileAccessHttpUrl, getAction } from '@/api/manage'
-import { getPlatformConfigByKey } from '@/api/api'
+import HeaderNotice from "./HeaderNotice";
+import UserPassword from "./UserPassword";
+import SettingDrawer from "@/components/setting/SettingDrawer";
+import DepartSelect from "./DepartSelect";
+import { mapActions, mapGetters, mapState } from "vuex";
+import { mixinDevice } from "@/utils/mixin.js";
+import { getFileAccessHttpUrl, getAction } from "@/api/manage";
+import { getPlatformConfigByKey } from "@/api/api";
 
 export default {
-  name: 'UserMenu',
+  name: "UserMenu",
   mixins: [mixinDevice],
   data() {
     return {
       // update-begin author:sunjianlei date:20200219 for: 头部菜单搜索规范命名 --------------
       searchMenuOptions: [],
-      searchMenuComp: 'span',
+      searchMenuComp: "span",
       searchMenuVisible: false,
       systemUrl: window.SYS_URL,
       showAd: false,
-      payFeeUrl: '',
+      payFeeUrl: "",
       // update-begin author:sunjianlei date:20200219 for: 头部菜单搜索规范命名 --------------
-    }
+    };
   },
   components: {
     HeaderNotice,
@@ -113,15 +136,15 @@ export default {
     theme: {
       type: String,
       required: false,
-      default: 'dark',
+      default: "dark",
     },
   },
   /* update_begin author:zhaoxin date:20191129 for: 做头部菜单栏导航*/
   created() {
-    let lists = []
-    this.searchMenus(lists, this.permissionMenuList)
-    this.searchMenuOptions = [...lists]
-    this.isShowAd()
+    let lists = [];
+    this.searchMenus(lists, this.permissionMenuList);
+    this.searchMenuOptions = [...lists];
+    this.isShowAd();
   },
   computed: {
     ...mapState({
@@ -135,8 +158,8 @@ export default {
     device: {
       immediate: true,
       handler() {
-        this.searchMenuVisible = false
-        this.searchMenuComp = this.isMobile() ? 'a-modal' : 'span'
+        this.searchMenuVisible = false;
+        this.searchMenuComp = this.isMobile() ? "a-modal" : "span";
       },
     },
     // update-end author:sunjianlei date:20200219 for: 菜单搜索改为动态组件，在手机端呈现出弹出框
@@ -144,55 +167,58 @@ export default {
   methods: {
     /* update_begin author:zhaoxin date:20191129 for: 做头部菜单栏导航*/
     showClick() {
-      this.searchMenuVisible = true
+      this.searchMenuVisible = true;
     },
     hiddenClick() {
-      this.shows = false
+      this.shows = false;
     },
     /* update_end author:zhaoxin date:20191129 for: 做头部菜单栏导航*/
-    ...mapActions(['Logout']),
-    ...mapGetters(['nickname', 'loginName', 'userInfo']),
+    ...mapActions(["Logout"]),
+    ...mapGetters(["nickname", "loginName", "userInfo"]),
     // getAvatar(){
     //   return getFileAccessHttpUrl(this.avatar())
     // },
     handleLogout() {
-      const that = this
+      const that = this;
 
       this.$confirm({
-        title: '提示',
-        content: '真的要注销登录吗 ?',
+        title: "提示",
+        content: "真的要注销登录吗 ?",
         onOk() {
           return that
             .Logout({})
             .then(() => {
-              window.location.href = '/'
+              window.location.href = "/";
               //window.location.reload()
             })
             .catch((err) => {
               that.$message.error({
-                title: '错误',
+                title: "错误",
                 description: err.message,
-              })
-            })
+              });
+            });
         },
         onCancel() {},
-      })
+      });
     },
     updatePassword() {
-      let userId = this.userInfo().id
-      this.$refs.userPassword.show(userId)
+      let userId = this.userInfo().id;
+      this.$refs.userPassword.show(userId);
     },
     systemSetting() {
-      this.$refs.settingDrawer.showDrawer()
+      this.$refs.settingDrawer.showDrawer();
     },
     /* update_begin author:zhaoxin date:20191129 for: 做头部菜单栏导航*/
     searchMenus(arr, menus) {
       for (let i of menus) {
-        if ('/layouts/RouteView' !== i.component && '/layouts/TabLayout' !== i.component) {
-          arr.push(i)
+        if (
+          "/layouts/RouteView" !== i.component &&
+          "/layouts/TabLayout" !== i.component
+        ) {
+          arr.push(i);
         }
         if (i.children && i.children.length > 0) {
-          this.searchMenus(arr, i.children)
+          this.searchMenus(arr, i.children);
         }
       }
     },
@@ -203,41 +229,51 @@ export default {
         option.componentOptions.children &&
         option.componentOptions.children[0]
       ) {
-        return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        return (
+          option.componentOptions.children[0].text
+            .toLowerCase()
+            .indexOf(input.toLowerCase()) >= 0
+        );
       }
     },
     // update_begin author:sunjianlei date:20191230 for: 解决外部链接打开失败的问题
     searchMethods(value) {
-      let route = this.searchMenuOptions.filter((item) => item.id === value)[0]
-      this.$emit('searchGlobalHeader', route.url, route.id, route.text, route.component)
-      this.searchMenuVisible = false
+      let route = this.searchMenuOptions.filter((item) => item.id === value)[0];
+      this.$emit(
+        "searchGlobalHeader",
+        route.url,
+        route.id,
+        route.text,
+        route.component
+      );
+      this.searchMenuVisible = false;
     },
     // update_end author:sunjianlei date:20191230 for: 解决外部链接打开失败的问题
     /*update_end author:zhaoxin date:20191129 for: 做头部菜单栏导航*/
     isShowAd() {
       //只有配置了租户续费地址和试用租户才显示广告
-      getPlatformConfigByKey({ platformKey: 'pay_fee_url' }).then((res) => {
+      getPlatformConfigByKey({ platformKey: "pay_fee_url" }).then((res) => {
         if (res && res.code === 200) {
-          let payFeeUrl = res.data.platformValue
+          let payFeeUrl = res.data.platformValue;
           if (payFeeUrl) {
-            getAction('/user/infoWithTenant', {}).then((res) => {
+            getAction("/user/infoWithTenant", {}).then((res) => {
               if (res && res.code === 200) {
-                let tenant = res.data
-                if (tenant && tenant.type === '0') {
+                let tenant = res.data;
+                if (tenant && tenant.type === "0") {
                   if (!this.isMobile()) {
                     //pc端才显示
-                    this.showAd = true
-                    this.payFeeUrl = payFeeUrl
+                    this.showAd = true;
+                    this.payFeeUrl = payFeeUrl;
                   }
                 }
               }
-            })
+            });
           }
         }
-      })
+      });
     },
   },
-}
+};
 </script>
 
 <style lang="less" scoped>

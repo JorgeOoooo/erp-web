@@ -1,37 +1,33 @@
 <template>
-  <component
-    :is="comp"
-    :formData="formData"
-    ref="compModel"
-    v-if="comp">
+  <component :is="comp" :formData="formData" ref="compModel" v-if="comp">
   </component>
 </template>
 <script>
-  export default {
-    name: 'DynamicNotice',
-    data () {
-      return {
-        compName: this.path
+export default {
+  name: "DynamicNotice",
+  data() {
+    return {
+      compName: this.path,
+    };
+  },
+  computed: {
+    comp: function () {
+      if (!this.path) {
+        return null;
       }
+      return null;
+      // return () => import(`@/views/${this.path}.vue`)
     },
-    computed: {
-      comp: function () {
-        if(!this.path){
-          return null
+  },
+  props: ["path", "formData"],
+  methods: {
+    detail() {
+      setTimeout(() => {
+        if (this.path) {
+          this.$refs.compModel.view(this.formData);
         }
-        return null
-        // return () => import(`@/views/${this.path}.vue`)
-      }
+      }, 200);
     },
-    props: ['path','formData'],
-    methods: {
-      detail () {
-        setTimeout(() => {
-          if(this.path){
-            this.$refs.compModel.view(this.formData);
-          }
-        }, 200)
-      },
-    }
-  }
+  },
+};
 </script>

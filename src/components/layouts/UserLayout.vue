@@ -46,27 +46,41 @@
         <span v-if="this.isShowRight"><a href="http://beian.miit.gov.cn/" target="_blank">苏ICP备2021042833号</a></span>
       </p>
     </div> -->
-    <a-modal v-model="isAndroidShow" title="微信扫一扫下载安卓手机版" width="200" centered>
+    <a-modal
+      v-model="isAndroidShow"
+      title="微信扫一扫下载安卓手机版"
+      width="200"
+      centered
+    >
       <template slot="footer">
         <a-button key="back" @click="handleAndroidCancel">取消</a-button>
       </template>
-      <div class="platform-modal"><img src="/static/android-code.png" style="width: 200px" /></div>
+      <div class="platform-modal">
+        <img src="/static/android-code.png" style="width: 200px" />
+      </div>
     </a-modal>
-    <a-modal v-model="isMiniProgramShow" title="微信扫一扫使用小程序版" width="200" centered>
+    <a-modal
+      v-model="isMiniProgramShow"
+      title="微信扫一扫使用小程序版"
+      width="200"
+      centered
+    >
       <template slot="footer">
         <a-button key="back" @click="handleMiniProgramCancel">取消</a-button>
       </template>
-      <div class="platform-modal"><img src="/static/weixin.jpg" style="width: 200px" /></div>
+      <div class="platform-modal">
+        <img src="/static/weixin.jpg" style="width: 200px" />
+      </div>
     </a-modal>
   </div>
 </template>
 
 <script>
-import RouteView from '@/components/layouts/RouteView'
-import { mixinDevice } from '@/utils/mixin.js'
+import RouteView from "@/components/layouts/RouteView";
+import { mixinDevice } from "@/utils/mixin.js";
 
 export default {
-  name: 'UserLayout',
+  name: "UserLayout",
   components: { RouteView },
   mixins: [mixinDevice],
   data() {
@@ -76,40 +90,40 @@ export default {
       isShowRight: false,
       isAndroidShow: false,
       isMiniProgramShow: false,
-    }
+    };
   },
   mounted() {
-    document.body.classList.add('userLayout')
+    document.body.classList.add("userLayout");
   },
   beforeDestroy() {
-    document.body.classList.remove('userLayout')
+    document.body.classList.remove("userLayout");
   },
   created() {
-    let host = window.location.host
-    if (host === 'cloud.huaxiaerp.vip' || host === 'cloud.huaxiaerp.com') {
-      this.isShowRight = true
+    let host = window.location.host;
+    if (host === "cloud.huaxiaerp.vip" || host === "cloud.huaxiaerp.com") {
+      this.isShowRight = true;
     } else {
-      this.isShowRight = false
+      this.isShowRight = false;
     }
   },
   methods: {
     handleAndroidCancel() {
-      this.isAndroidShow = false
+      this.isAndroidShow = false;
     },
     handleMiniProgramCancel() {
-      this.isMiniProgramShow = false
+      this.isMiniProgramShow = false;
     },
     openAndroid() {
-      this.isAndroidShow = true
+      this.isAndroidShow = true;
     },
     openIPhone() {
-      this.$message.warning('敬请期待！')
+      this.$message.warning("敬请期待！");
     },
     openMiniProgram() {
-      this.isMiniProgramShow = true
+      this.isMiniProgramShow = true;
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -209,9 +223,10 @@ export default {
           .title {
             font-size: 35px;
             color: #666;
-            font-family: 'Chinese Quote', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-              'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
-              'Segoe UI Emoji', 'Segoe UI Symbol';
+            font-family: "Chinese Quote", -apple-system, BlinkMacSystemFont,
+              "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+              "Helvetica Neue", Helvetica, Arial, sans-serif,
+              "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             font-weight: 700;
             position: relative;
             top: 2px;
