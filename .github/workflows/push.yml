@@ -51,7 +51,7 @@ jobs:
         run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "cd /www/wwwroot/web-image && sudo docker load -i erp-web.tar"
 
       - name: 关闭容器
-        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker kill erp-web"
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker stop erp-web && sudo docker rm erp-web"
 
       - name: 启动容器
         run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker run --name=erp-web erp-web:1.0.0"
