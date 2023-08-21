@@ -61,9 +61,9 @@
                 key="1"
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="batchDel"
-                ><a-icon type="delete" />删除</a-menu-item
+                ><a-icon type="delete" />批量删除</a-menu-item
               >
-              <a-menu-item
+              <!-- <a-menu-item
                 key="2"
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="batchSetStatus(true)"
@@ -74,7 +74,7 @@
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="batchSetStatus(false)"
                 ><a-icon type="close-square" />禁用</a-menu-item
-              >
+              > -->
             </a-menu>
             <a-button> 批量操作 <a-icon type="down" /> </a-button>
           </a-dropdown>
