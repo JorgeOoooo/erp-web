@@ -2379,7 +2379,7 @@ export default {
                 that.loading = false;
                 that.close();
               } else {
-                that.$message.warning(res.data.message);
+                that.$message.warning(res.msg);
                 that.loading = false;
               }
             })

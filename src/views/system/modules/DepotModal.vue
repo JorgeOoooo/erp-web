@@ -53,7 +53,7 @@
               suffix="元/天/KG"
             />
           </a-form-item>
-          <a-form-item
+          <!-- <a-form-item
             :labelCol="labelCol"
             :wrapperCol="wrapperCol"
             label="搬运费"
@@ -63,7 +63,7 @@
               v-decorator.trim="['truckage']"
               suffix="元"
             />
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item
             :labelCol="labelCol"
             :wrapperCol="wrapperCol"
