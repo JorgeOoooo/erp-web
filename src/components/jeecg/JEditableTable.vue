@@ -2652,7 +2652,7 @@ export default {
     handleSelectFilterOption(input, option, column) {
       if (column.allowSearch === true || column.allowInput === true) {
         return (
-          option.componentOptions.children[0].text
+          option?.componentOptions?.children[0].text
             .toLowerCase()
             .indexOf(input.toLowerCase()) >= 0
         );
@@ -3433,7 +3433,7 @@ export default {
     },
     filterOption(input, option) {
       return (
-        option.componentOptions.children[0].text
+        option?.componentOptions?.children[0].text
           .toLowerCase()
           .indexOf(input.toLowerCase()) >= 0
       );

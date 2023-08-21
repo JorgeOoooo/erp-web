@@ -223,18 +223,11 @@ export default {
       }
     },
     filterOption(input, option) {
-      if (
-        option &&
-        option.componentOptions &&
-        option.componentOptions.children &&
-        option.componentOptions.children[0]
-      ) {
-        return (
-          option.componentOptions.children[0].text
-            .toLowerCase()
-            .indexOf(input.toLowerCase()) >= 0
-        );
-      }
+      return (
+        option?.componentOptions?.children[0].text
+          .toLowerCase()
+          .indexOf(input.toLowerCase()) >= 0
+      );
     },
     // update_begin author:sunjianlei date:20191230 for: 解决外部链接打开失败的问题
     searchMethods(value) {
@@ -251,7 +244,7 @@ export default {
     // update_end author:sunjianlei date:20191230 for: 解决外部链接打开失败的问题
     /*update_end author:zhaoxin date:20191129 for: 做头部菜单栏导航*/
     isShowAd() {
-      //只有配置了租户续费地址和试用租户才显示广告
+      // 只有配置了租户续费地址和试用租户才显示广告
       getPlatformConfigByKey({ platformKey: "pay_fee_url" }).then((res) => {
         if (res && res.code === 200) {
           let payFeeUrl = res.data.platformValue;
@@ -261,7 +254,7 @@ export default {
                 let tenant = res.data;
                 if (tenant && tenant.type === "0") {
                   if (!this.isMobile()) {
-                    //pc端才显示
+                    // pc端才显示
                     this.showAd = true;
                     this.payFeeUrl = payFeeUrl;
                   }

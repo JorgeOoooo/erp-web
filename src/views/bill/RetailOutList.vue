@@ -100,6 +100,7 @@
                       <a-select-option
                         v-for="(depot, index) in depotList"
                         :value="depot.id"
+                        :key="index"
                       >
                         {{ depot.depotName }}
                       </a-select-option>
