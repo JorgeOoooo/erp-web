@@ -98,13 +98,13 @@
             @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record">
-              <a-popconfirm
+              <!-- <a-popconfirm
                 v-if="btnEnableList.indexOf(1) > -1"
                 title="确定设为默认吗?"
                 @confirm="() => handleSetDefault(record.id)"
               >
                 <a>设为默认</a>
-              </a-popconfirm>
+              </a-popconfirm> -->
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
               <a @click="handleEdit(record)">编辑</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />

@@ -64,7 +64,7 @@ module.exports = {
     },
     proxy: {
       "/jshERP-boot": {
-        target: "http://10.10.200.7:9999",
+        target: "http://101.34.52.227:9999",
         secure: false,
         changeOrigin: true,
       },
