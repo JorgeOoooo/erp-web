@@ -1090,7 +1090,7 @@
     lodash.kebabcase "^4.1.1"
     svg-tags "^1.0.0"
 
-"@vue/babel-preset-app@^3.12.1":
+"@vue/babel-preset-app@^3.3.0":
   version "3.12.1"
   resolved "https://registry.npmmirror.com/@vue/babel-preset-app/-/babel-preset-app-3.12.1.tgz#24c477052f078f30fdb7735103b14dd1fa2cbfe1"
   integrity sha512-Zjy5jQaikV1Pz+ri0YgXFS7q4/5wCxB5tRkDOEIt5+4105u0Feb/pvH20nVL6nx9GyXrECFfcm7Yxr/z++OaPQ==
@@ -1177,16 +1177,14 @@
   resolved "https://registry.npmmirror.com/@vue/cli-overlay/-/cli-overlay-3.12.1.tgz#bdfde8f7123561ab06e4e4c60b854cc5092f5ab1"
   integrity sha512-Bym92EN+lj+cNRN2ozbYyH+V8DMXWGbCDUk+hiJ4EYDBZfBkZKvalk1/mOBFwyxiopnnbOEBAAhL/UuMQ1xARg==
 
-"@vue/cli-plugin-babel@^3.3.0":
-  version "3.12.1"
-  resolved "https://registry.npmmirror.com/@vue/cli-plugin-babel/-/cli-plugin-babel-3.12.1.tgz#9a79159de8cd086b013fa6d78a39830b2e2ec706"
-  integrity sha512-Zetvz8PikLCGomeKOKu8pC9YQ7cfxs7pGpvEOzaxGdhMnebhjAYR6i6dOB57A6N5lhxQksXCtYTv26QgfiIpdg==
+"@vue/cli-plugin-babel@3.3.0":
+  version "3.3.0"
+  resolved "https://registry.npmmirror.com/@vue/cli-plugin-babel/-/cli-plugin-babel-3.3.0.tgz#5dea0b90b1ce0dc0ee48e33b32af6b859bcf8ff3"
+  integrity sha512-HS5DwLe42fmkDgu4+78zMITNK+WiLoHKHBCCOuoEqjmsvvKaH/ByCGJOHYgTTe0aI+AiTAAkR2sZ2YulAjlvlQ==
   dependencies:
     "@babel/core" "^7.0.0"
-    "@vue/babel-preset-app" "^3.12.1"
-    "@vue/cli-shared-utils" "^3.12.1"
-    babel-loader "^8.0.5"
-    webpack "^4.0.0"
+    "@vue/babel-preset-app" "^3.3.0"
+    babel-loader "^8.0.4"
 
 "@vue/cli-plugin-eslint@3.3.0":
   version "3.3.0"
@@ -2244,7 +2242,7 @@ babel-loader@^7.1.2:
     loader-utils "^1.0.2"
     mkdirp "^0.5.1"
 
-babel-loader@^8.0.5:
+babel-loader@^8.0.4:
   version "8.3.0"
   resolved "https://registry.npmmirror.com/babel-loader/-/babel-loader-8.3.0.tgz#124936e841ba4fe8176786d6ff28add1f134d6a8"
   integrity sha512-H8SvsMF+m9t15HNLMipppzkC+Y2Yq+v3SonZyU70RBL/h1gxPkH08Ot8pEE9Z4Kd+czyWJClmFS8qzIP9OZ04Q==
