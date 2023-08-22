@@ -60,7 +60,8 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/strongly-recommended"
+      "plugin:vue/strongly-recommended",
+      "@vue/standard"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
