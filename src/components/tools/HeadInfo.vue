@@ -14,7 +14,7 @@ export default {
       default: "",
     },
     content: {
-      type: Number,
+      type: [Number, String],
       default: "",
     },
     bordered: {
