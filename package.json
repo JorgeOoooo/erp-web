@@ -54,23 +54,7 @@
     "less-loader": "^4.1.0",
     "vue-template-compiler": "^2.6.10"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "eslint:recommended"
-    ],
-    "rules": {
-      "no-console": "off",
-      "no-debugger": "off",
-      "no-control-regex": 0
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
+  "eslintConfig": {},
   "postcss": {
     "plugins": {
       "autoprefixer": {}
