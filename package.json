@@ -55,6 +55,9 @@
       "autoprefixer": {}
     }
   },
+  "eslintConfig": {
+    "parser": "babel-eslint"
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
