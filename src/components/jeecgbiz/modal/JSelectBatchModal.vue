@@ -105,7 +105,7 @@ export default {
         },
         { dataIndex: "barCode", title: "条码", width: 100, ellipsis: true },
         { dataIndex: "name", title: "名称", width: 100, ellipsis: true },
-        { dataIndex: "standard", title: "规格", width: 80, ellipsis: true },
+        { dataIndex: "standard", title: "箱规", width: 80, ellipsis: true },
         { dataIndex: "model", title: "型号", width: 80, ellipsis: true },
         {
           dataIndex: "commodityUnit",

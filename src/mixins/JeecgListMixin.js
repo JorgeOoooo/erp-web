@@ -103,8 +103,8 @@ export const JeecgListMixin = {
       this.loading = true;
       getAction(this.url.list, params).then((res) => {
         if (res.code === 200) {
-          this.dataSource = res.data.rows;
-          this.ipagination.total = res.data.total;
+          this.dataSource = res.data?.rows || res.data?.records || [];
+          this.ipagination.total = res.data?.total || 0;
           this.tableAddTotalRow(this.columns, this.dataSource);
         }
         if (res.code === 510) {

@@ -38,7 +38,7 @@
                 :wrapperCol="{ span: 18, offset: 1 }"
               >
                 <a-input
-                  placeholder="条码|名称|规格|型号"
+                  placeholder="条码|名称|箱规|型号"
                   v-model="queryParam.materialParam"
                 ></a-input>
               </a-form-item>
@@ -266,7 +266,7 @@ export default {
       columnsDetail: [
         { title: "条码", dataIndex: "barCode", width: 120 },
         { title: "名称", dataIndex: "name", width: 100, ellipsis: true },
-        { title: "规格", dataIndex: "standard", width: 100, ellipsis: true },
+        { title: "箱规", dataIndex: "standard", width: 100, ellipsis: true },
         { title: "型号", dataIndex: "model", width: 150, ellipsis: true },
         { title: "单位", dataIndex: "unit", width: 50 },
         { title: "数量", dataIndex: "operNumber", width: 80 },
@@ -280,7 +280,7 @@ export default {
       dataSource: [],
       dataSourceDetail: [],
       url: {
-        list: "/depotHead/list",
+        list: "/documentHead/list",
       },
     };
   },

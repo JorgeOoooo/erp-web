@@ -38,7 +38,7 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
-                    placeholder="条码/名称/规格/型号"
+                    placeholder="条码/名称/箱规/型号"
                     v-model="queryParam.materialParam"
                   ></a-input>
                 </a-form-item>
@@ -158,7 +158,7 @@ export default {
         { title: "仓库", dataIndex: "depotName", width: 100, ellipsis: true },
         { title: "条码", dataIndex: "barCode", width: 100 },
         { title: "名称", dataIndex: "mname", width: 100, ellipsis: true },
-        { title: "规格", dataIndex: "mstandard", width: 80, ellipsis: true },
+        { title: "箱规", dataIndex: "mstandard", width: 80, ellipsis: true },
         { title: "型号", dataIndex: "mmodel", width: 80, ellipsis: true },
         {
           title: "扩展信息",
@@ -229,7 +229,7 @@ export default {
           "仓库",
           "条码",
           "名称",
-          "规格",
+          "箱规",
           "型号",
           "扩展信息",
           "单位",

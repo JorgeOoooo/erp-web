@@ -105,7 +105,7 @@
               >
                 <a>设为默认</a>
               </a-popconfirm> -->
-              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
+              <!-- <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" /> -->
               <a @click="handleEdit(record)">编辑</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
               <a-popconfirm
@@ -174,7 +174,7 @@ export default {
           title: "操作",
           dataIndex: "action",
           align: "center",
-          width: 200,
+          width: 100,
           scopedSlots: { customRender: "action" },
         },
         { title: "仓库名称", dataIndex: "name", width: 200 },

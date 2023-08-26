@@ -45,7 +45,7 @@
           </a-form>
         </div>
         <!-- 操作按钮区域 -->
-        <div class="table-operator" style="border-top: 5px">
+        <div class="table-operator" style="margin-top: 5px">
           <a-button
             v-if="btnEnableList.indexOf(1) > -1"
             @click="handleAdd"

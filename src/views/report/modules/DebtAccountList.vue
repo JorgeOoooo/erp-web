@@ -40,7 +40,7 @@
                 :wrapperCol="{ span: 18, offset: 1 }"
               >
                 <a-input
-                  placeholder="请输入名称、规格、型号"
+                  placeholder="请输入名称、箱规、型号"
                   v-model="queryParam.materialParam"
                 ></a-input>
               </a-form-item>

@@ -16,6 +16,7 @@ import {
   getCheckFlag,
   getMpListShort,
   getNowFormatDateTime,
+  getFormatDate
 } from "@/utils/util";
 import { USER_INFO } from "@/store/mutation-types";
 import Vue from "vue";
@@ -74,9 +75,12 @@ export const BillModalMixin = {
   created() {
     let userInfo = Vue.ls.get(USER_INFO);
     this.isTenant = userInfo.id === userInfo.tenantId ? true : false;
-    let realScreenWidth = window.screen.width;
-    this.width = realScreenWidth < 1500 ? "1200px" : "1550px";
-    this.minWidth = realScreenWidth < 1500 ? 1150 : 1500;
+    // let realScreenWidth = window.screen.width;
+    // this.width = realScreenWidth < 1500 ? "1200px" : "1550px";
+    // this.minWidth = realScreenWidth < 1500 ? 1150 : 1500;
+
+    this.width =  "1200px" 
+    this.minWidth =  1150
   },
   computed: {
     readOnly: function () {
@@ -85,16 +89,16 @@ export const BillModalMixin = {
   },
   methods: {
     addInit(amountNum) {
-      getAction("/sequence/buildNumber").then((res) => {
-        if (res && res.code === 200) {
-          this.form.setFieldsValue({
-            number: amountNum + res.data.defaultNumber,
-          });
-        }
-      });
+      // getAction("/sequence/buildNumber").then((res) => {
+      //   if (res && res.code === 200) {
+      //     this.form.setFieldsValue({
+      //       number: amountNum + res.data.defaultNumber,
+      //     });
+      //   }
+      // });
       this.$nextTick(() => {
         this.form.setFieldsValue({
-          operTime: getNowFormatDateTime(),
+          operTime: getFormatDate(),
           discount: 0,
           discountMoney: 0,
           discountLastMoney: 0,

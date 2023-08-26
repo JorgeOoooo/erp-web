@@ -32,20 +32,8 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
-                    placeholder="请输入条码、名称、规格、型号查询"
+                    placeholder="请输入名称、款号查询"
                     v-model="queryParam.materialParam"
-                  ></a-input>
-                </a-form-item>
-              </a-col>
-              <a-col :md="6" :sm="24">
-                <a-form-item
-                  label="颜色"
-                  :labelCol="labelCol"
-                  :wrapperCol="wrapperCol"
-                >
-                  <a-input
-                    placeholder="请输入颜色查询"
-                    v-model="queryParam.color"
                   ></a-input>
                 </a-form-item>
               </a-col>
@@ -58,123 +46,8 @@
                   <a-button style="margin-left: 8px" @click="searchReset"
                     >重置</a-button
                   >
-                  <a @click="handleToggleSearch" style="margin-left: 8px">
-                    {{ toggleSearchStatus ? "收起" : "展开" }}
-                    <a-icon :type="toggleSearchStatus ? 'up' : 'down'" />
-                  </a>
                 </a-col>
               </span>
-              <template v-if="toggleSearchStatus">
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="状态"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="请选择状态"
-                      v-model="queryParam.enabled"
-                    >
-                      <a-select-option value="1">启用</a-select-option>
-                      <a-select-option value="0">禁用</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="序列号"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="有无序列号"
-                      v-model="queryParam.enableSerialNumber"
-                    >
-                      <a-select-option value="1">有</a-select-option>
-                      <a-select-option value="0">无</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="批号"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="有无批号"
-                      v-model="queryParam.enableBatchNumber"
-                    >
-                      <a-select-option value="1">有</a-select-option>
-                      <a-select-option value="0">无</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="仓位货架"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input
-                      style="width: 100%"
-                      placeholder="请输入仓位货架查询"
-                      v-model="queryParam.position"
-                    ></a-input>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="扩展信息"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input
-                      style="width: 100%"
-                      placeholder="请输入扩展信息查询"
-                      v-model="queryParam.materialOther"
-                    ></a-input>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="基础重量"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input-number
-                      style="width: 100%"
-                      placeholder="请输入基础重量查询"
-                      v-model="queryParam.weight"
-                    ></a-input-number>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="保质期"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input-number
-                      style="width: 100%"
-                      placeholder="请输入保质期查询"
-                      v-model="queryParam.expiryNum"
-                    ></a-input-number>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="备注"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input
-                      placeholder="请输入备注查询"
-                      v-model="queryParam.remark"
-                    ></a-input>
-                  </a-form-item>
-                </a-col>
-              </template>
             </a-row>
           </a-form>
         </div>
@@ -187,7 +60,7 @@
             icon="plus"
             >新增</a-button
           >
-          <a-button
+          <!-- <a-button
             v-if="btnEnableList.indexOf(1) > -1"
             @click="handleImportXls()"
             type="primary"
@@ -199,7 +72,7 @@
             icon="download"
             @click="handleExportXls('商品信息')"
             >导出</a-button
-          >
+          > -->
           <a-dropdown>
             <a-menu slot="overlay">
               <a-menu-item
@@ -208,7 +81,7 @@
                 @click="batchDel"
                 ><a-icon type="delete" />删除</a-menu-item
               >
-              <a-menu-item
+              <!-- <a-menu-item
                 key="2"
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="batchSetStatus(true)"
@@ -231,7 +104,7 @@
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="batchSetMaterialCurrentStock()"
                 ><a-icon type="stock" />修正库存</a-menu-item
-              >
+              > -->
             </a-menu>
             <a-button> 批量操作 <a-icon type="down" /> </a-button>
           </a-dropdown>
@@ -245,7 +118,7 @@
                 <a-row style="width: 500px">
                   <template v-for="(item, index) in defColumns">
                     <template>
-                      <a-col :span="8">
+                      <a-col :span="8" :key="index">
                         <a-checkbox :value="item.dataIndex">
                           <j-ellipsis
                             :value="item.title"
@@ -429,30 +302,16 @@ export default {
           scopedSlots: { customRender: "action" },
         },
         {
-          title: "图片",
-          dataIndex: "pic",
-          width: 65,
-          scopedSlots: { customRender: "customPic" },
-        },
-        { title: "条码", dataIndex: "mBarCode", width: 120 },
-        {
           title: "名称",
           dataIndex: "name",
           width: 160,
           scopedSlots: { customRender: "customName" },
         },
-        { title: "规格", dataIndex: "standard", width: 120 },
-        { title: "型号", dataIndex: "model", width: 120 },
-        { title: "颜色", dataIndex: "color", width: 70, ellipsis: true },
+        { title: "箱规", dataIndex: "standard", width: 120 },
+        { title: "款号", dataIndex: "model", width: 120 },
         {
           title: "类别",
           dataIndex: "categoryName",
-          width: 100,
-          ellipsis: true,
-        },
-        {
-          title: "扩展信息",
-          dataIndex: "materialOther",
           width: 100,
           ellipsis: true,
         },
@@ -471,27 +330,6 @@ export default {
               }
             }
           },
-        },
-        { title: "基础重量", dataIndex: "weight", width: 80 },
-        { title: "保质期", dataIndex: "expiryNum", width: 60 },
-        {
-          title: "库存",
-          dataIndex: "stock",
-          width: 80,
-          scopedSlots: { customRender: "customRenderStock" },
-        },
-        { title: "采购价", dataIndex: "purchaseDecimal", width: 80 },
-        { title: "零售价", dataIndex: "commodityDecimal", width: 80 },
-        { title: "销售价", dataIndex: "wholesaleDecimal", width: 80 },
-        { title: "最低售价", dataIndex: "lowDecimal", width: 80 },
-        { title: "仓位货架", dataIndex: "position", width: 80 },
-        { title: "备注", dataIndex: "remark", width: 80 },
-        {
-          title: "状态",
-          dataIndex: "enabled",
-          align: "center",
-          width: 60,
-          scopedSlots: { customRender: "customRenderEnabled" },
         },
       ],
       url: {

@@ -23,6 +23,7 @@ export const BillListMixin = {
       retailList: [],
       userList: [],
       accountList: [],
+      depotList: []
     };
   },
   computed: {
@@ -82,11 +83,11 @@ export const BillListMixin = {
       }
     },
     myHandleDelete(record) {
-      if (record.status === "0") {
+      // if (record.status === "0") {
         this.handleDelete(record.id);
-      } else {
-        this.$message.warning("抱歉，只有未审核的单据才能删除！");
-      }
+      // } else {
+      //   this.$message.warning("抱歉，只有未审核的单据才能删除！");
+      // }
     },
     myHandleDetail(record, type, prefixNo) {
       if (this.btnEnableList.indexOf(7) === -1) {

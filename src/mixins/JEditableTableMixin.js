@@ -33,6 +33,9 @@ export const JEditableTableMixin = {
       if (!(this.refKeys instanceof Array)) {
         throw this.throwNotArray("refKeys");
       }
+      if(this.refKeys?.length == 0){
+        return Promise.resolve([])
+      }
       let values = this.refKeys.map((key) => getRefPromise(this, key));
       return Promise.all(values);
     },

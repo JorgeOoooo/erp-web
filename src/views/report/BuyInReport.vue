@@ -14,7 +14,7 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
-                    placeholder="条码/名称/规格/型号"
+                    placeholder="条码/名称/箱规/型号"
                     v-model="queryParam.materialParam"
                   ></a-input>
                 </a-form-item>
@@ -230,7 +230,7 @@ export default {
           ellipsis: true,
         },
         {
-          title: "规格",
+          title: "箱规",
           dataIndex: "materialStandard",
           width: 80,
           ellipsis: true,
@@ -359,7 +359,7 @@ export default {
         [
           "条码",
           "名称",
-          "规格",
+          "箱规",
           "型号",
           "扩展信息",
           "单位",

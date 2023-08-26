@@ -32,7 +32,7 @@
                   ></a-input>
                 </a-form-item>
               </a-col>
-              <a-col :md="6" :sm="24">
+              <!-- <a-col :md="6" :sm="24">
                 <a-form-item
                   label="联系电话"
                   :labelCol="labelCol"
@@ -43,7 +43,7 @@
                     v-model="queryParam.phonenum"
                   ></a-input>
                 </a-form-item>
-              </a-col>
+              </a-col> -->
               <span
                 style="float: left; overflow: hidden"
                 class="table-page-search-submitButtons"
@@ -67,7 +67,7 @@
             icon="plus"
             >新增</a-button
           >
-          <a-button
+          <!-- <a-button
             v-if="btnEnableList.indexOf(1) > -1"
             @click="handleImportXls()"
             type="primary"
@@ -79,7 +79,7 @@
             icon="download"
             @click="handleExportXls('客户信息')"
             >导出</a-button
-          >
+          > -->
           <a-dropdown>
             <a-menu slot="overlay">
               <a-menu-item
@@ -190,13 +190,10 @@ export default {
       columns: [
         {
           title: "#",
-          dataIndex: "",
-          key: "rowIndex",
+          dataIndex: "id",
+          key: "id",
           width: 60,
           align: "center",
-          customRender: function (t, r, index) {
-            return parseInt(index) + 1;
-          },
         },
         {
           title: "操作",
@@ -213,21 +210,21 @@ export default {
           width: 100,
           align: "left",
         },
-        { title: "联系电话", dataIndex: "phoneNum", width: 100, align: "left" },
-        { title: "电子邮箱", dataIndex: "email", width: 150, align: "left" },
-        {
-          title: "期初应收",
-          dataIndex: "beginNeedGet",
-          width: 80,
-          align: "left",
-        },
-        {
-          title: "期末应收",
-          dataIndex: "allNeedGet",
-          width: 80,
-          align: "left",
-        },
-        { title: "税率(%)", dataIndex: "taxRate", width: 80, align: "left" },
+        // { title: "联系电话", dataIndex: "phoneNum", width: 100, align: "left" },
+        // { title: "电子邮箱", dataIndex: "email", width: 150, align: "left" },
+        // {
+        //   title: "期初应收",
+        //   dataIndex: "beginNeedGet",
+        //   width: 80,
+        //   align: "left",
+        // },
+        // {
+        //   title: "期末应收",
+        //   dataIndex: "allNeedGet",
+        //   width: 80,
+        //   align: "left",
+        // },
+        // { title: "税率(%)", dataIndex: "taxRate", width: 80, align: "left" },
         { title: "排序", dataIndex: "sort", width: 60, align: "left" },
         {
           title: "状态",

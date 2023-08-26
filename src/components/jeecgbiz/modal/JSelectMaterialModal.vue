@@ -24,7 +24,7 @@
                 >
                   <a-input
                     ref="material"
-                    placeholder="条码、名称、规格、型号、颜色"
+                    placeholder="条码、名称、箱规、型号、颜色"
                     v-model="queryParam.q"
                   ></a-input>
                 </a-form-item>
@@ -221,7 +221,7 @@ export default {
           scopedSlots: { customRender: "customName" },
         },
         { dataIndex: "categoryName", title: "类别" },
-        { dataIndex: "standard", title: "规格" },
+        { dataIndex: "standard", title: "箱规" },
         { dataIndex: "model", title: "型号" },
         { dataIndex: "color", title: "颜色" },
         { dataIndex: "unit", title: "单位" },

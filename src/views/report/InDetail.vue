@@ -26,7 +26,7 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
-                    placeholder="条码/名称/规格/型号"
+                    placeholder="条码/名称/箱规/型号"
                     v-model="queryParam.materialParam"
                   ></a-input>
                 </a-form-item>
@@ -248,7 +248,7 @@ export default {
         beginTime: getNowFormatYear() + "-01-01",
         endTime: moment().format("YYYY-MM-DD"),
         roleType: Vue.ls.get("roleType"),
-        type: "入库",
+        type: "2",
         creator: "",
         remark: "",
       },
@@ -292,7 +292,7 @@ export default {
         },
         { title: "条码", dataIndex: "barCode", width: 80 },
         { title: "名称", dataIndex: "mname", width: 120, ellipsis: true },
-        { title: "规格", dataIndex: "standard", width: 60, ellipsis: true },
+        { title: "箱规", dataIndex: "standard", width: 60, ellipsis: true },
         { title: "型号", dataIndex: "model", width: 60, ellipsis: true },
         { title: "单位", dataIndex: "mUnit", width: 50, ellipsis: true },
         {
@@ -401,7 +401,7 @@ export default {
           "单据编号",
           "条码",
           "名称",
-          "规格",
+          "箱规",
           "型号",
           "单位",
           "数量",

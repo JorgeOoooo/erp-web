@@ -81,7 +81,7 @@
           </a-form>
         </div>
         <!-- 操作按钮区域 -->
-        <div class="table-operator" style="border-top: 5px">
+        <div class="table-operator" style="margin-top: 5px">
           <a-button @click="handleAdd" type="primary" icon="plus"
             >新增</a-button
           >

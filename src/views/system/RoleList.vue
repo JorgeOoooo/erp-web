@@ -219,12 +219,12 @@ export default {
           width: 100,
           slots: { title: "typeTitle" },
         },
-        {
-          align: "left",
-          dataIndex: "priceLimitStr",
-          width: 300,
-          slots: { title: "priceLimitTitle" },
-        },
+        // {
+        //   align: "left",
+        //   dataIndex: "priceLimitStr",
+        //   width: 300,
+        //   slots: { title: "priceLimitTitle" },
+        // },
         {
           title: "备注",
           align: "left",

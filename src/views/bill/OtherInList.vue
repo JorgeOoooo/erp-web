@@ -14,6 +14,7 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
+                    allowClear
                     placeholder="请输入单据编号"
                     v-model="queryParam.number"
                   ></a-input>
@@ -26,7 +27,8 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
-                    placeholder="请输入条码、名称、规格、型号、颜色、扩展信息"
+                    allowClear
+                    placeholder="请输入条码、名称、箱规、型号、颜色、扩展信息"
                     v-model="queryParam.materialParam"
                   ></a-input>
                 </a-form-item>
@@ -42,6 +44,7 @@
                     v-model="queryParam.createTimeRange"
                     format="YYYY-MM-DD"
                     :placeholder="['开始时间', '结束时间']"
+                    allowClear
                     @change="onDateChange"
                     @ok="onDateOk"
                   />
@@ -65,13 +68,14 @@
               <template v-if="toggleSearchStatus">
                 <a-col :md="6" :sm="24">
                   <a-form-item
-                    label="供应商"
+                    label="客户"
                     :labelCol="labelCol"
                     :wrapperCol="wrapperCol"
                   >
                     <a-select
-                      placeholder="选择供应商"
+                      placeholder="选择客户"
                       showSearch
+                      allowClear
                       optionFilterProp="children"
                       v-model="queryParam.organId"
                     >
@@ -94,6 +98,7 @@
                     <a-select
                       placeholder="请选择仓库"
                       showSearch
+                      allowClear
                       optionFilterProp="children"
                       v-model="queryParam.depotId"
                     >
@@ -116,6 +121,7 @@
                     <a-select
                       placeholder="选择操作员"
                       showSearch
+                      allowClear
                       optionFilterProp="children"
                       v-model="queryParam.creator"
                     >
@@ -136,12 +142,13 @@
                     :wrapperCol="wrapperCol"
                   >
                     <a-input
+                      allowClear
                       placeholder="请输入关联单据"
                       v-model="queryParam.linkNumber"
                     ></a-input>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <!-- <a-col :md="6" :sm="24">
                   <a-form-item
                     label="单据状态"
                     :labelCol="labelCol"
@@ -155,7 +162,7 @@
                       <a-select-option value="1">已审核</a-select-option>
                     </a-select>
                   </a-form-item>
-                </a-col>
+                </a-col> -->
                 <a-col :md="6" :sm="24">
                   <a-form-item
                     label="单据备注"
@@ -163,6 +170,7 @@
                     :wrapperCol="wrapperCol"
                   >
                     <a-input
+                      allowClear
                       placeholder="请输入单据备注"
                       v-model="queryParam.remark"
                     ></a-input>
@@ -258,6 +266,10 @@
                 <a>删除</a>
               </a-popconfirm>
             </span>
+            <template slot="customRenderType" slot-scope="packageType">
+              <span v-if="packageType == '1'">全托</span>
+              <span v-if="packageType == '2'">半托</span>
+            </template>
             <template slot="customRenderStatus" slot-scope="status">
               <a-tag v-if="status == '0'" color="red">未审核</a-tag>
               <a-tag v-if="status == '1'" color="green">已审核</a-tag>
@@ -303,7 +315,7 @@ export default {
       queryParam: {
         number: "",
         materialParam: "",
-        type: "入库",
+        type: "2",
         subType: "其它",
         roleType: Vue.ls.get("roleType"),
         organId: "",
@@ -330,33 +342,24 @@ export default {
           width: 150,
           scopedSlots: { customRender: "action" },
         },
-        { title: "供应商", dataIndex: "organName", width: 120, ellipsis: true },
         { title: "单据编号", dataIndex: "number", width: 160 },
         {
-          title: "商品信息",
-          dataIndex: "materialsList",
-          width: 220,
+          title: "客户",
+          dataIndex: "supplierName",
+          width: 120,
           ellipsis: true,
-          customRender: function (text, record, index) {
-            if (text) {
-              return text.replaceAll(",", "，");
-            }
-          },
         },
-        { title: "单据日期", dataIndex: "operTimeStr", width: 145 },
-        { title: "操作员", dataIndex: "userName", width: 80, ellipsis: true },
-        { title: "数量", dataIndex: "materialCount", width: 60 },
-        { title: "金额合计", dataIndex: "totalPrice", width: 80 },
+        { title: "单据日期", dataIndex: "createTime", width: 80 },
         {
-          title: "状态",
-          dataIndex: "status",
+          title: "仓管模式",
+          dataIndex: "packageType",
           width: 80,
-          align: "center",
-          scopedSlots: { customRender: "customRenderStatus" },
+          scopedSlots: { customRender: "customRenderType" },
         },
+        { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],
       url: {
-        list: "/depotHead/list",
+        list: "/documentHead/list",
         delete: "/depotHead/delete",
         deleteBatch: "/depotHead/deleteBatch",
         batchSetStatusUrl: "/depotHead/batchSetStatus",

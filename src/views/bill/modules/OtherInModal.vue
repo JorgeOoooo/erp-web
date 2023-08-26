@@ -1,7 +1,7 @@
 <template>
-  <j-modal
+  <a-modal
     :title="title"
-    :width="width"
+    :width="800"
     :visible="visible"
     :confirmLoading="confirmLoading"
     :keyboard="false"
@@ -12,32 +12,32 @@
   >
     <template slot="footer">
       <a-button @click="handleCancel">取消</a-button>
-      <a-button
+      <!-- <a-button
         v-if="checkFlag && isCanCheck"
         :loading="confirmLoading"
         @click="handleOkAndCheck"
         >保存并审核</a-button
-      >
+      > -->
       <a-button type="primary" :loading="confirmLoading" @click="handleOk"
         >保存</a-button
       >
       <!--发起多级审核-->
-      <a-button v-if="!checkFlag" @click="handleWorkflow()" type="primary"
+      <!-- <a-button v-if="!checkFlag" @click="handleWorkflow()" type="primary"
         >提交流程</a-button
-      >
+      > -->
     </template>
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
         <a-row class="form-row" :gutter="24">
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="12" :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
-              label="供应商"
+              label="客户"
             >
               <a-select
-                placeholder="选择供应商"
-                v-decorator="['organId']"
+                placeholder="选择客户"
+                v-decorator="['organId', validatorRules.organId]"
                 :dropdownMatchSelectWidth="false"
                 showSearch
                 optionFilterProp="children"
@@ -51,7 +51,7 @@
                     @mousedown="(e) => e.preventDefault()"
                     @click="addSupplier"
                   >
-                    <a-icon type="plus" /> 新增供应商
+                    <a-icon type="plus" /> 新增客户
                   </div>
                 </div>
                 <a-select-option
@@ -64,7 +64,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="12" :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
@@ -73,25 +73,53 @@
               <j-date
                 v-decorator="['operTime', validatorRules.operTime]"
                 :show-time="true"
+                dateFormat="YYYY-MM-DD"
+                style="width: 100%"
               />
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24">
+          <a-col :lg="12" :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
-              label="单据编号"
+              label="仓管模式"
             >
-              <a-input
-                placeholder="请输入单据编号"
-                v-decorator.trim="['number']"
-                :readOnly="true"
+              <a-select
+                v-decorator="['packageType']"
+                placeholder="选择托管类型"
+                :dropdownMatchSelectWidth="false"
+                showSearch
+                optionFilterProp="children"
+              >
+                <a-select-option value="1"> 全托 </a-select-option>
+                <a-select-option value="2"> 半托 </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12" :md="12" :sm="24">
+            <a-form-item
+              :labelCol="labelCol"
+              :wrapperCol="wrapperCol"
+              label="车牌号"
+            >
+              <a-input placeholder="请输入车牌号" v-decorator="['carNumber']" />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12" :md="12" :sm="24">
+            <a-form-item
+              :labelCol="labelCol"
+              :wrapperCol="wrapperCol"
+              label="备注"
+            >
+              <a-textarea
+                :rows="1"
+                placeholder="请输入备注"
+                v-decorator="['remark']"
               />
             </a-form-item>
           </a-col>
-          <a-col :lg="6" :md="12" :sm="24"></a-col>
         </a-row>
-        <j-editable-table
+        <!-- <j-editable-table
           id="billModal"
           :ref="refKeys[0]"
           :loading="materialTable.loading"
@@ -154,24 +182,8 @@
               <a-icon type="plus" /> 新增仓库
             </div>
           </template>
-        </j-editable-table>
-        <a-row class="form-row" :gutter="24">
-          <a-col :lg="24" :md="24" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="{ xs: { span: 24 }, sm: { span: 24 } }"
-              label=""
-            >
-              <a-textarea
-                :rows="1"
-                placeholder="请输入备注"
-                v-decorator="['remark']"
-                style="margin-top: 8px"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row class="form-row" :gutter="24">
+        </j-editable-table> -->
+        <!-- <a-row class="form-row" :gutter="24">
           <a-col :lg="6" :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
@@ -181,7 +193,7 @@
               <j-upload v-model="fileList" bizPath="bill"></j-upload>
             </a-form-item>
           </a-col>
-        </a-row>
+        </a-row> -->
       </a-form>
     </a-spin>
     <vendor-modal ref="vendorModalForm" @ok="vendorModalFormOk"></vendor-modal>
@@ -191,7 +203,7 @@
       @ok="batchSetDepotModalFormOk"
     ></batch-set-depot>
     <workflow-iframe ref="modalWorkflow"></workflow-iframe>
-  </j-modal>
+  </a-modal>
 </template>
 <script>
 import pick from "lodash.pick";
@@ -224,7 +236,7 @@ export default {
   data() {
     return {
       title: "操作",
-      width: "1600px",
+      width: "1200px",
       moreStatus: false,
       // 新增时子表默认添加几行空数据
       addDefaultRowNum: 1,
@@ -241,7 +253,7 @@ export default {
         xs: { span: 24 },
         sm: { span: 16 },
       },
-      refKeys: ["materialDataTable"],
+      refKeys: [],
       activeKey: "materialDataTable",
       materialTable: {
         loading: false,
@@ -268,7 +280,7 @@ export default {
           },
           { title: "名称", key: "name", width: "10%", type: FormTypes.normal },
           {
-            title: "规格",
+            title: "箱规",
             key: "standard",
             width: "9%",
             type: FormTypes.normal,
@@ -330,6 +342,9 @@ export default {
       },
       confirmLoading: false,
       validatorRules: {
+        organId: {
+          rules: [{ required: true, message: "请选择客户!" }],
+        },
         operTime: {
           rules: [{ required: true, message: "请输入单据日期!" }],
         },
@@ -338,7 +353,7 @@ export default {
         },
       },
       url: {
-        add: "/depotHead/addDepotHeadAndDetail",
+        add: "/documentHead/add",
         edit: "/depotHead/updateDepotHeadAndDetail",
         detailList: "/depotItem/getDetailList",
       },
@@ -398,29 +413,42 @@ export default {
     },
     //提交单据时整理成formData
     classifyIntoFormData(allValues) {
-      let totalPrice = 0;
-      let billMain = Object.assign(this.model, allValues.formValue);
-      let detailArr = allValues.tablesValue[0].values;
-      billMain.type = "入库";
-      billMain.subType = "其它";
-      billMain.defaultNumber = billMain.number;
-      for (let item of detailArr) {
-        totalPrice += item.allPrice - 0;
-      }
-      billMain.totalPrice = 0 - totalPrice;
-      if (this.fileList && this.fileList.length > 0) {
-        billMain.fileName = this.fileList;
-      } else {
-        billMain.fileName = "";
-      }
       if (this.model.id) {
-        billMain.id = this.model.id;
+        let totalPrice = 0;
+        let billMain = Object.assign(this.model, allValues.formValue);
+        let detailArr = allValues.tablesValue?.length
+          ? allValues.tablesValue[0].values
+          : [];
+        billMain.type = "入库";
+        billMain.subType = "其它";
+        billMain.defaultNumber = billMain.number;
+        for (let item of detailArr) {
+          totalPrice += item.allPrice - 0;
+        }
+        billMain.totalPrice = 0 - totalPrice;
+        if (this.fileList && this.fileList.length > 0) {
+          billMain.fileName = this.fileList;
+        } else {
+          billMain.fileName = "";
+        }
+        if (this.model.id) {
+          billMain.id = this.model.id;
+        }
+        billMain.status = this.billStatus;
+        return {
+          info: JSON.stringify(billMain),
+          rows: JSON.stringify(detailArr),
+        };
+      } else {
+        return {
+          type: 2,
+          packageType: allValues.formValue?.packageType,
+          supplierId: allValues.formValue?.organId,
+          carNumber: allValues.formValue?.carNumber,
+          createTime: allValues.formValue?.operTime,
+          remark: allValues.formValue?.remark,
+        };
       }
-      billMain.status = this.billStatus;
-      return {
-        info: JSON.stringify(billMain),
-        rows: JSON.stringify(detailArr),
-      };
     },
   },
 };

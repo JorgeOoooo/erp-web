@@ -61,7 +61,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24 / 2">
+            <!-- <a-col :span="24 / 2">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -163,7 +163,7 @@
                   v-decorator.trim="['accountNumber']"
                 />
               </a-form-item>
-            </a-col>
+            </a-col> -->
             <a-col :span="24 / 2">
               <a-form-item
                 :labelCol="labelCol"

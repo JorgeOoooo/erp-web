@@ -62,7 +62,7 @@
                 :wrapperCol="{ span: 18, offset: 1 }"
               >
                 <a-input
-                  placeholder="条码|名称|规格|型号"
+                  placeholder="条码|名称|箱规|型号"
                   v-model="queryParam.materialParam"
                 ></a-input>
               </a-form-item>
@@ -251,7 +251,7 @@ export default {
       ],
       dataSource: [],
       url: {
-        list: "/depotHead/list",
+        list: "/documentHead/list",
       },
     };
   },

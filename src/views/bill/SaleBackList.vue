@@ -27,7 +27,7 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
-                    placeholder="请输入条码、名称、规格、型号、颜色、扩展信息"
+                    placeholder="请输入条码、名称、箱规、型号、颜色、扩展信息"
                     v-model="queryParam.materialParam"
                   ></a-input>
                 </a-form-item>
@@ -327,7 +327,7 @@ export default {
       queryParam: {
         number: "",
         materialParam: "",
-        type: "入库",
+        type: "2",
         subType: "销售退货",
         roleType: Vue.ls.get("roleType"),
         organId: "",
@@ -408,7 +408,7 @@ export default {
         },
       ],
       url: {
-        list: "/depotHead/list",
+        list: "/documentHead/list",
         delete: "/depotHead/delete",
         deleteBatch: "/depotHead/deleteBatch",
         batchSetStatusUrl: "/depotHead/batchSetStatus",

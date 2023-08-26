@@ -390,7 +390,7 @@ export default {
           },
           { title: "名称", key: "name", width: "12%", type: FormTypes.normal },
           {
-            title: "规格",
+            title: "箱规",
             key: "standard",
             width: "10%",
             type: FormTypes.normal,
