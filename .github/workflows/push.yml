@@ -54,4 +54,4 @@ jobs:
         run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker stop erp-web && sudo docker rm erp-web"
 
       - name: 启动容器
-        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker run --name=erp-web --net=host -p 8000:8000 erp-web:1.0.0"
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker run -d --name=erp-web --net=host -p 8000:8000 erp-web:1.0.0"
