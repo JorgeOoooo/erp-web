@@ -46,10 +46,10 @@
               label="箱规"
               data-step="2"
               data-title="箱规"
-              data-intro="箱规不必填，比如：10*10*10"
+              data-intro="箱规必填，格式为：长*宽*高；支持小数点后两位小数。比如：1.50*1.25*10.0"
             >
               <a-input
-                placeholder="长*宽*高"
+                placeholder="长*宽*高；最多两位小数"
                 v-decorator.trim="['standard', validatorRules.standard]"
               />
             </a-form-item>

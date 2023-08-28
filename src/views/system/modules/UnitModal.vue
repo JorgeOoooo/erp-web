@@ -28,7 +28,7 @@
             label="基本单位"
           >
             <a-input
-              placeholder="请输入基本单位(小单位)"
+              placeholder="请输入基本单位"
               v-decorator.trim="['basicUnit', validatorRules.basicUnit]"
             />
           </a-form-item>
