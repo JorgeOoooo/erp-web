@@ -2,7 +2,6 @@ import Vue from "vue";
 import { getAction } from "@/api/manage";
 import { FormTypes } from "@/utils/JEditableTableUtil";
 import {
-  findBillDetailByNumber,
   findBySelectSup,
   findBySelectCus,
   findBySelectRetail,
@@ -12,7 +11,7 @@ import {
 } from "@/api/api";
 import { getCheckFlag } from "@/utils/util";
 
-export const BillListMixin = {
+export const BillListMixinSimple = {
   data() {
     return {
       /* 原始审核是否开启 */
@@ -23,7 +22,7 @@ export const BillListMixin = {
       retailList: [],
       userList: [],
       accountList: [],
-      depotList: []
+      depotList: [],
     };
   },
   computed: {
@@ -66,34 +65,24 @@ export const BillListMixin = {
       this.$refs.modalForm.materialTable.columns[1].type = FormTypes.popupJsh;
     },
     myHandleEdit(record) {
-      if (record.status === "0") {
-        this.$refs.modalForm.action = "edit";
-        if (this.btnEnableList.indexOf(2) === -1) {
-          this.$refs.modalForm.isCanCheck = false;
-        }
-        //查询单条单据信息
-        findBillDetailByNumber({ number: record.number }).then((res) => {
-          if (res && res.code === 200) {
-            let item = res.data;
-            this.handleEdit(item);
-          }
-        });
-      } else {
-        this.$message.warning("抱歉，只有未审核的单据才能编辑！");
+      this.$refs.modalForm.action = "edit";
+      if (this.btnEnableList.indexOf(2) === -1) {
+        this.$refs.modalForm.isCanCheck = false;
       }
+      let item = record;
+      this.handleEdit(item);
     },
     myHandleDelete(record) {
-      if (record.status === "0") {
-        this.handleDelete(record.id);
-      } else {
-        this.$message.warning("抱歉，只有未审核的单据才能删除！");
-      }
+      this.handleDelete(record.id);
     },
     myHandleDetail(record, type, prefixNo) {
       if (this.btnEnableList.indexOf(7) === -1) {
         this.$refs.modalDetail.isCanBackCheck = false;
       }
       this.handleDetail(record, type, prefixNo);
+    },
+    myHandleInfo(record) {
+      this.$refs.billInfo.show(record);
     },
     handleApprove(record) {
       this.$refs.modalForm.action = "approve";

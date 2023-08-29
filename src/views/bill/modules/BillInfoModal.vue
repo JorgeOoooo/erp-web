@@ -1,0 +1,188 @@
+<template>
+  <a-modal
+    :title="title"
+    :width="1000"
+    :visible="visible"
+    :keyboard="false"
+    switchFullscreen
+    @cancel="handleCancel"
+    style="top: 20px; height: 95%"
+  >
+    <template slot="footer">
+      <a-button @click="handleCancel">取消</a-button>
+    </template>
+    <div>
+      <div class="bill-info">
+        <span>单据编号：</span>
+        <span>
+          {{ model.number }}
+        </span>
+      </div>
+      <j-edit-line-table
+        :columns="columns"
+        :dataSource="dataSource"
+        :dataFormat="dataFormat"
+        :url="url"
+        :form-data="{ headId: this.model.id }"
+        @ok="getInInfo"
+      >
+      </j-edit-line-table>
+    </div>
+  </a-modal>
+</template>
+<script>
+import JEditLineTable from "@/components/jeecg/JEditLineTable";
+import JDate from "@/components/jeecg/JDate";
+import { FormTypes } from "@/utils/JEditableTableUtil";
+import { httpAction, getAction } from "@/api/manage";
+export default {
+  name: "BillInfoModal",
+  components: {
+    JEditLineTable,
+    JDate,
+    VNodes: {
+      functional: true,
+      render: (h, ctx) => ctx.props.vnodes,
+    },
+  },
+  data() {
+    const that = this;
+    return {
+      title: "详情",
+      visible: false,
+      model: {},
+      url: {
+        list: "/documentItem/head",
+        add: "/documentItem/add",
+        edit: "/documentItem/update",
+        delete: "/documentItem/delete/",
+      },
+      columns: [
+        {
+          title: "仓库名称",
+          key: "depotId",
+          dataIndex: "depotName",
+          width: 200,
+          type: FormTypes.select,
+          placeholder: "请选择${title}",
+          options: [],
+          allowSearch: true,
+          validateRules: [{ required: true }],
+          scopedSlots: { customRender: "depotName" },
+          ellipsis: true,
+        },
+        {
+          title: "商品名称",
+          key: "materialId",
+          dataIndex: "materialId",
+          width: 200,
+          type: FormTypes.select,
+          placeholder: "请选择${title}",
+          options: [],
+          allowSearch: true,
+          validateRules: [{ required: true }],
+          scopedSlots: { customRender: "materialId" },
+          ellipsis: true,
+        },
+        {
+          title: "数量",
+          key: "operNumber",
+          dataIndex: "operNumber",
+          width: 120,
+          type: FormTypes.inputNumber,
+          min: 1,
+          scopedSlots: { customRender: "operNumber" },
+        },
+        {
+          title: "备注",
+          key: "remark",
+          dataIndex: "remark",
+          type: FormTypes.input,
+          scopedSlots: { customRender: "remark" },
+          ellipsis: true,
+        },
+        {
+          title: "操作",
+          key: "action",
+          dataIndex: "action",
+          width: 120,
+          scopedSlots: { customRender: "action" },
+        },
+      ],
+      dataSource: [],
+      dataFormat: {
+        depotId: "",
+        materialId: "",
+        operNumber: 1,
+        remark: "",
+      },
+    };
+  },
+  created() {},
+  methods: {
+    show(record) {
+      this.model = record;
+      this.getInInfo();
+      this.getDepotData();
+      this.getMaterialData();
+      this.visible = true;
+    },
+    // 查询入库单详情
+    getInInfo() {
+      getAction(this.url.list, { headId: this.model.id }).then((res) => {
+        if (res.code === 200) {
+          this.dataSource = res.data || [];
+        }
+      });
+    },
+    // 查询可选商品列表
+    getMaterialData() {
+      httpAction("/material/model", {}, "get").then((res) => {
+        if (res.code === 200) {
+          this.columns[1].options =
+            res.data?.map((item) => {
+              return {
+                ...item,
+                value: item.id,
+                label: item.name + (item.model ? `(${item.model})` : ""),
+              };
+            }) || [];
+        } else {
+          this.$message.info(res.data);
+        }
+      });
+    },
+    // 查询可选仓库列表
+    getDepotData() {
+      getAction("/depot/findDepotByCurrentUser").then((res) => {
+        if (res.code === 200) {
+          this.columns[0].options =
+            res.data?.map((item) => {
+              return {
+                ...item,
+                value: item.id,
+                label: item.depotName,
+              };
+            }) || [];
+        } else {
+          this.$message.info(res.data);
+        }
+      });
+    },
+    /** 关闭弹窗 */
+    close() {
+      this.visible = false;
+      this.$emit("close");
+    },
+    /** 关闭按钮点击事件 */
+    handleCancel() {
+      this.close();
+    },
+  },
+};
+</script>
+<style scoped lang="less">
+.bill-info {
+  margin-bottom: 8px;
+}
+</style>

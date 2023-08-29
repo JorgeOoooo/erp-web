@@ -152,7 +152,7 @@ const findBySelectOrgan = (params) =>
   postAction("/supplier/findBySelect_organ", params);
 //单据相关
 const findBillDetailByNumber = (params) =>
-  getAction("/depotHead/getDetailByNumber", params);
+  getAction("/documentHead/getDetailByNumber", params);
 const findStockByDepotAndBarCode = (params) =>
   getAction("/depotItem/findStockByDepotAndBarCode", params);
 const getBatchNumberList = (params) =>

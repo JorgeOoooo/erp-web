@@ -2,36 +2,6 @@
   <a-row :gutter="24">
     <a-col :md="24">
       <a-card :style="cardStyle" :bordered="false">
-        <!-- 查询区域 -->
-        <!-- <div class="table-page-search-wrapper">
-          <a-form layout="inline" @keyup.enter.native="searchQuery">
-            <a-row :gutter="24">
-              <a-col :md="6" :sm="24">
-                <a-form-item
-                  label="计量单位"
-                  :labelCol="labelCol"
-                  :wrapperCol="wrapperCol"
-                >
-                  <a-input
-                    placeholder="请输入计量单位查询"
-                    v-model="queryParam.name"
-                  ></a-input>
-                </a-form-item>
-              </a-col>
-              <span
-                style="float: left; overflow: hidden"
-                class="table-page-search-submitButtons"
-              >
-                <a-col :md="6" :sm="24">
-                  <a-button type="primary" @click="searchQuery">查询</a-button>
-                  <a-button style="margin-left: 8px" @click="searchReset"
-                    >重置</a-button
-                  >
-                </a-col>
-              </span>
-            </a-row>
-          </a-form>
-        </div> -->
         <!-- 操作按钮区域 -->
         <div class="table-operator" style="margin-top: 5px">
           <a-button

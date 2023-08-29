@@ -5,26 +5,15 @@
     :visible="visible"
     :confirmLoading="confirmLoading"
     :keyboard="false"
-    :forceRender="true"
     switchFullscreen
     @cancel="handleCancel"
     style="top: 20px; height: 95%"
   >
     <template slot="footer">
       <a-button @click="handleCancel">取消</a-button>
-      <!-- <a-button
-        v-if="checkFlag && isCanCheck"
-        :loading="confirmLoading"
-        @click="handleOkAndCheck"
-        >保存并审核</a-button
-      > -->
       <a-button type="primary" :loading="confirmLoading" @click="handleOk"
         >保存</a-button
       >
-      <!--发起多级审核-->
-      <!-- <a-button v-if="!checkFlag" @click="handleWorkflow()" type="primary"
-        >提交流程</a-button
-      > -->
     </template>
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
@@ -37,22 +26,23 @@
             >
               <a-select
                 placeholder="选择客户"
-                v-decorator="['organId', validatorRules.organId]"
+                v-decorator="['supplierId', validatorRules.supplierId]"
                 :dropdownMatchSelectWidth="false"
                 showSearch
                 optionFilterProp="children"
               >
                 <div slot="dropdownRender" slot-scope="menu">
                   <v-nodes :vnodes="menu" />
-                  <a-divider style="margin: 4px 0" />
-                  <div
-                    v-if="isTenant"
-                    style="padding: 4px 8px; cursor: pointer"
-                    @mousedown="(e) => e.preventDefault()"
-                    @click="addSupplier"
-                  >
-                    <a-icon type="plus" /> 新增客户
-                  </div>
+                  <template v-if="isTenant">
+                    <a-divider style="margin: 4px 0" />
+                    <div
+                      style="padding: 4px 8px; cursor: pointer"
+                      @mousedown="(e) => e.preventDefault()"
+                      @click="addSupplier"
+                    >
+                      <a-icon type="plus" /> 新增客户
+                    </div>
+                  </template>
                 </div>
                 <a-select-option
                   v-for="(item, index) in supList"
@@ -71,8 +61,8 @@
               label="单据日期"
             >
               <j-date
-                v-decorator="['operTime', validatorRules.operTime]"
-                :show-time="true"
+                v-decorator="['createTime', validatorRules.createTime]"
+                :show-time="false"
                 dateFormat="YYYY-MM-DD"
                 style="width: 100%"
               />
@@ -91,8 +81,8 @@
                 showSearch
                 optionFilterProp="children"
               >
-                <a-select-option value="1"> 全托 </a-select-option>
-                <a-select-option value="2"> 半托 </a-select-option>
+                <a-select-option :value="1"> 全托 </a-select-option>
+                <a-select-option :value="2"> 半托 </a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -119,114 +109,22 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <!-- <j-editable-table
-          id="billModal"
-          :ref="refKeys[0]"
-          :loading="materialTable.loading"
-          :columns="materialTable.columns"
-          :dataSource="materialTable.dataSource"
-          :minWidth="minWidth"
-          :maxHeight="300"
-          :rowNumber="false"
-          :rowSelection="true"
-          :actionButton="true"
-          :dragSort="true"
-          @valueChange="onValueChange"
-          @added="onAdded"
-          @deleted="onDeleted"
-        >
-          <template #buttonAfter>
-            <a-row
-              :gutter="24"
-              style="float: left"
-              data-step="4"
-              data-title="扫码录入"
-              data-intro="此功能支持扫码枪扫描商品条码进行录入"
-            >
-              <a-col v-if="scanStatus" :md="6" :sm="24">
-                <a-button @click="scanEnter">扫码录入</a-button>
-              </a-col>
-              <a-col
-                v-if="!scanStatus"
-                :md="16"
-                :sm="24"
-                style="padding: 0 6px 0 12px"
-              >
-                <a-input
-                  placeholder="请扫描商品条码并回车"
-                  v-model="scanBarCode"
-                  @pressEnter="scanPressEnter"
-                  ref="scanBarCode"
-                />
-              </a-col>
-              <a-col
-                v-if="!scanStatus"
-                :md="6"
-                :sm="24"
-                style="padding: 0px 24px 0 0"
-              >
-                <a-button @click="stopScan">收起扫码</a-button>
-              </a-col>
-            </a-row>
-          </template>
-          <template #depotBatchSet>
-            <a-icon type="down" @click="handleBatchSetDepot" />
-          </template>
-          <template #depotAdd>
-            <a-divider v-if="isTenant" style="margin: 4px 0" />
-            <div
-              v-if="isTenant"
-              style="padding: 4px 8px; cursor: pointer"
-              @click="addDepot"
-            >
-              <a-icon type="plus" /> 新增仓库
-            </div>
-          </template>
-        </j-editable-table> -->
-        <!-- <a-row class="form-row" :gutter="24">
-          <a-col :lg="6" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="附件"
-            >
-              <j-upload v-model="fileList" bizPath="bill"></j-upload>
-            </a-form-item>
-          </a-col>
-        </a-row> -->
       </a-form>
     </a-spin>
-    <vendor-modal ref="vendorModalForm" @ok="vendorModalFormOk"></vendor-modal>
-    <depot-modal ref="depotModalForm" @ok="depotModalFormOk"></depot-modal>
-    <batch-set-depot
-      ref="batchSetDepotModalForm"
-      @ok="batchSetDepotModalFormOk"
-    ></batch-set-depot>
-    <workflow-iframe ref="modalWorkflow"></workflow-iframe>
   </a-modal>
 </template>
 <script>
+// import JEditLineTable from "@/components/jeecg/JEditLineTable";
 import pick from "lodash.pick";
-import VendorModal from "../../system/modules/VendorModal";
-import DepotModal from "../../system/modules/DepotModal";
-import BatchSetDepot from "../dialog/BatchSetDepot";
-import WorkflowIframe from "@/components/tools/WorkflowIframe";
-import { FormTypes } from "@/utils/JEditableTableUtil";
-import { JEditableTableMixin } from "@/mixins/JEditableTableMixin";
+import { findBySelectSup } from "@/api/api";
 import { BillModalMixin } from "../mixins/BillModalMixin";
-import { getMpListShort } from "@/utils/util";
-import JUpload from "@/components/jeecg/JUpload";
 import JDate from "@/components/jeecg/JDate";
-import Vue from "vue";
+import { httpAction } from "@/api/manage";
 export default {
   name: "OtherInModal",
-  mixins: [JEditableTableMixin, BillModalMixin],
+  mixins: [BillModalMixin],
   components: {
-    VendorModal,
-    DepotModal,
-    BatchSetDepot,
-    WorkflowIframe,
-    JUpload,
+    // JEditLineTable,
     JDate,
     VNodes: {
       functional: true,
@@ -236,14 +134,8 @@ export default {
   data() {
     return {
       title: "操作",
-      width: "1200px",
-      moreStatus: false,
-      // 新增时子表默认添加几行空数据
-      addDefaultRowNum: 1,
       visible: false,
-      operTimeStr: "",
       prefixNo: "QTRK",
-      fileList: [],
       model: {},
       labelCol: {
         xs: { span: 24 },
@@ -253,99 +145,14 @@ export default {
         xs: { span: 24 },
         sm: { span: 16 },
       },
-      refKeys: [],
-      activeKey: "materialDataTable",
-      materialTable: {
-        loading: false,
-        dataSource: [],
-        columns: [
-          {
-            title: "仓库名称",
-            key: "depotId",
-            width: "8%",
-            type: FormTypes.select,
-            placeholder: "请选择${title}",
-            options: [],
-            allowSearch: true,
-            validateRules: [{ required: true, message: "${title}不能为空" }],
-          },
-          {
-            title: "条码",
-            key: "barCode",
-            width: "12%",
-            type: FormTypes.popupJsh,
-            kind: "material",
-            multi: true,
-            validateRules: [{ required: true, message: "${title}不能为空" }],
-          },
-          { title: "名称", key: "name", width: "10%", type: FormTypes.normal },
-          {
-            title: "箱规",
-            key: "standard",
-            width: "9%",
-            type: FormTypes.normal,
-          },
-          { title: "型号", key: "model", width: "9%", type: FormTypes.normal },
-          { title: "颜色", key: "color", width: "5%", type: FormTypes.normal },
-          {
-            title: "扩展信息",
-            key: "materialOther",
-            width: "5%",
-            type: FormTypes.normal,
-          },
-          { title: "库存", key: "stock", width: "5%", type: FormTypes.normal },
-          { title: "单位", key: "unit", width: "4%", type: FormTypes.normal },
-          {
-            title: "序列号",
-            key: "snList",
-            width: "12%",
-            type: FormTypes.popupJsh,
-            kind: "snAdd",
-            multi: true,
-          },
-          {
-            title: "批号",
-            key: "batchNumber",
-            width: "7%",
-            type: FormTypes.input,
-          },
-          {
-            title: "有效期",
-            key: "expirationDate",
-            width: "7%",
-            type: FormTypes.date,
-          },
-          { title: "多属性", key: "sku", width: "9%", type: FormTypes.normal },
-          {
-            title: "数量",
-            key: "operNumber",
-            width: "5%",
-            type: FormTypes.inputNumber,
-            statistics: true,
-            validateRules: [{ required: true, message: "${title}不能为空" }],
-          },
-          {
-            title: "单价",
-            key: "unitPrice",
-            width: "5%",
-            type: FormTypes.inputNumber,
-          },
-          {
-            title: "金额",
-            key: "allPrice",
-            width: "5%",
-            type: FormTypes.inputNumber,
-            statistics: true,
-          },
-          { title: "备注", key: "remark", width: "5%", type: FormTypes.input },
-        ],
-      },
       confirmLoading: false,
+      form: this.$form.createForm(this),
+      supList: [],
       validatorRules: {
-        organId: {
+        supplierId: {
           rules: [{ required: true, message: "请选择客户!" }],
         },
-        operTime: {
+        createTime: {
           rules: [{ required: true, message: "请输入单据日期!" }],
         },
         type: {
@@ -354,101 +161,88 @@ export default {
       },
       url: {
         add: "/documentHead/add",
-        edit: "/depotHead/updateDepotHeadAndDetail",
-        detailList: "/depotItem/getDetailList",
+        edit: "/documentHead/update",
+        detailList: "/documentHead/getDetailList",
       },
     };
   },
   created() {},
   methods: {
-    //调用完edit()方法之后会自动调用此方法
-    editAfter() {
-      this.billStatus = "0";
-      this.currentSelectDepotId = "";
-      this.changeColumnHide();
-      this.changeFormTypes(this.materialTable.columns, "snList", 0);
-      this.changeFormTypes(this.materialTable.columns, "batchNumber", 0);
-      this.changeFormTypes(this.materialTable.columns, "expirationDate", 0);
-      if (this.action === "add") {
-        this.addInit(this.prefixNo);
-        this.fileList = [];
-      } else {
-        this.model.operTime = this.model.operTimeStr;
-        this.fileList = this.model.fileName;
-        this.$nextTick(() => {
-          this.form.setFieldsValue(
-            pick(
-              this.model,
-              "organId",
-              "operTime",
-              "number",
-              "remark",
-              "discount",
-              "discountMoney",
-              "discountLastMoney",
-              "otherMoney",
-              "accountId",
-              "changeAmount"
-            )
-          );
-        });
-        // 加载子表数据
-        let params = {
-          headerId: this.model.id,
-          mpList: getMpListShort(Vue.ls.get("materialPropertyList")), //扩展属性
-          linkType: "basic",
-        };
-        let url = this.readOnly ? this.url.detailList : this.url.detailList;
-        this.requestSubTableData(url, params, this.materialTable);
-      }
-      //复制新增单据-初始化单号和日期
-      if (this.action === "copyAdd") {
-        this.model.id = "";
-        this.model.tenantId = "";
-        this.copyAddInit(this.prefixNo);
-      }
-      this.initSystemConfig();
-      this.initSupplier();
-      this.initDepot();
+    initSupplier() {
+      let that = this;
+      findBySelectSup({}).then((res) => {
+        if (res) {
+          that.supList = res;
+        }
+      });
     },
-    //提交单据时整理成formData
-    classifyIntoFormData(allValues) {
-      if (this.model.id) {
-        let totalPrice = 0;
-        let billMain = Object.assign(this.model, allValues.formValue);
-        let detailArr = allValues.tablesValue?.length
-          ? allValues.tablesValue[0].values
-          : [];
-        billMain.type = "入库";
-        billMain.subType = "其它";
-        billMain.defaultNumber = billMain.number;
-        for (let item of detailArr) {
-          totalPrice += item.allPrice - 0;
+    /** 当点击新增按钮时调用此方法 */
+    add() {
+      this.edit({});
+    },
+    /** 当点击了编辑（修改）按钮时调用此方法 */
+    edit(record) {
+      this.visible = true;
+      this.form.resetFields();
+      this.model = Object.assign({}, record);
+      this.$nextTick(() => {
+        this.form.setFieldsValue(
+          pick(
+            this.model,
+            "packageType",
+            "supplierId",
+            "carNumber",
+            "createTime",
+            "remark"
+          )
+        );
+      });
+      this.initSupplier();
+    },
+    /** 关闭弹窗 */
+    close() {
+      this.visible = false;
+      this.$emit("close");
+    },
+    /** 关闭按钮点击事件 */
+    handleCancel() {
+      this.close();
+    },
+    /** 确认提交 */
+    handleOk() {
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          let formData = {
+            type: 2,
+            packageType: values?.packageType,
+            supplierId: values?.supplierId,
+            carNumber: values?.carNumber,
+            createTime: values?.createTime,
+            remark: values?.remark,
+          };
+          formData = Object.assign(this.model, formData);
+
+          let url = this.url.add,
+            method = "post";
+          if (this.model.id) {
+            url = this.url.edit;
+            method = "post";
+          }
+          this.confirmLoading = true;
+          httpAction(url, formData, method)
+            .then((res) => {
+              if (res.code === 200) {
+                this.$emit("ok");
+                this.confirmLoading = false;
+                this.close();
+              } else {
+                this.$message.warning(res.message || res.data.message);
+                this.confirmLoading = false;
+              }
+            })
+            .finally(() => {});
         }
-        billMain.totalPrice = 0 - totalPrice;
-        if (this.fileList && this.fileList.length > 0) {
-          billMain.fileName = this.fileList;
-        } else {
-          billMain.fileName = "";
-        }
-        if (this.model.id) {
-          billMain.id = this.model.id;
-        }
-        billMain.status = this.billStatus;
-        return {
-          info: JSON.stringify(billMain),
-          rows: JSON.stringify(detailArr),
-        };
-      } else {
-        return {
-          type: 2,
-          packageType: allValues.formValue?.packageType,
-          supplierId: allValues.formValue?.organId,
-          carNumber: allValues.formValue?.carNumber,
-          createTime: allValues.formValue?.operTime,
-          remark: allValues.formValue?.remark,
-        };
-      }
+      });
     },
   },
 };

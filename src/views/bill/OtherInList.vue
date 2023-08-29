@@ -22,15 +22,25 @@
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item
-                  label="商品信息"
+                  label="客户"
                   :labelCol="labelCol"
                   :wrapperCol="wrapperCol"
                 >
-                  <a-input
+                  <a-select
+                    placeholder="选择客户"
+                    showSearch
                     allowClear
-                    placeholder="请输入条码、名称、箱规、型号、颜色、扩展信息"
-                    v-model="queryParam.materialParam"
-                  ></a-input>
+                    optionFilterProp="children"
+                    v-model="queryParam.supplierId"
+                  >
+                    <a-select-option
+                      v-for="(item, index) in supList"
+                      :key="index"
+                      :value="item.id"
+                    >
+                      {{ item.supplier }}
+                    </a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
@@ -59,124 +69,8 @@
                   <a-button style="margin-left: 8px" @click="searchReset"
                     >重置</a-button
                   >
-                  <a @click="handleToggleSearch" style="margin-left: 8px">
-                    {{ toggleSearchStatus ? "收起" : "展开" }}
-                    <a-icon :type="toggleSearchStatus ? 'up' : 'down'" />
-                  </a>
                 </a-col>
               </span>
-              <template v-if="toggleSearchStatus">
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="客户"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="选择客户"
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      v-model="queryParam.organId"
-                    >
-                      <a-select-option
-                        v-for="(item, index) in supList"
-                        :key="index"
-                        :value="item.id"
-                      >
-                        {{ item.supplier }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="仓库名称"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="请选择仓库"
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      v-model="queryParam.depotId"
-                    >
-                      <a-select-option
-                        v-for="(depot, index) in depotList"
-                        :value="depot.id"
-                        :key="index"
-                      >
-                        {{ depot.depotName }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="操作员"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="选择操作员"
-                      showSearch
-                      allowClear
-                      optionFilterProp="children"
-                      v-model="queryParam.creator"
-                    >
-                      <a-select-option
-                        v-for="(item, index) in userList"
-                        :key="index"
-                        :value="item.id"
-                      >
-                        {{ item.userName }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="关联单据"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input
-                      allowClear
-                      placeholder="请输入关联单据"
-                      v-model="queryParam.linkNumber"
-                    ></a-input>
-                  </a-form-item>
-                </a-col>
-                <!-- <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="单据状态"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="选择单据状态"
-                      v-model="queryParam.status"
-                    >
-                      <a-select-option value="0">未审核</a-select-option>
-                      <a-select-option value="1">已审核</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col> -->
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="单据备注"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input
-                      allowClear
-                      placeholder="请输入单据备注"
-                      v-model="queryParam.remark"
-                    ></a-input>
-                  </a-form-item>
-                </a-col>
-              </template>
             </a-row>
           </a-form>
         </div>
@@ -196,18 +90,6 @@
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="batchDel"
                 ><a-icon type="delete" />删除</a-menu-item
-              >
-              <a-menu-item
-                key="2"
-                v-if="checkFlag && btnEnableList.indexOf(2) > -1"
-                @click="batchSetStatus(1)"
-                ><a-icon type="check" />审核</a-menu-item
-              >
-              <a-menu-item
-                key="3"
-                v-if="checkFlag && btnEnableList.indexOf(7) > -1"
-                @click="batchSetStatus(0)"
-                ><a-icon type="stop" />反审核</a-menu-item
               >
             </a-menu>
             <a-button> 批量操作 <a-icon type="down" /> </a-button>
@@ -245,6 +127,8 @@
           >
             <span slot="action" slot-scope="text, record">
               <a @click="myHandleDetail(record, '其它入库', prefixNo)">查看</a>
+              <a-divider type="vertical" />
+              <a @click="myHandleInfo(record)">详情</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
               <a
                 v-if="btnEnableList.indexOf(1) > -1"
@@ -289,6 +173,11 @@
           @ok="modalFormOk"
           @close="modalFormClose"
         ></bill-detail>
+        <bill-info-modal
+          ref="billInfo"
+          @ok="modalFormOk"
+          @close="modalFormClose"
+        ></bill-info-modal>
       </a-card>
     </a-col>
   </a-row>
@@ -297,15 +186,17 @@
 <script>
 import OtherInModal from "./modules/OtherInModal";
 import BillDetail from "./dialog/BillDetail";
+import BillInfoModal from "./modules/BillInfoModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
-import { BillListMixin } from "./mixins/BillListMixin";
+import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
 import JDate from "@/components/jeecg/JDate";
 import Vue from "vue";
 export default {
   name: "OtherInList",
-  mixins: [JeecgListMixin, BillListMixin],
+  mixins: [JeecgListMixin, BillListMixinSimple],
   components: {
     OtherInModal,
+    BillInfoModal,
     BillDetail,
     JDate,
   },
@@ -314,16 +205,10 @@ export default {
       // 查询条件
       queryParam: {
         number: "",
-        materialParam: "",
+        supplierId: "",
         type: "2",
         subType: "其它",
         roleType: Vue.ls.get("roleType"),
-        organId: "",
-        depotId: "",
-        creator: "",
-        linkNumber: "",
-        status: "",
-        remark: "",
       },
       prefixNo: "QTRK",
       labelCol: {
@@ -342,7 +227,7 @@ export default {
           width: 150,
           scopedSlots: { customRender: "action" },
         },
-        { title: "单据编号", dataIndex: "number", width: 160 },
+        { title: "单据编号", dataIndex: "number", width: 120 },
         {
           title: "客户",
           dataIndex: "supplierName",
@@ -356,13 +241,14 @@ export default {
           width: 80,
           scopedSlots: { customRender: "customRenderType" },
         },
+        { title: "车牌号", dataIndex: "carNumber", width: 80, ellipsis: true },
         { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],
       url: {
         list: "/documentHead/list",
-        delete: "/depotHead/delete",
-        deleteBatch: "/depotHead/deleteBatch",
-        batchSetStatusUrl: "/depotHead/batchSetStatus",
+        delete: "/documentHead/delete",
+        deleteBatch: "/documentHead/deleteBatch",
+        batchSetStatusUrl: "/documentHead/batchSetStatus",
       },
     };
   },
@@ -373,7 +259,12 @@ export default {
     this.getDepotData();
     this.initUser();
   },
-  methods: {},
+  methods: {
+    onDateChange: function (value, dateString) {
+      this.queryParam.beginTime = dateString[0];
+      this.queryParam.endTime = dateString[1];
+    },
+  },
 };
 </script>
 <style scoped>

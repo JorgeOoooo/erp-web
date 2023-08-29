@@ -311,35 +311,6 @@ export default {
       this.loadTreeData();
       this.loadUnitListData();
     },
-    /** 查询条码tab的数据 */
-    requestMeTableData(url, params, tab) {
-      tab.loading = true;
-      getAction(url, params)
-        .then((res) => {
-          for (let i = 0; i < res.data.rows.length; i++) {
-            if (res.data.rows[i].sku) {
-              this.meTable.columns[2].type = FormTypes.input;
-            } else {
-              this.meTable.columns[2].type = FormTypes.hidden;
-            }
-          }
-          tab.dataSource = res.data.rows || [];
-        })
-        .finally(() => {
-          tab.loading = false;
-        });
-    },
-    /** 查询仓库tab的数据 */
-    requestDepotTableData(url, params, tab) {
-      tab.loading = true;
-      getAction(url, params)
-        .then((res) => {
-          tab.dataSource = res.data || [];
-        })
-        .finally(() => {
-          tab.loading = false;
-        });
-    },
     close() {
       this.$emit("close");
       this.visible = false;
@@ -403,26 +374,6 @@ export default {
           that.confirmLoading = false;
         });
     },
-    parseParam(param) {
-      return param ? param : "";
-    },
-    validateBarCode(type, value, row, column, callback, target) {
-      let params = {
-        barCode: value,
-        id: row.id.length >= 20 ? 0 : row.id,
-      };
-      checkMaterialBarCode(params).then((res) => {
-        if (res && res.code === 200) {
-          if (!res.data.status) {
-            callback(true);
-          } else {
-            callback(false, "该条码已经存在");
-          }
-        } else {
-          callback(false, res.data);
-        }
-      });
-    },
     loadTreeData() {
       let that = this;
       let params = {};
@@ -468,126 +419,6 @@ export default {
           this.mpShort.otherField3.enabled = mpList[i].enabled;
         }
       }
-    },
-    onlyUnitOnChange(e) {
-      if (e.target.value) {
-        //单位有填写了之后则显示多属性的文本框
-        this.manySkuStatus = true;
-      } else {
-        this.manySkuStatus = false;
-      }
-      this.$refs.editableMeTable.getValues((error, values) => {
-        let mArr = values;
-        for (let i = 0; i < mArr.length; i++) {
-          let mInfo = mArr[i];
-          mInfo.commodityUnit = e.target.value;
-        }
-        this.meTable.dataSource = mArr;
-      });
-    },
-    manyUnitOnChange(value) {
-      let unitArr = this.unitList;
-      let basicUnit = "",
-        otherUnit = "",
-        ratio = 1,
-        otherUnitTwo = "",
-        ratioTwo = 1,
-        otherUnitThree = "",
-        ratioThree = 1;
-      for (let i = 0; i < unitArr.length; i++) {
-        if (unitArr[i].id === value) {
-          basicUnit = unitArr[i].basicUnit;
-          otherUnit = unitArr[i].otherUnit;
-          ratio = unitArr[i].ratio;
-          if (unitArr[i].otherUnitTwo) {
-            otherUnitTwo = unitArr[i].otherUnitTwo;
-            ratioTwo = unitArr[i].ratioTwo;
-          }
-          if (unitArr[i].otherUnitThree) {
-            otherUnitThree = unitArr[i].otherUnitThree;
-            ratioThree = unitArr[i].ratioThree;
-          }
-        }
-      }
-      this.$refs.editableMeTable.getValues((error, values) => {
-        let mArr = values,
-          basicPurchaseDecimal = "",
-          basicCommodityDecimal = "",
-          basicWholesaleDecimal = "",
-          basicLowDecimal = "";
-        for (let i = 0; i < mArr.length; i++) {
-          let mInfo = mArr[i];
-          if (i === 0) {
-            mInfo.commodityUnit = basicUnit;
-            basicPurchaseDecimal = mInfo.purchaseDecimal;
-            basicCommodityDecimal = mInfo.commodityDecimal;
-            basicWholesaleDecimal = mInfo.wholesaleDecimal;
-            basicLowDecimal = mInfo.lowDecimal;
-          } else {
-            //副单位进行换算
-            mInfo.commodityUnit = otherUnit;
-            if (basicPurchaseDecimal) {
-              mInfo.purchaseDecimal = (basicPurchaseDecimal * ratio).toFixed(2);
-            }
-            if (basicCommodityDecimal) {
-              mInfo.commodityDecimal = (basicCommodityDecimal * ratio).toFixed(
-                2
-              );
-            }
-            if (basicWholesaleDecimal) {
-              mInfo.wholesaleDecimal = (basicWholesaleDecimal * ratio).toFixed(
-                2
-              );
-            }
-            if (basicLowDecimal) {
-              mInfo.lowDecimal = (basicLowDecimal * ratio).toFixed(2);
-            }
-            if (otherUnitTwo && i === 2) {
-              mInfo.commodityUnit = otherUnitTwo;
-              if (basicPurchaseDecimal) {
-                mInfo.purchaseDecimal = (
-                  basicPurchaseDecimal * ratioTwo
-                ).toFixed(2);
-              }
-              if (basicCommodityDecimal) {
-                mInfo.commodityDecimal = (
-                  basicCommodityDecimal * ratioTwo
-                ).toFixed(2);
-              }
-              if (basicWholesaleDecimal) {
-                mInfo.wholesaleDecimal = (
-                  basicWholesaleDecimal * ratioTwo
-                ).toFixed(2);
-              }
-              if (basicLowDecimal) {
-                mInfo.lowDecimal = (basicLowDecimal * ratioTwo).toFixed(2);
-              }
-            }
-            if (otherUnitThree && i === 3) {
-              mInfo.commodityUnit = otherUnitThree;
-              if (basicPurchaseDecimal) {
-                mInfo.purchaseDecimal = (
-                  basicPurchaseDecimal * ratioThree
-                ).toFixed(2);
-              }
-              if (basicCommodityDecimal) {
-                mInfo.commodityDecimal = (
-                  basicCommodityDecimal * ratioThree
-                ).toFixed(2);
-              }
-              if (basicWholesaleDecimal) {
-                mInfo.wholesaleDecimal = (
-                  basicWholesaleDecimal * ratioThree
-                ).toFixed(2);
-              }
-              if (basicLowDecimal) {
-                mInfo.lowDecimal = (basicLowDecimal * ratioThree).toFixed(2);
-              }
-            }
-          }
-        }
-        this.meTable.dataSource = mArr;
-      });
     },
     addUnit() {
       this.$refs.unitModalForm.add();
