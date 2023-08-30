@@ -4,6 +4,7 @@
     :width="1000"
     :visible="visible"
     :keyboard="false"
+    :destroyOnClose="true"
     switchFullscreen
     @cancel="handleCancel"
     style="top: 20px; height: 95%"
@@ -64,24 +65,26 @@ export default {
           dataIndex: "depotName",
           width: 200,
           type: FormTypes.select,
-          placeholder: "请选择${title}",
           options: [],
           allowSearch: true,
-          validateRules: [{ required: true }],
+          validateRules: [
+            { required: true, message: "必填", trigger: "change" },
+          ],
           scopedSlots: { customRender: "depotName" },
           ellipsis: true,
         },
         {
-          title: "商品名称",
+          title: "商品款号",
           key: "materialId",
-          dataIndex: "materialId",
+          dataIndex: "model",
           width: 200,
           type: FormTypes.select,
-          placeholder: "请选择${title}",
           options: [],
           allowSearch: true,
-          validateRules: [{ required: true }],
-          scopedSlots: { customRender: "materialId" },
+          validateRules: [
+            { required: true, message: "必填", trigger: "change" },
+          ],
+          scopedSlots: { customRender: "model" },
           ellipsis: true,
         },
         {
@@ -105,7 +108,7 @@ export default {
           title: "操作",
           key: "action",
           dataIndex: "action",
-          width: 120,
+          width: 140,
           scopedSlots: { customRender: "action" },
         },
       ],

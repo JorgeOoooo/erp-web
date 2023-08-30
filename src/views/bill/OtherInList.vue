@@ -126,7 +126,7 @@
             @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record">
-              <a @click="myHandleDetail(record, '其它入库', prefixNo)">查看</a>
+              <a @click="myHandleDetail(record, '其它入库', prefixNo)">打印</a>
               <a-divider type="vertical" />
               <a @click="myHandleInfo(record)">详情</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />

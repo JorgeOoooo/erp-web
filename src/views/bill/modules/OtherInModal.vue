@@ -120,6 +120,7 @@ import { findBySelectSup } from "@/api/api";
 import { BillModalMixin } from "../mixins/BillModalMixin";
 import JDate from "@/components/jeecg/JDate";
 import { httpAction } from "@/api/manage";
+import moment from "dayjs";
 export default {
   name: "OtherInModal",
   mixins: [BillModalMixin],
@@ -178,7 +179,7 @@ export default {
     },
     /** 当点击新增按钮时调用此方法 */
     add() {
-      this.edit({});
+      this.edit({ createTime: moment(new Date()).format("YYYY-MM-DD") });
     },
     /** 当点击了编辑（修改）按钮时调用此方法 */
     edit(record) {

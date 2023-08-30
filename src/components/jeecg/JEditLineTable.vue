@@ -25,11 +25,7 @@
               slot-scope="text, record"
             >
               <div :key="col.dataIndex" v-if="record.id === editableLineId">
-                <a-form-model-item
-                  :props="col.key"
-                  :rules="col.validateRules"
-                  help=""
-                >
+                <a-form-model-item :prop="col.key" :rules="col.validateRules">
                   <a-select
                     v-if="col.type == FormTypes.select"
                     v-model="form[col.key]"
@@ -76,21 +72,33 @@
             <template slot="action" slot-scope="text, record">
               <div key="action" class="table-actions">
                 <template v-if="record.id === editableLineId">
-                  <a @click="() => handleSaveLine(record)">保存</a>
+                  <a-button
+                    type="link"
+                    @click="() => handleSaveLine(record)"
+                    size="small"
+                  >
+                    保存
+                  </a-button>
                   <a-popconfirm
                     title="确认要取消编辑该行数据?"
                     @confirm="() => handleCancelLine()"
                   >
-                    <a>取消</a>
+                    <a-button type="link" size="small"> 取消 </a-button>
                   </a-popconfirm>
                 </template>
                 <template v-else>
-                  <a @click="() => handleEditLine(record)">编辑</a>
+                  <a-button
+                    type="link"
+                    @click="() => handleEditLine(record)"
+                    size="small"
+                  >
+                    编辑
+                  </a-button>
                   <a-popconfirm
                     title="确认要删除该行数据?"
                     @confirm="() => handleDeleteLine(record)"
                   >
-                    <a>删除</a>
+                    <a-button type="link" size="small"> 删除 </a-button>
                   </a-popconfirm>
                 </template>
               </div>
@@ -160,13 +168,17 @@ export default {
       }
       this.editableLineId = 0;
       this.$set(this, "form", { ...this.dataFormat, id: 0 });
-      this.$refs.ruleForm.clearValidate();
+      // this.$refs.ruleForm.clearValidate();
     },
     handleSaveLine(record) {
       this.$refs.formRef.validate((valid) => {
         if (valid) {
           this.loading = true;
-          let formData = Object.assign(record, this.form, this.formData);
+          let formData = {
+            ...record,
+            ...this.form,
+            ...this.formData,
+          };
           let url = this.url.add;
           if (formData.id != 0) {
             url = this.url.edit;
@@ -237,14 +249,22 @@ export default {
 .input-table {
   /deep/ .ant-form-item {
     margin-bottom: 0;
+
+    .ant-form-explain {
+      display: none;
+    }
   }
 }
 .actions {
   margin-bottom: 8px;
 }
 .table-actions {
-  a + a {
-    margin-left: 8px;
+  /deep/ .ant-btn-link {
+    padding: 0;
+
+    & + .ant-btn-link {
+      margin-left: 8px;
+    }
   }
 }
 </style>
