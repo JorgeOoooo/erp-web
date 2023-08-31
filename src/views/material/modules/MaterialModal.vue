@@ -229,13 +229,13 @@ export default {
       validatorRules: {
         name: {
           rules: [
-            { required: true, message: "请输入名称!" },
+            // { required: true, message: "请输入名称!" },
             { max: 100, message: "长度请小于100个字符", trigger: "blur" },
           ],
         },
         standard: {
           rules: [
-            { required: true, message: "请输入箱规!" },
+            // { required: true, message: "请输入箱规!" },
             { max: 100, message: "长度请小于100个字符", trigger: "blur" },
           ],
         },

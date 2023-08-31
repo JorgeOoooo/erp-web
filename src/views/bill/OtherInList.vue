@@ -126,7 +126,7 @@
             @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record">
-              <a @click="myHandleDetail(record, '其它入库', prefixNo)">打印</a>
+              <a @click="myHandleDetail(record, 2, prefixNo)">打印</a>
               <a-divider type="vertical" />
               <a @click="myHandleInfo(record)">详情</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
@@ -185,7 +185,7 @@
 <!--power by ji shenghua-->
 <script>
 import OtherInModal from "./modules/OtherInModal";
-import BillDetail from "./dialog/BillDetail";
+import BillDetail from "./dialog/BillDetailSimple";
 import BillInfoModal from "./modules/BillInfoModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
 import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
