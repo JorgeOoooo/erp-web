@@ -41,6 +41,13 @@
                   <a-button style="margin-left: 8px" @click="searchReset"
                     >重置</a-button
                   >
+                  <a-button
+                    style="margin-left: 8px"
+                    type="dashed"
+                    shape="circle"
+                    icon="redo"
+                    @click="searchQuery"
+                  />
                 </a-col>
               </span>
             </a-row>

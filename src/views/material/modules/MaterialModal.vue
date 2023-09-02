@@ -69,7 +69,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :md="12" :sm="24">
+          <!-- <a-col :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
@@ -106,7 +106,7 @@
                 </a-select-option>
               </a-select>
             </a-form-item>
-          </a-col>
+          </a-col> -->
           <a-col :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
@@ -245,9 +245,9 @@ export default {
             { max: 100, message: "长度请小于100个字符", trigger: "blur" },
           ],
         },
-        unitId: {
-          rules: [{ required: true, message: "请输入单位!" }],
-        },
+        // unitId: {
+        //   rules: [{ required: true, message: "请输入单位!" }],
+        // },
       },
       url: {
         add: "/material/add",
@@ -291,7 +291,7 @@ export default {
             "name",
             "standard",
             "unit",
-            "unitId",
+            // "unitId",
             "model",
             "color",
             "categoryId",
@@ -309,7 +309,7 @@ export default {
         );
       });
       this.loadTreeData();
-      this.loadUnitListData();
+      // this.loadUnitListData();
     },
     close() {
       this.$emit("close");
