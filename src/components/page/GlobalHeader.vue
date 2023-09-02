@@ -16,9 +16,7 @@
         @click="toggle"
       ></a-icon>
 
-      <span v-if="device === 'desktop'" class="company-name">{{
-        companyName
-      }}</span>
+      <span v-if="device === 'desktop'" class="company-name"></span>
       <span v-else>{{ systemTitle }}</span>
 
       <user-menu :theme="theme" @searchGlobalHeader="searchGlobalHeader" />

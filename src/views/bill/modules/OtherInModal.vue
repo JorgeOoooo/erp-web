@@ -29,6 +29,8 @@
                 v-decorator="['supplierId', validatorRules.supplierId]"
                 :dropdownMatchSelectWidth="false"
                 showSearch
+                allowClear
+                :disabled="!!model.id"
                 optionFilterProp="children"
               >
                 <div slot="dropdownRender" slot-scope="menu">
@@ -79,6 +81,7 @@
                 placeholder="选择托管类型"
                 :dropdownMatchSelectWidth="false"
                 showSearch
+                allowClear
                 optionFilterProp="children"
               >
                 <a-select-option :value="1"> 全托 </a-select-option>
@@ -92,7 +95,53 @@
               :wrapperCol="wrapperCol"
               label="车牌号"
             >
-              <a-input placeholder="请输入车牌号" v-decorator="['carNumber']" />
+              <a-input
+                placeholder="请输入车牌号"
+                v-decorator="['carNumber']"
+                allowClear
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12" :md="12" :sm="24">
+            <a-form-item
+              :labelCol="labelCol"
+              :wrapperCol="wrapperCol"
+              label="巴恰费"
+            >
+              <a-input-number
+                placeholder="请输入巴恰费"
+                v-decorator="['handlingFee']"
+                allowClear
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12" :md="12" :sm="24">
+            <a-form-item
+              :labelCol="labelCol"
+              :wrapperCol="wrapperCol"
+              label="服务费"
+            >
+              <a-input-number
+                placeholder="请输入服务费"
+                v-decorator="['serverFee']"
+                allowClear
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12" :md="12" :sm="24">
+            <a-form-item
+              :labelCol="labelCol"
+              :wrapperCol="wrapperCol"
+              label="车费"
+            >
+              <a-input-number
+                placeholder="请输入车费"
+                v-decorator="['carFee']"
+                allowClear
+                style="width: 100%"
+              />
             </a-form-item>
           </a-col>
           <a-col :lg="12" :md="12" :sm="24">
@@ -194,7 +243,10 @@ export default {
             "supplierId",
             "carNumber",
             "createTime",
-            "remark"
+            "remark",
+            "handlingFee",
+            "serverFee",
+            "carFee"
           )
         );
       });
@@ -220,6 +272,9 @@ export default {
             carNumber: values?.carNumber,
             createTime: values?.createTime,
             remark: values?.remark,
+            handlingFee: values?.handlingFee,
+            serverFee: values?.serverFee,
+            carFee: values?.carFee,
           };
           formData = Object.assign(this.model, formData);
 

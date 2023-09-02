@@ -24,7 +24,21 @@
               :slot="col.dataIndex"
               slot-scope="text, record"
             >
-              <div :key="col.dataIndex" v-if="record.id === editableLineId">
+              <div :key="col.dataIndex" v-if="col.dataIndex == 'volume'">
+                {{
+                  !notShowText.includes("volume")
+                    ? getVolume(
+                        record.id === editableLineId,
+                        record.standard,
+                        record.operNumber
+                      )
+                    : ""
+                }}
+              </div>
+              <div
+                :key="col.dataIndex"
+                v-else-if="record.id === editableLineId"
+              >
                 <a-form-model-item :prop="col.key" :rules="col.validateRules">
                   <a-select
                     v-if="col.type == FormTypes.select"
@@ -37,6 +51,7 @@
                     allowClear
                     style="width: 100%"
                     placeholder="请选择"
+                    @change="(val) => changeValue(val, col)"
                   >
                     <a-select-option
                       v-for="option in col.options"
@@ -61,11 +76,14 @@
                     :precision="0"
                     style="width: 100%"
                     placeholder="请输入"
+                    @change="(val) => changeValue(val, col)"
                   />
-                  <span v-else>{{ text }}</span>
+                  <span v-else-if="!notShowText.includes(col.dataIndex)">{{
+                    text
+                  }}</span>
                 </a-form-model-item>
               </div>
-              <template v-else>
+              <template v-else-if="!notShowText.includes(col.dataIndex)">
                 {{ text }}
               </template>
             </template>
@@ -142,6 +160,10 @@ export default {
       required: true,
       default: () => ({}),
     },
+    notShowText: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -191,7 +213,7 @@ export default {
                 this.editableLineId = undefined;
                 this.$emit("ok");
               } else {
-                this.$message.warning(res.data || res.data.message);
+                this.$message.warning(res.data?.message || res.data);
               }
             })
             .finally(() => {
@@ -230,7 +252,6 @@ export default {
       this.$set(this, "form", { ...record });
       this.$refs.ruleForm.clearValidate();
     },
-
     /** 用于搜索下拉框中的内容 */
     handleSelectFilterOption(input, option, column) {
       if (column.allowSearch === true || column.allowInput === true) {
@@ -241,6 +262,31 @@ export default {
         );
       }
       return true;
+    },
+    changeValue(val, col) {
+      if (col.key === "materialId") {
+        let obj = col.options.find((item) => item.id == val);
+        this.$set(this.form, "standard", obj.standard);
+      }
+    },
+    getVolume(isEditLine, standard, operNumber) {
+      if (isEditLine) {
+        standard = this.form?.standard || "";
+        operNumber = this.form?.operNumber || "";
+        if (standard == null || standard == "" || operNumber == "") return "";
+        let arr = standard.split("*");
+        let volume = arr.reduce((prev, cur) => {
+          return prev * cur;
+        }, 1.0);
+        return parseFloat((volume * operNumber).toFixed(4));
+      } else {
+        if (standard == null || standard == "" || operNumber == "") return "";
+        let arr = standard.split("*");
+        let volume = arr.reduce((prev, cur) => {
+          return prev * cur;
+        }, 1.0);
+        return parseFloat((volume * operNumber).toFixed(4));
+      }
     },
   },
 };

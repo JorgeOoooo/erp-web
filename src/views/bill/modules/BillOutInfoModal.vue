@@ -20,18 +20,6 @@
             {{ model.number }}
           </span>
         </div>
-        <div class="item">
-          <span>仓管类型：</span>
-          <span>
-            {{
-              model.packageType == 1
-                ? "全托"
-                : model.packageType == 2
-                ? "半托"
-                : ""
-            }}
-          </span>
-        </div>
       </div>
       <j-edit-line-table
         :columns="columns"
@@ -39,9 +27,11 @@
         :dataFormat="dataFormat"
         :url="url"
         :form-data="{ headId: this.model.id }"
-        :notShowText="notShowText"
         @ok="getInInfo"
       >
+        <template #volume="{ isEdit }">
+          {{ isEdit }}
+        </template>
       </j-edit-line-table>
     </div>
   </a-modal>
@@ -121,19 +111,6 @@ export default {
           scopedSlots: { customRender: "remark" },
         },
         {
-          title: "箱规",
-          key: "standard",
-          dataIndex: "standard",
-          scopedSlots: { customRender: "standard" },
-        },
-        {
-          title: "体积",
-          key: "volume",
-          dataIndex: "volume",
-          width: 120,
-          scopedSlots: { customRender: "volume" },
-        },
-        {
           title: "操作",
           key: "action",
           dataIndex: "action",
@@ -148,7 +125,6 @@ export default {
         operNumber: 1,
         remark: "",
       },
-      notShowText: [],
     };
   },
   created() {},
@@ -158,11 +134,6 @@ export default {
       this.getInInfo();
       this.getDepotData();
       this.getMaterialData();
-      if (this.model.packageType == 1) {
-        this.notShowText = [];
-      } else {
-        this.notShowText = ["standard", "volume"];
-      }
       this.visible = true;
     },
     // 查询入库单详情

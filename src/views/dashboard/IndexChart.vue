@@ -252,62 +252,6 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-row :gutter="24">
-      <a-col
-        :sm="24"
-        :md="24"
-        :xl="24"
-        :style="{ paddingRight: '0px', marginBottom: '6px' }"
-      >
-        <a-card
-          :bordered="false"
-          :body-style="{ padding: '5' }"
-          data-step="7"
-          data-title="服务和版权"
-          data-intro="展示服务到期时间（快到期时会出现续费链接，请注意及时续费）、
-          用户数量（是指最多可以录入的用户数量）、版权信息"
-        >
-          <div class="hidden-xs" style="float: right">
-            <a-popover
-              trigger="hover"
-              :visible="hovered"
-              @visibleChange="handleHoverChange"
-            >
-              <div slot="content">
-                <img src="/static/weixin.jpg" style="width: 258px" />
-              </div>
-              <a-button type="link" v-if="showWeixinSpan()"
-                >华夏ERP微信小程序</a-button
-              >
-            </a-popover>
-            &copy; 2015-2030 {{ systemTitle }} V1.0.0
-          </div>
-          <a-tag v-if="tenant.type == 0" color="blue"
-            >试用到期：{{ tenant.expireTime }}</a-tag
-          >
-          <a-tag v-if="tenant.type == 0" color="blue"
-            >试用用户：{{ tenant.userCurrentNum }}/{{
-              tenant.userNumLimit
-            }}</a-tag
-          >
-          <a-tag v-if="tenant.type == 1" color="blue"
-            >服务到期：{{ tenant.expireTime }}</a-tag
-          >
-          <a-tag v-if="tenant.type == 1" color="blue"
-            >授权用户：{{ tenant.userCurrentNum }}/{{
-              tenant.userNumLimit
-            }}</a-tag
-          >
-          <a
-            v-if="hasExpire"
-            style="color: red"
-            :href="payFeeUrl"
-            target="_blank"
-            >立即续费</a
-          >
-        </a-card>
-      </a-col>
-    </a-row>
   </div>
 </template>
 <script>

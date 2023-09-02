@@ -96,7 +96,7 @@
           </a-dropdown>
           <a-tooltip
             placement="left"
-            title="可以进行库存初始化，生产管理模块的成品入库。"
+            title="全托需要箱柜和体积；半托全部按包计算，不需要箱柜和体积。"
             slot="action"
           >
             <a-icon
@@ -126,8 +126,8 @@
             @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record">
-              <a @click="myHandleDetail(record, 2, prefixNo)">打印</a>
-              <a-divider type="vertical" />
+              <!-- <a @click="myHandleDetail(record, 2, prefixNo)">打印</a>
+              <a-divider type="vertical" /> -->
               <a @click="myHandleInfo(record)">详情</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
               <a

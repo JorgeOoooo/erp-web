@@ -62,6 +62,91 @@
           </div>
         </div>
       </div>
+      <div class="info-table">
+        <div class="left">
+          <div class="text-vertical">
+            {{ tableTitle }}
+          </div>
+        </div>
+        <div class="table">
+          <a-table
+            ref="table"
+            size="middle"
+            bordered
+            :rowKey="(record, index) => index + 1"
+            :pagination="false"
+            :columns="columns"
+            :dataSource="dataSource"
+          >
+            <template slot="index" slot-scope="text, record, index">
+              {{ index + 1 }}
+            </template>
+          </a-table>
+        </div>
+        <div class="right">
+          <div class="item">一.存根联</div>
+          <div class="item">二.客户联</div>
+          <div class="item">三.记账联</div>
+        </div>
+      </div>
+      <div class="info-line">
+        <div class="left"></div>
+        <div class="rigth">
+          <div class="info-item">
+            <div class="label">数量汇总：</div>
+            <div class="value line">
+              {{ model.numberCount }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-line">
+        <div class="left"></div>
+        <div class="rigth">
+          <div class="info-item">
+            <div class="label">立方数汇总：</div>
+            <div class="value line">
+              {{ model.volumeCount }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-line mt-40">
+        <div class="left">
+          <div class="info-item">
+            <div class="label">巴恰费：</div>
+            <div class="value line"></div>
+          </div>
+        </div>
+        <div>
+          <div class="middle">
+            <div class="info-item">
+              <div class="label">服务费：</div>
+              <div class="value line"></div>
+            </div>
+          </div>
+        </div>
+        <div class="rigth">
+          <div class="info-item">
+            <div class="label">车费：</div>
+            <div class="value line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-line">
+        <div class="left">
+          <div class="info-item">
+            <div class="label">送货人：</div>
+            <div class="value line"></div>
+          </div>
+        </div>
+        <div class="rigth">
+          <div class="info-item">
+            <div class="label">收货人：</div>
+            <div class="value line"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- <bill-print-iframe ref="modalDetail"></bill-print-iframe> -->
     <!-- <financial-detail ref="financialDetailModal"></financial-detail> -->
@@ -97,35 +182,53 @@ export default {
   data() {
     return {
       title: "详情",
-      width: "1600px",
+      width: "1000px",
       visible: false,
       modalStyle: "",
       model: {},
-      tableWidth: {
-        width: "1500px",
-      },
-      tableWidthRetail: {
-        width: "1150px",
-      },
       loading: false,
       dataSource: [],
+      columns: [
+        {
+          title: "序号",
+          scopedSlots: { customRender: "index" },
+        },
+        {
+          title: "商品款号",
+          dataIndex: "model",
+        },
+        {
+          title: "件数",
+          dataIndex: "operNumber",
+        },
+        {
+          title: "库房号",
+          dataIndex: "depotName",
+        },
+        {
+          title: "备注",
+          dataIndex: "remark",
+        },
+        {
+          title: "箱规",
+          dataIndex: "standard",
+        },
+        {
+          title: "体积",
+          dataIndex: "volume",
+        },
+      ],
       url: {
         detailList: "/documentItem/head",
       },
-      //表头
-      columns: [],
     };
   },
-  created() {
-    let realScreenWidth = window.screen.width;
-    this.width = realScreenWidth < 1500 ? "1200px" : "1550px";
-    this.tableWidth = {
-      width: realScreenWidth < 1500 ? "1150px" : "1500px",
-    };
-    this.tableWidthRetail = {
-      width: realScreenWidth < 1500 ? "800px" : "1100px",
-    };
+  computed: {
+    tableTitle() {
+      return window.SYS_TITLE + "仓储服务中心";
+    },
   },
+  created() {},
   methods: {
     show(record, type) {
       //查询单条单据信息
@@ -135,6 +238,7 @@ export default {
           this.visible = true;
           this.modalStyle = "top:20px;height: 95%;";
           this.model = Object.assign({}, item);
+          this.dataSource = item.documentItemPrintVOList;
         }
       });
     },
@@ -151,11 +255,18 @@ export default {
 </script>
 
 <style scoped lang="less">
+#print {
+  padding: 28px;
+}
+.mt-40 {
+  margin-top: 40px !important;
+}
 .info-line {
   display: flex;
   justify-content: space-between;
   line-height: 24px;
   font-size: 16px;
+  padding-right: 70px;
 
   &:first-child {
     padding-top: 20px;
@@ -165,14 +276,19 @@ export default {
   & + .info-line {
     margin-top: 12px;
   }
-}
-.left {
-  min-width: 220px;
-  text-align: left;
-}
-.right {
-  min-width: 220px;
-  text-align: right;
+
+  & + .info-table {
+    margin-top: 20px;
+  }
+
+  .left {
+    min-width: 220px;
+    text-align: left;
+  }
+  .right {
+    min-width: 220px;
+    text-align: right;
+  }
 }
 .info-item {
   display: inline-flex;
@@ -184,13 +300,42 @@ export default {
   }
   .value {
     display: inline-block;
-    min-width: 120px;
+    min-width: 140px;
     padding-bottom: 4px;
     &.line {
       border-bottom: 1px solid #000;
     }
   }
 }
+
+.info-table {
+  display: flex;
+  align-items: center;
+  .left {
+    width: 30px;
+    .text-vertical {
+      width: 20px;
+      line-height: 20px;
+    }
+  }
+
+  .table {
+    flex: 1;
+  }
+
+  .right {
+    width: 70px;
+    padding-left: 10px;
+    .item + .item {
+      margin-top: 12px;
+    }
+  }
+
+  & + .info-line {
+    margin-top: 20px;
+  }
+}
+
 @page {
   size: auto A4 landscape;
   margin: 3mm;
