@@ -14,6 +14,7 @@
                   :wrapperCol="wrapperCol"
                 >
                   <a-input
+                    allowClear
                     placeholder="请输入单据编号"
                     v-model="queryParam.number"
                   ></a-input>
@@ -21,14 +22,25 @@
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item
-                  label="商品信息"
+                  label="客户"
                   :labelCol="labelCol"
                   :wrapperCol="wrapperCol"
                 >
-                  <a-input
-                    placeholder="请输入条码、名称、箱规、型号、颜色、扩展信息"
-                    v-model="queryParam.materialParam"
-                  ></a-input>
+                  <a-select
+                    placeholder="选择客户"
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    v-model="queryParam.supplierId"
+                  >
+                    <a-select-option
+                      v-for="(item, index) in supList"
+                      :key="index"
+                      :value="item.id"
+                    >
+                      {{ item.supplier }}
+                    </a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
@@ -42,6 +54,7 @@
                     v-model="queryParam.createTimeRange"
                     format="YYYY-MM-DD"
                     :placeholder="['开始时间', '结束时间']"
+                    allowClear
                     @change="onDateChange"
                     @ok="onDateOk"
                   />
@@ -56,85 +69,15 @@
                   <a-button style="margin-left: 8px" @click="searchReset"
                     >重置</a-button
                   >
-                  <a @click="handleToggleSearch" style="margin-left: 8px">
-                    {{ toggleSearchStatus ? "收起" : "展开" }}
-                    <a-icon :type="toggleSearchStatus ? 'up' : 'down'" />
-                  </a>
+                  <a-button
+                    style="margin-left: 8px"
+                    type="dashed"
+                    shape="circle"
+                    icon="redo"
+                    @click="searchQuery"
+                  />
                 </a-col>
               </span>
-              <template v-if="toggleSearchStatus">
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="仓库名称"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="请选择仓库"
-                      showSearch
-                      optionFilterProp="children"
-                      v-model="queryParam.depotId"
-                    >
-                      <a-select-option
-                        v-for="(depot, index) in depotList"
-                        :value="depot.id"
-                        :key="index"
-                      >
-                        {{ depot.depotName }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="操作员"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="选择操作员"
-                      showSearch
-                      optionFilterProp="children"
-                      v-model="queryParam.creator"
-                    >
-                      <a-select-option
-                        v-for="(item, index) in userList"
-                        :key="index"
-                        :value="item.id"
-                      >
-                        {{ item.userName }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="单据状态"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-select
-                      placeholder="选择单据状态"
-                      v-model="queryParam.status"
-                    >
-                      <a-select-option value="0">未审核</a-select-option>
-                      <a-select-option value="1">已审核</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :md="6" :sm="24">
-                  <a-form-item
-                    label="单据备注"
-                    :labelCol="labelCol"
-                    :wrapperCol="wrapperCol"
-                  >
-                    <a-input
-                      placeholder="请输入单据备注"
-                      v-model="queryParam.remark"
-                    ></a-input>
-                  </a-form-item>
-                </a-col>
-              </template>
             </a-row>
           </a-form>
         </div>
@@ -155,24 +98,12 @@
                 @click="batchDel"
                 ><a-icon type="delete" />删除</a-menu-item
               >
-              <a-menu-item
-                key="2"
-                v-if="checkFlag && btnEnableList.indexOf(2) > -1"
-                @click="batchSetStatus(1)"
-                ><a-icon type="check" />审核</a-menu-item
-              >
-              <a-menu-item
-                key="3"
-                v-if="checkFlag && btnEnableList.indexOf(7) > -1"
-                @click="batchSetStatus(0)"
-                ><a-icon type="stop" />反审核</a-menu-item
-              >
             </a-menu>
             <a-button> 批量操作 <a-icon type="down" /> </a-button>
           </a-dropdown>
-          <a-tooltip
+          <!-- <a-tooltip
             placement="left"
-            title="用于两个仓库之间的商品调拨，调拨单会影响库存。"
+            title="可以进行库存初始化，生产管理模块的成品入库。"
             slot="action"
           >
             <a-icon
@@ -180,7 +111,7 @@
               type="question-circle"
               style="font-size: 20px; float: right"
             />
-          </a-tooltip>
+          </a-tooltip> -->
         </div>
         <!-- table区域-begin -->
         <div>
@@ -202,7 +133,9 @@
             @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record">
-              <a @click="myHandleDetail(record, '调拨出库', prefixNo)">查看</a>
+              <!-- <a @click="myHandleDetail(record, 2, prefixNo)">打印</a>
+              <a-divider type="vertical" /> -->
+              <a @click="myHandleInfo(record)">详情</a>
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
               <a
                 v-if="btnEnableList.indexOf(1) > -1"
@@ -224,6 +157,10 @@
                 <a>删除</a>
               </a-popconfirm>
             </span>
+            <template slot="customRenderType" slot-scope="packageType">
+              <span v-if="packageType == '1'">全托</span>
+              <span v-if="packageType == '2'">半托</span>
+            </template>
             <template slot="customRenderStatus" slot-scope="status">
               <a-tag v-if="status == '0'" color="red">未审核</a-tag>
               <a-tag v-if="status == '1'" color="green">已审核</a-tag>
@@ -243,23 +180,30 @@
           @ok="modalFormOk"
           @close="modalFormClose"
         ></bill-detail>
+        <allocation-out-info-modal
+          ref="billInfo"
+          @ok="modalFormOk"
+          @close="modalFormClose"
+        ></allocation-out-info-modal>
       </a-card>
     </a-col>
   </a-row>
 </template>
-<!--power by jishenghua-->
+<!--power by ji shenghua-->
 <script>
 import AllocationOutModal from "./modules/AllocationOutModal";
-import BillDetail from "./dialog/BillDetail";
+import BillDetail from "./dialog/BillDetailSimple";
+import AllocationOutInfoModal from "./modules/AllocationOutInfoModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
-import { BillListMixin } from "./mixins/BillListMixin";
+import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
 import JDate from "@/components/jeecg/JDate";
 import Vue from "vue";
 export default {
-  name: "AllocationOutList",
-  mixins: [JeecgListMixin, BillListMixin],
+  name: "OtherInList",
+  mixins: [JeecgListMixin, BillListMixinSimple],
   components: {
     AllocationOutModal,
+    AllocationOutInfoModal,
     BillDetail,
     JDate,
   },
@@ -268,16 +212,12 @@ export default {
       // 查询条件
       queryParam: {
         number: "",
-        materialParam: "",
-        type: "出库",
-        subType: "调拨",
+        supplierId: undefined,
+        type: "5",
+        subType: "其它",
         roleType: Vue.ls.get("roleType"),
-        depotId: "",
-        creator: "",
-        status: "",
-        remark: "",
       },
-      prefixNo: "DBCK",
+      prefixNo: "QTRK",
       labelCol: {
         span: 5,
       },
@@ -294,45 +234,44 @@ export default {
           width: 150,
           scopedSlots: { customRender: "action" },
         },
-        { title: "单据编号", dataIndex: "number", width: 160 },
+        { title: "单据编号", dataIndex: "number", width: 120 },
         {
-          title: "商品信息",
-          dataIndex: "materialsList",
-          width: 220,
+          title: "客户",
+          dataIndex: "supplierName",
+          width: 120,
           ellipsis: true,
-          customRender: function (text, record, index) {
-            if (text) {
-              return text.replaceAll(",", "，");
-            }
-          },
         },
-        { title: "单据日期", dataIndex: "operTimeStr", width: 145 },
-        { title: "操作员", dataIndex: "userName", width: 80, ellipsis: true },
-        { title: "数量", dataIndex: "materialCount", width: 60 },
-        { title: "金额合计", dataIndex: "totalPrice", width: 80 },
-        {
-          title: "状态",
-          dataIndex: "status",
-          width: 80,
-          align: "center",
-          scopedSlots: { customRender: "customRenderStatus" },
-        },
+        { title: "单据日期", dataIndex: "createTime", width: 80 },
+        // {
+        //   title: "仓管模式",
+        //   dataIndex: "packageType",
+        //   width: 80,
+        //   scopedSlots: { customRender: "customRenderType" },
+        // },
+        // { title: "车牌号", dataIndex: "carNumber", width: 80, ellipsis: true },
+        { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],
       url: {
         list: "/documentHead/list",
-        delete: "/depotHead/delete",
-        deleteBatch: "/depotHead/deleteBatch",
-        batchSetStatusUrl: "/depotHead/batchSetStatus",
+        delete: "/documentHead/delete",
+        deleteBatch: "/documentHead/deleteBatch",
+        batchSetStatusUrl: "/documentHead/batchSetStatus",
       },
     };
   },
   computed: {},
   created() {
     this.initSystemConfig();
+    this.initSupplier();
     this.getDepotData();
     this.initUser();
   },
-  methods: {},
+  methods: {
+    onDateChange: function (value, dateString) {
+      this.queryParam.beginTime = dateString[0];
+      this.queryParam.endTime = dateString[1];
+    },
+  },
 };
 </script>
 <style scoped>

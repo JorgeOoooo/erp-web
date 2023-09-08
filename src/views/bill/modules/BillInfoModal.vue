@@ -143,10 +143,7 @@ export default {
       ],
       dataSource: [],
       dataFormat: {
-        depotId: "",
-        materialId: "",
         operNumber: 1,
-        remark: "",
       },
       notShowText: [],
     };

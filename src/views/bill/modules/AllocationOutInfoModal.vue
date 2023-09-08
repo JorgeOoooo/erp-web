@@ -42,7 +42,7 @@ import JDate from "@/components/jeecg/JDate";
 import { FormTypes } from "@/utils/JEditableTableUtil";
 import { httpAction, getAction } from "@/api/manage";
 export default {
-  name: "BillOutInfoModal",
+  name: "AllocationOutInfoModal",
   components: {
     JEditLineTable,
     JDate,
@@ -91,7 +91,7 @@ export default {
           scopedSlots: { customRender: "operNumber" },
         },
         {
-          title: "库房号",
+          title: "调出仓库",
           key: "depotId",
           dataIndex: "depotName",
           width: 140,
@@ -102,6 +102,19 @@ export default {
             { required: true, message: "必填", trigger: "change" },
           ],
           scopedSlots: { customRender: "depotName" },
+        },
+        {
+          title: "调入仓库",
+          key: "anotherDepotId",
+          dataIndex: "anotherDepotName",
+          width: 140,
+          type: FormTypes.select,
+          options: [],
+          allowSearch: true,
+          validateRules: [
+            { required: true, message: "必填", trigger: "change" },
+          ],
+          scopedSlots: { customRender: "anotherDepotName" },
         },
         {
           title: "备注",
@@ -170,6 +183,7 @@ export default {
                 label: item.depotName,
               };
             }) || [];
+          this.columns[3].options = this.columns[2].options;
         } else {
           this.$message.info(res.data);
         }

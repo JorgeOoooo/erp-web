@@ -78,13 +78,13 @@
                     placeholder="请输入"
                     @change="(val) => changeValue(val, col)"
                   />
-                  <span v-else-if="!notShowText.includes(col.dataIndex)">{{
-                    text
-                  }}</span>
+                  <span v-else-if="!notShowText.includes(col.dataIndex)">
+                    {{ filterShowText(col, record, text) }}
+                  </span>
                 </a-form-model-item>
               </div>
               <template v-else-if="!notShowText.includes(col.dataIndex)">
-                {{ text }}
+                {{ filterShowText(col, record, text) }}
               </template>
             </template>
             <template slot="action" slot-scope="text, record">
@@ -286,6 +286,16 @@ export default {
           return prev * cur;
         }, 1.0);
         return parseFloat((volume * operNumber).toFixed(4));
+      }
+    },
+    filterShowText(col, record, text) {
+      if (col.filterShow == true) {
+        return (
+          col?.options?.find((item) => item.value == record[col.key])?.label ||
+          ""
+        );
+      } else {
+        return text;
       }
     },
   },

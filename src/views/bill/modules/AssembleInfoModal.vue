@@ -29,9 +29,6 @@
         :form-data="{ headId: this.model.id }"
         @ok="getInInfo"
       >
-        <template #volume="{ isEdit }">
-          {{ isEdit }}
-        </template>
       </j-edit-line-table>
     </div>
   </a-modal>
@@ -42,7 +39,7 @@ import JDate from "@/components/jeecg/JDate";
 import { FormTypes } from "@/utils/JEditableTableUtil";
 import { httpAction, getAction } from "@/api/manage";
 export default {
-  name: "BillOutInfoModal",
+  name: "AssembleInfoModal",
   components: {
     JEditLineTable,
     JDate,
@@ -104,12 +101,48 @@ export default {
           scopedSlots: { customRender: "depotName" },
         },
         {
+          title: "调整方式",
+          key: "changeType",
+          dataIndex: "changeType",
+          width: 140,
+          type: FormTypes.select,
+          filterShow: true,
+          options: [
+            {
+              label: "增加",
+              value: 1,
+            },
+            {
+              label: "减少",
+              value: 2,
+            },
+          ],
+          allowSearch: true,
+          validateRules: [
+            { required: true, message: "必填", trigger: "change" },
+          ],
+          scopedSlots: { customRender: "changeType" },
+        },
+        {
           title: "备注",
           key: "remark",
           dataIndex: "remark",
           type: FormTypes.input,
           scopedSlots: { customRender: "remark" },
         },
+        // {
+        //   title: "箱规",
+        //   key: "standard",
+        //   dataIndex: "standard",
+        //   scopedSlots: { customRender: "standard" },
+        // },
+        // {
+        //   title: "体积",
+        //   key: "volume",
+        //   dataIndex: "volume",
+        //   width: 120,
+        //   scopedSlots: { customRender: "volume" },
+        // },
         {
           title: "操作",
           key: "action",
@@ -121,6 +154,7 @@ export default {
       dataSource: [],
       dataFormat: {
         operNumber: 1,
+        standard: undefined,
       },
     };
   },

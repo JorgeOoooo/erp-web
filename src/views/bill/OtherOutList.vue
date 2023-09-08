@@ -212,7 +212,7 @@ export default {
       // 查询条件
       queryParam: {
         number: "",
-        supplierId: "",
+        supplierId: undefined,
         type: "1",
         subType: "其它",
         roleType: Vue.ls.get("roleType"),
