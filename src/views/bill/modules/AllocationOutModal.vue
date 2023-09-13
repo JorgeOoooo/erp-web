@@ -189,7 +189,7 @@ export default {
           scopedSlots: { customRender: "operNumber" },
         },
         {
-          title: "调入仓库",
+          title: "调出仓库",
           dataIndex: "depotId",
           type: FormTypes.select,
           options: [],
@@ -198,7 +198,7 @@ export default {
           scopedSlots: { customRender: "depotId" },
         },
         {
-          title: "调出仓库",
+          title: "调入仓库",
           dataIndex: "anotherDepotId",
           type: FormTypes.select,
           options: [],

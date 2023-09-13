@@ -89,11 +89,11 @@ export default {
     },
     multipage() {
       //判断如果是手机模式，自动切换为单页面模式
-      if (this.isMobile()) {
-        return false;
-      } else {
-        return this.$store.state.app.multipage;
-      }
+      // if (this.isMobile()) {
+      return false;
+      // } else {
+      //   return this.$store.state.app.multipage;
+      // }
     },
     includedComponents() {
       const includedRouters = Vue.ls.get(CACHE_INCLUDED_ROUTES);

@@ -87,7 +87,14 @@
                   style="float: left; overflow: hidden"
                   class="table-page-search-submitButtons"
                 >
-                  <a-button type="primary" @click="searchQuery">查询</a-button>
+                  <a-button type="primary" @click="searchQuery">查询</a-button
+                  ><a-button
+                    style="margin-left: 8px"
+                    type="dashed"
+                    shape="circle"
+                    icon="redo"
+                    @click="searchQuery"
+                  />
                 </span>
               </a-col>
             </a-row>
