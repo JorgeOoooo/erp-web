@@ -10,7 +10,7 @@
       </a-row>
 
       <div ref="editLineTableRef" class="input-table">
-        <a-form-model ref="formRef" :model="form">
+        <a-form-model ref="formRef" :model="form" bordered>
           <a-table
             :columns="columns"
             :data-source="data"
@@ -27,11 +27,7 @@
               <div :key="col.dataIndex" v-if="col.dataIndex == 'volume'">
                 {{
                   !notShowText.includes("volume")
-                    ? getVolume(
-                        record.id === editableLineId,
-                        record.standard,
-                        record.operNumber
-                      )
+                    ? getVolume(record.id === editableLineId, record)
                     : ""
                 }}
               </div>
@@ -41,17 +37,47 @@
               >
                 <a-form-model-item :prop="col.key" :rules="col.validateRules">
                   <a-select
-                    v-if="col.type == FormTypes.select"
+                    v-if="col.type == FormTypes.lazySelect"
+                    v-model="form[col.key]"
+                    :dropdownMatchSelectWidth="false"
+                    :default-active-first-option="false"
+                    :show-arrow="false"
+                    :filter-option="false"
+                    :not-found-content="
+                      loadings[col.key] || false ? undefined : null
+                    "
+                    showSearch
+                    allowClear
+                    style="width: 100%"
+                    placeholder="请输入内容后选择"
+                    @search="(val) => handleSearch(val, col)"
+                    @change="(val) => handleChange(val, col)"
+                  >
+                    <a-spin
+                      v-if="loadings[col.key] || false"
+                      slot="notFoundContent"
+                      size="small"
+                    />
+                    <a-select-option
+                      v-for="option in options[col.key]"
+                      :key="option.value"
+                      :value="option.value"
+                    >
+                      {{ option.label }}
+                    </a-select-option>
+                  </a-select>
+                  <a-select
+                    v-else-if="col.type == FormTypes.select"
                     v-model="form[col.key]"
                     :filterOption="
                       (i, o) => handleSelectFilterOption(i, o, col)
                     "
                     :dropdownMatchSelectWidth="false"
-                    :showSearch="true"
+                    showSearch
                     allowClear
                     style="width: 100%"
                     placeholder="请选择"
-                    @change="(val) => changeValue(val, col)"
+                    @change="(val) => handleChange(val, col)"
                   >
                     <a-select-option
                       v-for="option in col.options"
@@ -76,7 +102,7 @@
                     :precision="0"
                     style="width: 100%"
                     placeholder="请输入"
-                    @change="(val) => changeValue(val, col)"
+                    @change="(val) => handleChange(val, col)"
                   />
                   <span v-else-if="!notShowText.includes(col.dataIndex)">
                     {{ filterShowText(col, record, text) }}
@@ -129,11 +155,15 @@
 </template>
 <script>
 import { FormTypes } from "@/utils/JEditableTableUtil";
-import { httpAction } from "@/api/manage";
+import { httpAction, getAction } from "@/api/manage";
 export default {
   name: "JEditLineTable",
   components: {},
   props: {
+    type: {
+      type: String,
+      default: "",
+    },
     // 列信息
     columns: {
       type: Array,
@@ -142,7 +172,6 @@ export default {
     // 数据源
     dataSource: {
       type: Array,
-      required: true,
       default: () => [],
     },
     dataFormat: {
@@ -152,12 +181,10 @@ export default {
     },
     url: {
       type: Object,
-      required: true,
       default: () => ({}),
     },
     formData: {
       type: Object,
-      required: true,
       default: () => ({}),
     },
     notShowText: {
@@ -172,12 +199,17 @@ export default {
       // 当前可编辑行。值为undefined时没有可编辑行；值为0时为正在新增的行；值为其他时为正在编辑的行
       editableLineId: undefined,
       form: {},
+      tempData: [],
+      loadings: {},
+      options: {},
+      timer: {},
+      currentValue: {},
     };
   },
   computed: {
     data() {
       return [
-        ...this.dataSource,
+        ...(this.type == "temp" ? this.tempData : this.dataSource),
         ...(this.editableLineId === 0 ? [this.form] : []),
       ];
     },
@@ -190,41 +222,60 @@ export default {
       }
       this.editableLineId = 0;
       this.$set(this, "form", { ...this.dataFormat, id: 0 });
-      // this.$refs.ruleForm.clearValidate();
+      // this.$refs.formRef.clearValidate();
     },
     handleSaveLine(record) {
       this.$refs.formRef.validate((valid) => {
         if (valid) {
-          this.loading = true;
-          let formData = {
-            ...record,
-            ...this.form,
-            ...this.formData,
-          };
-          let url = this.url.add;
-          if (formData.id != 0) {
-            url = this.url.edit;
+          if (this.type == "temp") {
+            // 临时数据
+            if (this.editableLineId == 0) {
+              this.tempData.push({ ...this.form, id: Date.now() });
+              this.editableLineId = undefined;
+            } else {
+              let index = this.tempData.findIndex(
+                (item) => item.id == this.editableLineId
+              );
+              this.tempData.splice(index, 1, { ...this.form });
+              this.editableLineId = undefined;
+            }
           } else {
-            delete formData.id;
+            this.loading = true;
+            let formData = {
+              ...record,
+              ...this.form,
+              ...this.formData,
+            };
+            let url = this.url.add;
+            if (formData.id != 0) {
+              url = this.url.edit;
+            } else {
+              delete formData.id;
+            }
+            httpAction(url, formData, "post")
+              .then((res) => {
+                if (res.code === 200) {
+                  this.editableLineId = undefined;
+                  this.$emit("ok");
+                } else {
+                  this.$message.warning(res.data?.message || res.data);
+                }
+              })
+              .finally(() => {
+                this.loading = false;
+              });
           }
-          httpAction(url, formData, "post")
-            .then((res) => {
-              if (res.code === 200) {
-                this.editableLineId = undefined;
-                this.$emit("ok");
-              } else {
-                this.$message.warning(res.data?.message || res.data);
-              }
-            })
-            .finally(() => {
-              this.loading = false;
-            });
         }
       });
     },
     handleDeleteLine(record) {
       if (this.editableLineId !== undefined) {
         this.$message.warning("存在正在新增或编辑的行，请保存或取消后再删除！");
+        return;
+      }
+      if (this.type == "temp") {
+        let index = this.tempData.findIndex((item) => item.id == record.id);
+        this.tempData.splice(index, 1);
         return;
       }
       this.loading = true;
@@ -250,7 +301,16 @@ export default {
       }
       this.editableLineId = record.id;
       this.$set(this, "form", { ...record });
-      this.$refs.ruleForm.clearValidate();
+      this.$refs?.formRef?.clearValidate();
+    },
+    handleCopyLine(record) {
+      if (this.editableLineId !== undefined) {
+        this.$message.warning("存在正在新增或编辑的行，请保存或取消后再编辑！");
+        return;
+      }
+      this.editableLineId = 0;
+      this.$set(this, "form", { ...record, id: 0 });
+      this.$refs?.formRef?.clearValidate();
     },
     /** 用于搜索下拉框中的内容 */
     handleSelectFilterOption(input, option, column) {
@@ -263,45 +323,100 @@ export default {
       }
       return true;
     },
-    changeValue(val, col) {
-      if (col.key === "materialId") {
-        let obj = col.options.find((item) => item.id == val);
-        this.$set(this.form, "standard", obj.standard);
+    handleChange(val, col) {
+      if (col.type == FormTypes.lazySelect) {
+        let obj = this.options?.[col.key]?.find((item) => item.id == val);
+        this.$set(this.form, col.dataIndex, obj?.label);
+
+        if (col.key === "materialId") {
+          let obj = this.options?.[col.key]?.find((item) => item.id == val);
+          this.$set(this.form, "standard", obj?.standard);
+        }
       }
     },
-    getVolume(isEditLine, standard, operNumber) {
-      if (isEditLine) {
-        standard = this.form?.standard || "";
-        operNumber = this.form?.operNumber || "";
-        if (standard == null || standard == "" || operNumber == "") return "";
-        let arr = standard.split("*");
-        let volume = arr.reduce((prev, cur) => {
-          return prev * cur;
-        }, 1.0);
-        return parseFloat((volume * operNumber).toFixed(4));
-      } else {
-        if (standard == null || standard == "" || operNumber == "") return "";
-        let arr = standard.split("*");
-        let volume = arr.reduce((prev, cur) => {
-          return prev * cur;
-        }, 1.0);
-        return parseFloat((volume * operNumber).toFixed(4));
+    handleSearch(val, col) {
+      console.log(val, col);
+      if (!val) {
+        // this.$set(this.options, col.key, undefined);
+        return;
       }
+      let that = this;
+      if (this.timer?.[col.key]) {
+        clearTimeout(this.timer[col.key]);
+        this.timer[col.key] = null;
+      }
+      this.$set(this.currentValue, col.key, val);
+      function getOptions() {
+        that.$set(that.loadings, col.key, true);
+        let params = {};
+        if (col.selectConfig.inputText) {
+          params[col.selectConfig.inputText] = val;
+        }
+        getAction(col.selectConfig.url, params)
+          .then((res) => {
+            if (res.code === 200) {
+              if (that.currentValue?.[col.key] == val) {
+                that.$set(
+                  that.options,
+                  col.key,
+                  res.data?.map((item) => {
+                    return {
+                      ...item,
+                      value: item?.[col.selectConfig.valueKey || "value"],
+                      label: item?.[col.selectConfig.labelKey || "label"],
+                    };
+                  }) || []
+                );
+              }
+            } else {
+              that.$message.info(res.data);
+            }
+          })
+          .finally(() => {
+            that.$set(that.loadings, col.key, false);
+          });
+      }
+      this.$set(this.timer, col.key, setTimeout(getOptions, 300));
+    },
+    getVolume(isEditLine, record) {
+      let obj = isEditLine ? this.form : record;
+
+      // let col = this.columns.find((item) => item.key == "materialId");
+      // let material = col.options.find((item) => item.id == obj?.materialId);
+      // if (!material) return "";
+
+      let standard = obj?.standard || "";
+      let operNumber = obj?.operNumber || "";
+      if (standard == null || standard == "" || operNumber == "") return "";
+      let arr = standard.split("*");
+      let volume = arr.reduce((prev, cur) => {
+        return prev * cur;
+      }, 1.0);
+      return parseFloat((volume * operNumber).toFixed(4));
     },
     filterShowText(col, record, text) {
       if (col.filterShow == true) {
         return (
           col?.options?.find((item) => item.value == record[col.key])?.label ||
-          ""
+          text
         );
       } else {
         return text;
       }
     },
+    setTempData(data) {
+      this.tempData = data;
+    },
+    validate() {
+      return this.editableLineId === undefined;
+    },
   },
 };
 </script>
 <style lang="less" scoped>
+.JEditLineTable {
+  overflow: hidden;
+}
 .input-table {
   /deep/ .ant-form-item {
     margin-bottom: 0;
@@ -309,6 +424,11 @@ export default {
     .ant-form-explain {
       display: none;
     }
+  }
+
+  /deep/ .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 8px;
   }
 }
 .actions {

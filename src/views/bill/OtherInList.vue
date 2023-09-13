@@ -135,20 +135,20 @@
             <span slot="action" slot-scope="text, record">
               <!-- <a @click="myHandleDetail(record, 2, prefixNo)">打印</a>
               <a-divider type="vertical" /> -->
-              <a @click="myHandleInfo(record)">详情</a>
-              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
+              <!-- <a @click="myHandleInfo(record)">详情</a>
+              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" /> -->
               <a
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="myHandleEdit(record)"
                 >编辑</a
               >
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
-              <a
+              <!-- <a
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="myHandleCopyAdd(record)"
                 >复制</a
               >
-              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
+              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" /> -->
               <a-popconfirm
                 v-if="btnEnableList.indexOf(1) > -1"
                 title="确定删除吗?"
@@ -175,16 +175,16 @@
           @ok="modalFormOk"
           @close="modalFormClose"
         ></other-in-modal>
-        <bill-detail
+        <!-- <bill-detail
           ref="modalDetail"
           @ok="modalFormOk"
           @close="modalFormClose"
-        ></bill-detail>
-        <bill-info-modal
+        ></bill-detail> -->
+        <!-- <bill-info-modal
           ref="billInfo"
           @ok="modalFormOk"
           @close="modalFormClose"
-        ></bill-info-modal>
+        ></bill-info-modal> -->
       </a-card>
     </a-col>
   </a-row>
@@ -192,8 +192,8 @@
 <!--power by ji shenghua-->
 <script>
 import OtherInModal from "./modules/OtherInModal";
-import BillDetail from "./dialog/BillDetailSimple";
-import BillInfoModal from "./modules/BillInfoModal";
+// import BillDetail from "./dialog/BillDetailSimple";
+// import BillInfoModal from "./modules/BillInfoModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
 import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
 import JDate from "@/components/jeecg/JDate";
@@ -203,8 +203,8 @@ export default {
   mixins: [JeecgListMixin, BillListMixinSimple],
   components: {
     OtherInModal,
-    BillInfoModal,
-    BillDetail,
+    // BillInfoModal,
+    // BillDetail,
     JDate,
   },
   data() {
@@ -231,7 +231,7 @@ export default {
           title: "操作",
           dataIndex: "action",
           align: "center",
-          width: 150,
+          width: 100,
           scopedSlots: { customRender: "action" },
         },
         { title: "单据编号", dataIndex: "number", width: 120 },

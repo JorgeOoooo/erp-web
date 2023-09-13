@@ -1,13 +1,19 @@
 <template>
   <a-modal
-    :title="title"
-    :width="800"
+    :title="
+      (h) => {
+        return h('div', { attrs: { style: 'text-align: center' } }, title);
+      }
+    "
+    width="96%"
     :visible="visible"
     :confirmLoading="confirmLoading"
     :keyboard="false"
+    :maskClosable="false"
     switchFullscreen
     @cancel="handleCancel"
-    style="top: 20px; height: 95%"
+    destroyOnClose
+    style="top: 20px; height: 90%"
   >
     <template slot="footer">
       <a-button @click="handleCancel">取消</a-button>
@@ -16,192 +22,194 @@
       >
     </template>
     <a-spin :spinning="confirmLoading">
-      <a-form :form="form">
-        <a-row class="form-row" :gutter="24">
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="客户"
-            >
-              <a-select
-                placeholder="选择客户"
-                v-decorator="['supplierId', validatorRules.supplierId]"
-                :dropdownMatchSelectWidth="false"
-                showSearch
-                allowClear
-                :disabled="!!model.id"
-                optionFilterProp="children"
+      <div class="my-modal">
+        <a-form
+          :form="form"
+          class="my-form"
+          labelAlign="left"
+          style="height: 100%"
+        >
+          <a-row class="form-row" :gutter="24">
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="客户"
               >
-                <div slot="dropdownRender" slot-scope="menu">
-                  <v-nodes :vnodes="menu" />
-                  <template v-if="isTenant">
-                    <a-divider style="margin: 4px 0" />
-                    <div
-                      style="padding: 4px 8px; cursor: pointer"
-                      @mousedown="(e) => e.preventDefault()"
-                      @click="addSupplier"
-                    >
-                      <a-icon type="plus" /> 新增客户
-                    </div>
-                  </template>
-                </div>
-                <a-select-option
-                  v-for="(item, index) in supList"
-                  :key="index"
-                  :value="item.id"
+                <a-select
+                  placeholder="选择客户"
+                  v-decorator="['supplierId', validatorRules.supplierId]"
+                  :dropdownMatchSelectWidth="false"
+                  showSearch
+                  allowClear
+                  :disabled="!!model.id"
+                  optionFilterProp="children"
                 >
-                  {{ item.supplier }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="单据日期"
-            >
-              <j-date
-                v-decorator="['createTime', validatorRules.createTime]"
-                :show-time="false"
-                dateFormat="YYYY-MM-DD"
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-          <!-- <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="仓管模式"
-            >
-              <a-select
-                v-decorator="['packageType']"
-                placeholder="选择托管类型"
-                :dropdownMatchSelectWidth="false"
-                showSearch
-                allowClear
-                optionFilterProp="children"
+                  <div slot="dropdownRender" slot-scope="menu">
+                    <v-nodes :vnodes="menu" />
+                    <template v-if="isTenant">
+                      <a-divider style="margin: 4px 0" />
+                      <div
+                        style="padding: 4px 8px; cursor: pointer"
+                        @mousedown="(e) => e.preventDefault()"
+                        @click="addSupplier"
+                      >
+                        <a-icon type="plus" /> 新增客户
+                      </div>
+                    </template>
+                  </div>
+                  <a-select-option
+                    v-for="(item, index) in supList"
+                    :key="index"
+                    :value="item.id"
+                  >
+                    {{ item.supplier }}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="单据日期"
               >
-                <a-select-option :value="1"> 全托 </a-select-option>
-                <a-select-option :value="2"> 半托 </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col> -->
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="车牌号"
-            >
-              <a-input
-                placeholder="请输入车牌号"
-                v-decorator="['carNumber']"
-                allowClear
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="巴恰费"
-            >
-              <a-input-number
-                placeholder="请输入巴恰费"
-                v-decorator="['handlingFee']"
-                allowClear
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="服务费"
-            >
-              <a-input-number
-                placeholder="请输入服务费"
-                v-decorator="['serverFee']"
-                allowClear
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="车费"
-            >
-              <a-input-number
-                placeholder="请输入车费"
-                v-decorator="['carFee']"
-                allowClear
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="送货人"
-            >
-              <a-input
-                placeholder="请输入送货人"
-                v-decorator="['sender']"
-                allowClear
-                style="width: 100%"
-              />
-            </a-form-item> </a-col
-          ><a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="收货人"
-            >
-              <a-input
-                placeholder="请输入收货人"
-                v-decorator="['receiver']"
-                allowClear
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :lg="12" :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
-              label="备注"
-            >
-              <a-textarea
-                :rows="1"
-                placeholder="请输入备注"
-                v-decorator="['remark']"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
+                <j-date
+                  v-decorator="['createTime', validatorRules.createTime]"
+                  :show-time="false"
+                  dateFormat="YYYY-MM-DD"
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="车牌号"
+              >
+                <a-input
+                  placeholder="请输入车牌号"
+                  v-decorator="['carNumber']"
+                  allowClear
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+          <editable-table
+            ref="editTableRef"
+            type="temp"
+            :columns="columns"
+            style="height: calc(100% - 144px); margin: 12px 0"
+          >
+          </editable-table>
+
+          <a-row class="form-row" :gutter="24">
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="巴恰费"
+              >
+                <a-input-number
+                  placeholder="请输入巴恰费"
+                  v-decorator="['handlingFee']"
+                  allowClear
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="服务费"
+              >
+                <a-input-number
+                  placeholder="请输入服务费"
+                  v-decorator="['serverFee']"
+                  allowClear
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="车费"
+              >
+                <a-input-number
+                  placeholder="请输入车费"
+                  v-decorator="['carFee']"
+                  allowClear
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="送货人"
+              >
+                <a-input
+                  placeholder="请输入送货人"
+                  v-decorator="['sender']"
+                  allowClear
+                  style="width: 100%"
+                />
+              </a-form-item> </a-col
+            ><a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="收货人"
+              >
+                <a-input
+                  placeholder="请输入收货人"
+                  v-decorator="['receiver']"
+                  allowClear
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="备注"
+              >
+                <a-textarea
+                  :rows="1"
+                  placeholder="请输入备注"
+                  v-decorator="['remark']"
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
     </a-spin>
   </a-modal>
 </template>
 <script>
-// import JEditLineTable from "@/components/jeecg/JEditLineTable";
 import pick from "lodash.pick";
 import { findBySelectSup } from "@/api/api";
 import { BillModalMixin } from "../mixins/BillModalMixin";
 import JDate from "@/components/jeecg/JDate";
-import { httpAction } from "@/api/manage";
+import EditableTable from "@/components/jeecg/EditableTable";
+import { httpAction, getAction } from "@/api/manage";
+import { FormTypes } from "@/utils/JEditableTableUtil";
 import moment from "dayjs";
 export default {
   name: "OtherInModal",
   mixins: [BillModalMixin],
   components: {
-    // JEditLineTable,
+    EditableTable,
     JDate,
     VNodes: {
       functional: true,
@@ -210,6 +218,7 @@ export default {
   },
   data() {
     return {
+      action: "",
       title: "操作",
       visible: false,
       prefixNo: "QTRK",
@@ -240,11 +249,73 @@ export default {
         add: "/documentHead/add",
         edit: "/documentHead/update",
         detailList: "/documentHead/getDetailList",
+        list: "/documentItem/head",
       },
+      columns: [
+        {
+          title: "商品款号",
+          dataIndex: "materialId",
+          type: FormTypes.lazySelect,
+          selectConfig: {
+            url: "/material/model",
+            inputText: "model",
+            labelKey: "model",
+            valueKey: "id",
+          },
+          allowSearch: true,
+          required: true,
+          scopedSlots: { customRender: "materialId" },
+          ellipsis: true,
+        },
+        {
+          title: "件数",
+          dataIndex: "operNumber",
+          width: 120,
+          type: FormTypes.inputNumber,
+          min: 1,
+          required: true,
+          scopedSlots: { customRender: "operNumber" },
+        },
+        {
+          title: "库房号",
+          dataIndex: "depotId",
+          type: FormTypes.select,
+          options: [],
+          allowSearch: true,
+          required: true,
+          scopedSlots: { customRender: "depotId" },
+        },
+        {
+          title: "备注",
+          dataIndex: "remark",
+          type: FormTypes.input,
+          tabIndex: -1,
+          scopedSlots: { customRender: "remark" },
+        },
+      ],
     };
   },
   created() {},
   methods: {
+    initList() {
+      getAction(this.url.list, { headId: this.model.id }).then((res) => {
+        if (res.code === 200) {
+          let data = res.data?.map((item) => {
+            return {
+              ...item,
+              SHOW_materialId: {
+                label: item.model,
+                value: item.materialId,
+                standard: item.standard,
+              },
+            };
+          });
+          this.$nextTick(() => {
+            this.$refs.editTableRef.initDataSource(data || []);
+          });
+        }
+      });
+    },
     initSupplier() {
       let that = this;
       findBySelectSup({}).then((res) => {
@@ -280,6 +351,17 @@ export default {
         );
       });
       this.initSupplier();
+      this.getDepotData();
+
+      if (this.model.id) {
+        this.title = "编辑-出库单";
+        this.initList();
+      } else {
+        this.title = "新增-出库单";
+        this.$nextTick(() => {
+          this.$refs.editTableRef.initDataSource();
+        });
+      }
     },
     /** 关闭弹窗 */
     close() {
@@ -294,44 +376,84 @@ export default {
     handleOk() {
       this.form.validateFields((err, values) => {
         if (!err) {
-          let formData = {
-            type: 1,
-            // packageType: values?.packageType,
-            supplierId: values?.supplierId,
-            carNumber: values?.carNumber,
-            createTime: values?.createTime,
-            remark: values?.remark,
-            handlingFee: values?.handlingFee,
-            serverFee: values?.serverFee,
-            carFee: values?.carFee,
-            sender: values?.sender,
-            receiver: values?.receiver,
-          };
-          formData = Object.assign(this.model, formData);
+          this.$refs.editTableRef.validate((valid) => {
+            if (valid) {
+              let formData = {
+                type: 1,
+                // packageType: values?.packageType,
+                supplierId: values?.supplierId,
+                carNumber: values?.carNumber,
+                createTime: values?.createTime,
+                remark: values?.remark,
+                handlingFee: values?.handlingFee,
+                serverFee: values?.serverFee,
+                carFee: values?.carFee,
+                sender: values?.sender,
+                receiver: values?.receiver,
+                documentItemAddUnitDtos:
+                  this.$refs.editTableRef.getDataSource() || [],
+              };
+              formData = Object.assign(this.model, formData);
 
-          let url = this.url.add,
-            method = "post";
-          if (this.model.id) {
-            url = this.url.edit;
-            method = "post";
-          }
-          this.confirmLoading = true;
-          httpAction(url, formData, method)
-            .then((res) => {
-              if (res.code === 200) {
-                this.$emit("ok");
-                this.confirmLoading = false;
-                this.close();
-              } else {
-                this.$message.warning(res.message || res.data.message);
-                this.confirmLoading = false;
+              let url = this.url.add,
+                method = "post";
+              if (this.model.id) {
+                url = this.url.edit;
+                method = "post";
               }
-            })
-            .finally(() => {});
+              this.confirmLoading = true;
+              httpAction(url, formData, method)
+                .then((res) => {
+                  if (res.code === 200) {
+                    this.$emit("ok");
+                    this.confirmLoading = false;
+                    this.close();
+                  } else {
+                    this.$message.warning(res.message || res.data.message);
+                    this.confirmLoading = false;
+                  }
+                })
+                .finally(() => {});
+            } else {
+              this.$message.warning("存在编辑的行，请编辑完成后再提交！");
+            }
+          });
+        }
+      });
+    },
+    // 查询可选仓库列表
+    getDepotData() {
+      getAction("/depot/findDepotByCurrentUser").then((res) => {
+        if (res.code === 200) {
+          this.columns[2].options =
+            res.data?.map((item) => {
+              return {
+                ...item,
+                value: item.id,
+                label: item.depotName,
+              };
+            }) || [];
+        } else {
+          this.$message.info(res.data);
         }
       });
     },
   },
 };
 </script>
-<style scoped></style>
+<style scoped lang="less">
+.my-modal {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.my-form {
+  /deep/ .ant-form-item {
+    margin-bottom: 0;
+
+    .ant-form-explain {
+      display: none;
+    }
+  }
+}
+</style>

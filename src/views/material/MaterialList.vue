@@ -308,6 +308,7 @@ export default {
           width: 100,
           scopedSlots: { customRender: "action" },
         },
+        { title: "款号", dataIndex: "model", width: 120 },
         {
           title: "名称",
           dataIndex: "name",
@@ -315,7 +316,6 @@ export default {
           scopedSlots: { customRender: "customName" },
         },
         { title: "箱规", dataIndex: "standard", width: 120 },
-        { title: "款号", dataIndex: "model", width: 120 },
         {
           title: "类别",
           dataIndex: "categoryName",

@@ -18,6 +18,7 @@ const FormTypes = {
   input_pop: "input_pop",
   slot: "slot",
   hidden: "hidden",
+  lazySelect: "lazySelect",
 };
 const VALIDATE_NO_PASSED = Symbol();
 export { FormTypes, VALIDATE_NO_PASSED };
