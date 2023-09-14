@@ -90,6 +90,13 @@
             icon="plus"
             >新增</a-button
           >
+          <a-button
+            v-if="btnEnableList.indexOf(1) > -1"
+            @click="handleImportXls()"
+            type="primary"
+            icon="import"
+            >导入</a-button
+          >
           <a-dropdown>
             <a-menu slot="overlay">
               <a-menu-item
@@ -175,6 +182,11 @@
           @ok="modalFormOk"
           @close="modalFormClose"
         ></assemble-modal>
+        <import-modal
+          ref="modalImportForm"
+          @ok="modalFormOk"
+          :data="{ type: '3' }"
+        ></import-modal>
         <!-- <bill-detail
           ref="modalDetail"
           @ok="modalFormOk"
@@ -192,6 +204,7 @@
 <!--power by ji shenghua-->
 <script>
 import AssembleModal from "./modules/AssembleModal";
+import ImportModal from "@/components/tools/ImportModal";
 // import BillDetail from "./dialog/BillDetailSimple";
 // import AssembleInfoModal from "./modules/AssembleInfoModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
@@ -203,6 +216,7 @@ export default {
   mixins: [JeecgListMixin, BillListMixinSimple],
   components: {
     AssembleModal,
+    ImportModal,
     // AssembleInfoModal,
     // BillDetail,
     JDate,
@@ -256,6 +270,7 @@ export default {
         delete: "/documentHead/delete",
         deleteBatch: "/documentHead/deleteBatch",
         batchSetStatusUrl: "/documentHead/batchSetStatus",
+        importExcelUrl: "/documentHead/import",
       },
     };
   },
@@ -267,6 +282,17 @@ export default {
     this.initUser();
   },
   methods: {
+    handleImportXls() {
+      let importExcelUrl = this.url.importExcelUrl;
+      let templateUrl = "";
+      let templateName = "";
+      this.$refs.modalImportForm.initModal(
+        importExcelUrl,
+        templateUrl,
+        templateName
+      );
+      this.$refs.modalImportForm.title = "库存盘点导入";
+    },
     onDateChange: function (value, dateString) {
       this.queryParam.beginTime = dateString[0];
       this.queryParam.endTime = dateString[1];

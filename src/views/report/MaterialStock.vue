@@ -218,7 +218,7 @@ export default {
             return {
               ...item,
               value: item.id,
-              label: item.name + (item.model ? `(${item.model})` : ""),
+              label: item.model,
             };
           });
         } else {

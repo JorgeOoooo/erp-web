@@ -67,14 +67,14 @@
             icon="plus"
             >新增</a-button
           >
-          <!-- <a-button
+          <a-button
             v-if="btnEnableList.indexOf(1) > -1"
             @click="handleImportXls()"
             type="primary"
             icon="import"
             >导入</a-button
           >
-          <a-button
+          <!-- <a-button
             type="primary"
             icon="download"
             @click="handleExportXls('商品信息')"
@@ -213,10 +213,7 @@
         <!-- table区域-end -->
         <!-- 表单区域 -->
         <material-modal ref="modalForm" @ok="modalFormOk"></material-modal>
-        <import-file-modal
-          ref="modalImportForm"
-          @ok="modalFormOk"
-        ></import-file-modal>
+        <import-modal ref="modalImportForm" @ok="modalFormOk"></import-modal>
         <batch-set-info-modal
           ref="batchSetInfoModalForm"
           @ok="modalFormOk"
@@ -227,7 +224,7 @@
 </template>
 <script>
 import MaterialModal from "./modules/MaterialModal";
-import ImportFileModal from "@/components/tools/ImportFileModal";
+import ImportModal from "@/components/tools/ImportModal";
 import BatchSetInfoModal from "./modules/BatchSetInfoModal";
 import { queryMaterialCategoryTreeList } from "@/api/api";
 import { postAction, getFileAccessHttpUrl } from "@/api/manage";
@@ -242,7 +239,7 @@ export default {
   mixins: [JeecgListMixin],
   components: {
     MaterialModal,
-    ImportFileModal,
+    ImportModal,
     BatchSetInfoModal,
     JEllipsis,
     JDate,
@@ -343,7 +340,7 @@ export default {
         list: "/material/list",
         delete: "/material/delete",
         deleteBatch: "/material/deleteBatch",
-        importExcelUrl: "/material/importExcel",
+        importExcelUrl: "/material/import",
         exportXlsUrl: "/material/exportExcel",
         batchSetStatusUrl: "/material/batchSetStatus",
         batchSetMaterialCurrentStockUrl:

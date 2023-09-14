@@ -32,13 +32,17 @@
               :not-found-content="
                 loadings[col.dataIndex] || false ? undefined : null
               "
-              :tabindex="getTabIndex(col, index)"
+              :tabIndex="getTabIndex(col, index)"
+              :open="getOpen(col, record)"
               showSearch
               allowClear
               style="width: 100%"
               placeholder="请输入内容后选择"
               @search="(val) => handleSearch(val, col)"
               @change="(val) => handleChange(val, col, record)"
+              @focus="focus(col, record)"
+              @blur="blur(col, record)"
+              @select="select(col, record, index)"
             >
               <a-spin
                 v-if="loadings[col.dataIndex] || false"
@@ -58,12 +62,16 @@
               v-model="record[col.dataIndex]"
               :filterOption="(i, o) => handleSelectFilterOption(i, o, col)"
               :dropdownMatchSelectWidth="false"
-              :tabindex="getTabIndex(col, index)"
+              :tabIndex="getTabIndex(col, index)"
+              :open="getOpen(col, record)"
               showSearch
               allowClear
               style="width: 100%"
               placeholder="请选择"
               @change="(val) => handleChange(val, col, record)"
+              @focus="focus(col, record)"
+              @blur="blur(col, record)"
+              @select="select(col, record, index)"
             >
               <a-select-option
                 v-for="option in col.options"
@@ -318,6 +326,18 @@ export default {
       } else {
         return text;
       }
+    },
+    getOpen(col, record) {
+      return record?.["SHOW_" + col.dataIndex + "_open"] || false;
+    },
+    focus(col, record) {
+      this.$set(record, "SHOW_" + col.dataIndex + "_open", true);
+    },
+    blur(col, record) {
+      this.$set(record, "SHOW_" + col.dataIndex + "_open", false);
+    },
+    select(col, record, index) {
+      this.$set(record, "SHOW_" + col.dataIndex + "_open", false);
     },
   },
 };
