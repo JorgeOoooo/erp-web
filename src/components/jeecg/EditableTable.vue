@@ -30,8 +30,11 @@
               :show-arrow="false"
               :filter-option="false"
               :not-found-content="
-                loadings[col.dataIndex] || false ? undefined : null
+                getLoading(col, record)
+                  ? undefined
+                  : '暂无数据，请修改查询条件或新增'
               "
+              :getPopupContainer="getPopupContainer"
               :tabIndex="getTabIndex(col, index)"
               :open="getOpen(col, record)"
               showSearch
@@ -45,7 +48,42 @@
               @select="select(col, record, index)"
             >
               <a-spin
-                v-if="loadings[col.dataIndex] || false"
+                v-if="getLoading(col, record)"
+                slot="notFoundContent"
+                size="small"
+              />
+              <a-select-option
+                v-for="option in getOptions(col, record)"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </a-select-option>
+            </a-select>
+            <a-select
+              v-else-if="col.type == FormTypes.forceSelect"
+              v-model="record[col.dataIndex]"
+              :filterOption="(i, o) => handleSelectFilterOption(i, o, col)"
+              :dropdownMatchSelectWidth="false"
+              :tabIndex="getTabIndex(col, index)"
+              :open="getOpen(col, record)"
+              :not-found-content="
+                getLoading(col, record)
+                  ? undefined
+                  : '暂无数据，请修改查询条件或新增'
+              "
+              :getPopupContainer="getPopupContainer"
+              showSearch
+              allowClear
+              style="width: 100%"
+              placeholder="请选择"
+              @change="(val) => handleChange(val, col, record)"
+              @focus="focus(col, record)"
+              @blur="blur(col, record)"
+              @select="select(col, record, index)"
+            >
+              <a-spin
+                v-if="getLoading(col, record)"
                 slot="notFoundContent"
                 size="small"
               />
@@ -64,6 +102,12 @@
               :dropdownMatchSelectWidth="false"
               :tabIndex="getTabIndex(col, index)"
               :open="getOpen(col, record)"
+              :not-found-content="
+                getLoading(col, record)
+                  ? undefined
+                  : '暂无数据，请修改查询条件或新增'
+              "
+              :getPopupContainer="getPopupContainer"
               showSearch
               allowClear
               style="width: 100%"
@@ -73,6 +117,11 @@
               @blur="blur(col, record)"
               @select="select(col, record, index)"
             >
+              <a-spin
+                v-if="getLoading(col, record)"
+                slot="notFoundContent"
+                size="small"
+              />
               <a-select-option
                 v-for="option in col.options"
                 :key="option.value"
@@ -133,6 +182,14 @@ export default {
       type: Array,
       required: true,
     },
+    r_loadings: {
+      type: Object,
+      default: () => ({}),
+    },
+    r_options: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -165,9 +222,27 @@ export default {
     this.initScroll();
   },
   methods: {
+    resetOptions(name = "", options = []) {
+      if (name) {
+        this.options[name] = options;
+      }
+    },
     validate(callback) {
       this.$refs.formRef.validate((valid) => {
         callback?.(valid);
+      });
+    },
+    resetFidldsData(fields) {
+      console.log(fields);
+      fields.forEach((field) => {
+        console.log(field);
+        this.form.dataSource.forEach((item, index) => {
+          console.log(item);
+          if (this.form.dataSource[index]?.[field]) {
+            this.form.dataSource[index][field] = undefined;
+            this.form.dataSource[index]["SHOW_" + field] = undefined;
+          }
+        });
       });
     },
     getDataSource() {
@@ -185,6 +260,9 @@ export default {
       let offsetHeight =
         document.querySelector(".JEditLineTable")?.offsetHeight;
       let height = offsetHeight ? offsetHeight - 30 : 168;
+      document.querySelector(
+        ".JEditLineTable .ant-table-body"
+      ).style.minHeight = height + "px";
       this.y = height;
     },
     initDataSource(data = []) {
@@ -213,7 +291,9 @@ export default {
       }
 
       if (col.type == FormTypes.lazySelect) {
-        let obj = this.options?.[col.dataIndex]?.find((item) => item.id == val);
+        let obj = this.options?.[col.dataIndex]?.find(
+          (item) => item.value == val
+        );
         this.$set(
           record,
           "SHOW_" + col.dataIndex,
@@ -221,10 +301,21 @@ export default {
         );
         if (col.dataIndex === "materialId") {
           let obj = this.options?.[col.dataIndex]?.find(
-            (item) => item.id == val
+            (item) => item.value == val
           );
           this.$set(record, "standard", obj?.standard);
         }
+      } else if (col.type == FormTypes.forceSelect) {
+        let obj = record.options?.find((item) => item.value == val);
+        this.$set(
+          record,
+          "SHOW_" + col.dataIndex,
+          obj ? { ...obj } : undefined
+        );
+      }
+
+      if (typeof col?.change == "function") {
+        col?.change(val, col, record);
       }
     },
     handleSearch(val, col) {
@@ -243,6 +334,12 @@ export default {
         let params = {};
         if (col.selectConfig.inputText) {
           params[col.selectConfig.inputText] = val;
+        }
+        if (typeof col?.getParams == "function") {
+          params = {
+            ...params,
+            ...col.getParams(col),
+          };
         }
         getAction(col.selectConfig.url, params)
           .then((res) => {
@@ -285,7 +382,12 @@ export default {
       return col.tabIndex != -1 ? 0 : -1;
     },
     getOptions(col, record) {
-      let options = this.options[col.dataIndex] || [];
+      let options = [];
+      if (col.type == FormTypes.forceSelect) {
+        options = this.r_options?.[record.id + "_" + col.dataIndex] || [];
+      } else {
+        options = this.options[col.dataIndex] || [];
+      }
       let selectedOption = record?.["SHOW_" + col.dataIndex];
       if (selectedOption) {
         let index = options.findIndex(
@@ -330,14 +432,33 @@ export default {
     getOpen(col, record) {
       return record?.["SHOW_" + col.dataIndex + "_open"] || false;
     },
+    getLoading(col, record) {
+      return (
+        this.r_loadings?.[record.id + "_" + col.dataIndex] ||
+        this.loadings[col.dataIndex] ||
+        false
+      );
+    },
     focus(col, record) {
       this.$set(record, "SHOW_" + col.dataIndex + "_open", true);
+
+      if (col.type == FormTypes.forceSelect) {
+        if (
+          !this.r_options?.[record.id + "_" + col.dataIndex]?.length &&
+          typeof col?.getOptions == "function"
+        ) {
+          col.getOptions(col, record);
+        }
+      }
     },
     blur(col, record) {
       this.$set(record, "SHOW_" + col.dataIndex + "_open", false);
     },
     select(col, record, index) {
       this.$set(record, "SHOW_" + col.dataIndex + "_open", false);
+    },
+    getPopupContainer() {
+      return document.querySelector(".JEditLineTable .ant-table-body");
     },
   },
 };

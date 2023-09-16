@@ -39,10 +39,10 @@ jobs:
         run: yarn run build
 
       - name: 镜像构建
-        run: docker build -t erp-web:1.0.0 .
+        run: docker build -t erp-web:1.0.1 .
 
       - name: 镜像打包
-        run: docker save -o erp-web.tar erp-web:1.0.0
+        run: docker save -o erp-web.tar erp-web:1.0.1
 
       - name: 上传镜像包到服务器
         run: sshpass -p ${{secrets.REMOTE_PWD}} scp -r -o StrictHostKeyChecking=no ./erp-web.tar root@${{secrets.REMOTE_IP}}:/www/wwwroot/web-image
@@ -54,4 +54,4 @@ jobs:
         run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker stop erp-web && sudo docker rm erp-web"
 
       - name: 启动容器
-        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker run -d --name=erp-web --net=host -p 8000:8000 erp-web:1.0.0"
+        run: sshpass -p ${{secrets.REMOTE_PWD}} ssh -o StrictHostKeyChecking=no root@${{secrets.REMOTE_IP}} "sudo docker run -d --name=erp-web --net=host -p 8000:8000 erp-web:1.0.1"

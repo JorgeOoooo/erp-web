@@ -19,6 +19,7 @@ const FormTypes = {
   slot: "slot",
   hidden: "hidden",
   lazySelect: "lazySelect",
+  forceSelect: "forceSelect",
 };
 const VALIDATE_NO_PASSED = Symbol();
 export { FormTypes, VALIDATE_NO_PASSED };

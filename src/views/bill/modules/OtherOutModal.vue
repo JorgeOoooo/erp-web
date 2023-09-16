@@ -31,11 +31,13 @@
         >
           <a-row class="form-row" :gutter="24">
             <a-col :lg="6" :md="6" :sm="12">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="客户"
-              >
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <span slot="label">
+                  客户&nbsp;
+                  <a-tooltip title="注意：修改客户将会影响商品及库存信息">
+                    <a-icon type="question-circle-o" />
+                  </a-tooltip>
+                </span>
                 <a-select
                   placeholder="选择客户"
                   v-decorator="['supplierId', validatorRules.supplierId]"
@@ -44,6 +46,7 @@
                   allowClear
                   :disabled="!!model.id"
                   optionFilterProp="children"
+                  @change="changeSupplierId"
                 >
                   <div slot="dropdownRender" slot-scope="menu">
                     <v-nodes :vnodes="menu" />
@@ -101,6 +104,8 @@
             ref="editTableRef"
             type="temp"
             :columns="columns"
+            :r_loadings="loadings"
+            :r_options="options"
             style="height: calc(100% - 144px); margin: 12px 0"
           >
           </editable-table>
@@ -266,6 +271,8 @@ export default {
           required: true,
           scopedSlots: { customRender: "materialId" },
           ellipsis: true,
+          change: this.changeMeterialId,
+          getParams: this.getSupplierId,
         },
         {
           title: "件数",
@@ -279,11 +286,11 @@ export default {
         {
           title: "库房号",
           dataIndex: "depotId",
-          type: FormTypes.select,
-          options: [],
+          type: FormTypes.forceSelect,
           allowSearch: true,
           required: true,
           scopedSlots: { customRender: "depotId" },
+          getOptions: this.getDepotData,
         },
         {
           title: "备注",
@@ -293,6 +300,8 @@ export default {
           scopedSlots: { customRender: "remark" },
         },
       ],
+      loadings: {},
+      options: {},
     };
   },
   created() {},
@@ -300,7 +309,7 @@ export default {
     initList() {
       getAction(this.url.list, { headId: this.model.id }).then((res) => {
         if (res.code === 200) {
-          let data = res.data?.map((item) => {
+          let data = res.data?.map((item, index) => {
             return {
               ...item,
               SHOW_materialId: {
@@ -308,6 +317,11 @@ export default {
                 value: item.materialId,
                 standard: item.standard,
               },
+              SHOW_depotId: {
+                label: item.depotName,
+                value: item.depotId,
+              },
+              id: Date.now() + "." + index,
             };
           });
           this.$nextTick(() => {
@@ -351,7 +365,6 @@ export default {
         );
       });
       this.initSupplier();
-      this.getDepotData();
 
       if (this.model.id) {
         this.title = "编辑-出库单";
@@ -421,22 +434,47 @@ export default {
         }
       });
     },
-    // 查询可选仓库列表
-    getDepotData() {
-      getAction("/depot/findDepotByCurrentUser").then((res) => {
-        if (res.code === 200) {
-          this.columns[2].options =
-            res.data?.map((item) => {
+    getDepotData(col, record) {
+      let supplierId = this.form.getFieldValue("supplierId");
+      let materialId = record.materialId;
+      if (!materialId || !supplierId) {
+        this.$set(this.options, record.id + "_" + col.dataIndex, []);
+        return;
+      }
+      this.$set(this.loadings, record.id + "_" + col.dataIndex, true);
+      getAction("/depot/user/material", {
+        userId: supplierId,
+        materialId: materialId,
+      })
+        .then((res) => {
+          if (res.code === 200) {
+            const options = res.data.map((item) => {
               return {
                 ...item,
                 value: item.id,
-                label: item.depotName,
+                label: item.name,
               };
-            }) || [];
-        } else {
-          this.$message.info(res.data);
-        }
-      });
+            });
+            this.$set(this.options, record.id + "_" + col.dataIndex, options);
+          }
+        })
+        .finally(() => {
+          this.$set(this.loadings, record.id + "_" + col.dataIndex, false);
+        });
+    },
+    changeSupplierId() {
+      this.options = {};
+      this.$refs.editTableRef.initDataSource();
+    },
+    changeMeterialId(val, col, record) {
+      this.$set(record, "depotId", undefined);
+      this.$set(record, "SHOW_depotId", undefined);
+      this.$set(this.options, record.id + "_depotId", []);
+    },
+    getSupplierId() {
+      return {
+        supplierId: this.form.getFieldValue("supplierId"),
+      };
     },
   },
 };
