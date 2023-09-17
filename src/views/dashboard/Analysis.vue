@@ -1,16 +1,16 @@
 <template>
   <div style="margin: 12px 12px 0px">
-    <index-chart></index-chart>
+    <quick-add></quick-add>
   </div>
 </template>
 
 <script>
-import IndexChart from "./IndexChart";
+import QuickAdd from "./QuickAdd";
 
 export default {
   name: "Analysis",
   components: {
-    IndexChart,
+    QuickAdd,
   },
   data() {
     return {};

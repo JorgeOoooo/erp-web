@@ -7699,3 +7699,16 @@ font.weak {
   box-shadow: 0 0 0 2px color(~`colorPalette("@{primary-color}", 1)`);
 }
 // end -------- JAreaLinkage 三级联动样式 --------------
+
+.quick-item{
+  border: 1px solid @primary-color;
+  .icon{
+    color: @primary-color;
+  }
+  .text{
+    color: @primary-color;
+  }
+  &:hover{
+    background-color: color-mix(in oklch, @primary-color, transparent 90%);;
+  }
+}
