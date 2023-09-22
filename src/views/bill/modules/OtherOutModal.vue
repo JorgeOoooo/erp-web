@@ -46,7 +46,7 @@
                   allowClear
                   :disabled="!!model.id"
                   optionFilterProp="children"
-                  @change="changeSupplierId"
+                  @change="changeSupplier"
                 >
                   <div slot="dropdownRender" slot-scope="menu">
                     <v-nodes :vnodes="menu" />
@@ -462,7 +462,7 @@ export default {
           this.$set(this.loadings, record.id + "_" + col.dataIndex, false);
         });
     },
-    changeSupplierId() {
+    changeSupplier() {
       this.options = {};
       this.$refs.editTableRef.initDataSource();
     },

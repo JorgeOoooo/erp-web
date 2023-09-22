@@ -140,6 +140,10 @@
                 <a>删除</a>
               </a-popconfirm>
             </span>
+            <template slot="customRenderType" slot-scope="packageType">
+              <span v-if="packageType == '1'">全托</span>
+              <span v-if="packageType == '2'">半托</span>
+            </template>
             <!-- 状态渲染模板 -->
             <template slot="customRenderFlag" slot-scope="enabled">
               <a-tag v-if="enabled" color="green">启用</a-tag>
@@ -210,6 +214,12 @@ export default {
           scopedSlots: { customRender: "action" },
         },
         { title: "名称", dataIndex: "supplier", width: 150, align: "left" },
+        {
+          title: "仓管模式",
+          dataIndex: "packageType",
+          width: 80,
+          scopedSlots: { customRender: "customRenderType" },
+        },
         { title: "联系人", dataIndex: "contacts", width: 70, align: "left" },
         {
           title: "手机号码",

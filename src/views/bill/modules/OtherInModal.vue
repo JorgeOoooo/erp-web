@@ -43,6 +43,7 @@
                   showSearch
                   allowClear
                   :disabled="!!model.id"
+                  @change="changeSupplier"
                   optionFilterProp="children"
                 >
                   <div slot="dropdownRender" slot-scope="menu">
@@ -82,7 +83,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :lg="6" :md="6" :sm="12">
+            <!-- <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -101,7 +102,7 @@
                   <a-select-option :value="2"> 半托 </a-select-option>
                 </a-select>
               </a-form-item>
-            </a-col>
+            </a-col> -->
             <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
@@ -196,6 +197,7 @@ import EditableTable from "@/components/jeecg/EditableTable";
 import { httpAction, getAction } from "@/api/manage";
 import { FormTypes } from "@/utils/JEditableTableUtil";
 import moment from "dayjs";
+import { round } from "lodash";
 export default {
   name: "OtherInModal",
   mixins: [BillModalMixin],
@@ -245,18 +247,11 @@ export default {
       columns: [
         {
           title: "商品款号",
-          dataIndex: "materialId",
-          type: FormTypes.lazySelect,
-          selectConfig: {
-            url: "/material/model",
-            inputText: "model",
-            labelKey: "model",
-            valueKey: "id",
-          },
-          allowSearch: true,
+          dataIndex: "model",
+          type: FormTypes.lazyInput,
           required: true,
-          scopedSlots: { customRender: "materialId" },
-          ellipsis: true,
+          scopedSlots: { customRender: "model" },
+          confirm: this.confirm,
         },
         {
           title: "件数",
@@ -269,12 +264,11 @@ export default {
         },
         {
           title: "库房号",
-          dataIndex: "depotId",
-          type: FormTypes.select,
-          options: [],
-          allowSearch: true,
+          dataIndex: "depotName",
+          type: FormTypes.lazyInput,
           required: true,
-          scopedSlots: { customRender: "depotId" },
+          scopedSlots: { customRender: "depotName" },
+          confirm: this.confirm,
         },
         {
           title: "箱规",
@@ -306,7 +300,7 @@ export default {
           let data = res.data?.map((item) => {
             return {
               ...item,
-              SHOW_materialId: {
+              SHOW_model: {
                 label: item.model,
                 value: item.materialId,
                 standard: item.standard,
@@ -355,7 +349,7 @@ export default {
         );
       });
       this.initSupplier();
-      this.getDepotData();
+      // this.getDepotData();
 
       if (this.model.id) {
         this.title = "编辑-入库单";
@@ -426,6 +420,13 @@ export default {
     changePackageType(value) {
       this.showText = value == 1;
     },
+    changeSupplier(value) {
+      const supplier = this.supList.find((item) => item.id == value);
+      if (supplier) {
+        this.changePackageType(supplier.packageTypeName == "半托" ? 2 : 1);
+      }
+      this.$refs.editTableRef.initDataSource();
+    },
     // 查询可选仓库列表
     getDepotData() {
       getAction("/depot/findDepotByCurrentUser").then((res) => {
@@ -445,12 +446,12 @@ export default {
     },
     renderStandard(record) {
       if (!this.showText) return "";
-      let standard = record?.SHOW_materialId?.standard || "";
+      let standard = record?.SHOW_model?.standard || "";
       return standard;
     },
     renderVolume(record) {
       if (!this.showText) return "";
-      let standard = record?.SHOW_materialId?.standard || "";
+      let standard = record?.SHOW_model?.standard || "";
       let operNumber = record?.operNumber || "";
       if (standard == null || standard == "" || operNumber == "") return "";
       let arr = standard.split("*");
@@ -458,6 +459,38 @@ export default {
         return prev * cur;
       }, 1.0);
       return parseFloat((volume * operNumber).toFixed(4));
+    },
+    confirm(col, record) {
+      const supplierId = this.form.getFieldValue("supplierId");
+      const value = record?.[col.dataIndex];
+      if (!supplierId || !value) {
+        this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+      } else {
+        this.$set(record, "SHOW_STATUS_" + col.dataIndex, "loading");
+        getAction("/material/check/user/model", {
+          model: value,
+          supplierId,
+        })
+          .then((res) => {
+            if (res.code == 200) {
+              if (res.data) {
+                this.$set(record, "SHOW_STATUS_" + col.dataIndex, "success");
+                if (col.dataIndex == "model") {
+                  this.$set(record, "SHOW_" + col.dataIndex, {
+                    standard: res.data?.standard,
+                  });
+                }
+              } else {
+                this.$set(record, "SHOW_STATUS_" + col.dataIndex, "warning");
+              }
+            } else {
+              this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+            }
+          })
+          .catch(() => {
+            this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+          });
+      }
     },
   },
 };

@@ -295,6 +295,7 @@ export default {
         "enableSerialNumber",
         "enableBatchNumber",
         "action",
+        "supplier",
       ],
       // 默认的列
       defColumns: [
@@ -306,6 +307,7 @@ export default {
           scopedSlots: { customRender: "action" },
         },
         { title: "款号", dataIndex: "model", width: 120 },
+        { title: "所属客户", dataIndex: "supplier", width: 120 },
         {
           title: "名称",
           dataIndex: "name",

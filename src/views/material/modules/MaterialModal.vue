@@ -69,44 +69,33 @@
               />
             </a-form-item>
           </a-col>
-          <!-- <a-col :md="12" :sm="24">
+          <a-col :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
-              label="单位"
+              label="客户"
               data-step="4"
-              data-title="单位"
-              data-intro="选择单位"
+              data-title="客户"
+              data-intro="客户必填，商品的所属客户"
             >
               <a-select
-                :value="unitList"
-                placeholder="选择单位"
-                v-decorator="['unitId', validatorRules.unitId]"
-                showSearch
-                optionFilterProp="children"
+                placeholder="请选择客户"
+                v-decorator="['supplierId', validatorRules.supplierId]"
                 :dropdownMatchSelectWidth="false"
+                showSearch
+                allowClear
+                optionFilterProp="children"
               >
-                <div slot="dropdownRender" slot-scope="menu">
-                  <v-nodes :vnodes="menu" />
-                  <a-divider style="margin: 4px 0" />
-                  <div
-                    style="padding: 4px 8px; cursor: pointer"
-                    @mousedown="(e) => e.preventDefault()"
-                    @click="addUnit"
-                  >
-                    <a-icon type="plus" /> 新增计量单位
-                  </div>
-                </div>
                 <a-select-option
-                  v-for="(item, index) in unitList"
+                  v-for="(item, index) in supList"
                   :key="index"
                   :value="item.id"
                 >
-                  {{ item.basicUnit }}
+                  {{ item.supplier }}
                 </a-select-option>
               </a-select>
             </a-form-item>
-          </a-col> -->
+          </a-col>
           <a-col :md="12" :sm="24">
             <a-form-item
               :labelCol="labelCol"
@@ -162,6 +151,7 @@ import {
   checkMaterial,
   checkMaterialBarCode,
   getMaxBarCode,
+  findBySelectSup,
   queryMaterialCategoryTreeList,
 } from "@/api/api";
 import { removeByVal, handleIntroJs } from "@/utils/util";
@@ -212,11 +202,11 @@ export default {
       showOkFlag: true,
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 6 },
+        sm: { span: 8 },
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 18 },
+        sm: { span: 16 },
       },
       mpShort: {
         mfrs: {},
@@ -245,6 +235,9 @@ export default {
             { max: 100, message: "长度请小于100个字符", trigger: "blur" },
           ],
         },
+        supplierId: {
+          rules: [{ required: true, message: "请选择客户!" }],
+        },
         // unitId: {
         //   rules: [{ required: true, message: "请输入单位!" }],
         // },
@@ -255,6 +248,7 @@ export default {
         materialsExtendList: "/materialsExtend/getDetailList",
         depotWithStock: "/depot/getAllListWithStock",
       },
+      supList: [],
     };
   },
   created() {
@@ -304,11 +298,13 @@ export default {
             "mfrs",
             "otherField1",
             "otherField2",
-            "otherField3"
+            "otherField3",
+            "supplierId"
           )
         );
       });
       this.loadTreeData();
+      this.initSupplier();
       // this.loadUnitListData();
     },
     close() {
@@ -427,6 +423,14 @@ export default {
     },
     unitModalFormOk() {
       this.loadUnitListData();
+    },
+    initSupplier() {
+      let that = this;
+      findBySelectSup({}).then((res) => {
+        if (res) {
+          that.supList = res;
+        }
+      });
     },
   },
 };

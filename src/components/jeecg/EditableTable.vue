@@ -139,6 +139,52 @@
               :tabindex="getTabIndex(col, index)"
               @change="(val) => handleChange(val, col, record)"
             />
+            <div v-else-if="col.type == FormTypes.lazyInput">
+              <a-input
+                v-model="record[col.dataIndex]"
+                allowClear
+                style="width: calc(100% - 20px)"
+                placeholder="请输入"
+                :tabindex="getTabIndex(col, index)"
+                @pressEnter="confirmInput(col, record)"
+                @blur="confirmInput(col, record)"
+                @change="(val) => handleChange(val, col, record)"
+              />
+              <span class="lazyInputStatus">
+                <a-icon
+                  v-if="record?.['SHOW_STATUS_' + col.dataIndex] == 'loading'"
+                  type="loading"
+                />
+                <a-tooltip
+                  v-else-if="
+                    record?.['SHOW_STATUS_' + col.dataIndex] == 'success'
+                  "
+                  placement="top"
+                >
+                  <template slot="title">
+                    <span>校验完成。已存在该条目。</span>
+                  </template>
+                  <a-icon type="check-circle" style="color: #52c41a" />
+                </a-tooltip>
+                <a-tooltip
+                  v-else-if="
+                    record?.['SHOW_STATUS_' + col.dataIndex] == 'warning'
+                  "
+                  placement="top"
+                >
+                  <template slot="title">
+                    <span>校验完成。该条目不存在。提交时将会自动新增。</span>
+                  </template>
+                  <a-icon type="issues-close" style="color: #1890ff" />
+                </a-tooltip>
+                <a-tooltip v-else placement="top">
+                  <template slot="title">
+                    <span>未校验。</span>
+                  </template>
+                  <a-icon type="minus-circle" style="color: #7e8894" />
+                </a-tooltip>
+              </span>
+            </div>
             <a-input-number
               v-else-if="col.type == FormTypes.inputNumber"
               v-model="record[col.dataIndex]"
@@ -460,6 +506,11 @@ export default {
     getPopupContainer() {
       return document.querySelector(".JEditLineTable .ant-table-body");
     },
+    confirmInput(col, record) {
+      if (typeof col.confirm == "function") {
+        col.confirm(col, record);
+      }
+    },
   },
 };
 </script>
@@ -480,5 +531,11 @@ export default {
   /deep/ .ant-table-tbody > tr > td {
     padding: 4px 8px;
   }
+}
+.lazyInputStatus {
+  display: inline-block;
+  width: 20px;
+  height: 100%;
+  padding: 0 3px;
 }
 </style>

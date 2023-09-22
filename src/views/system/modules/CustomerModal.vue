@@ -2,7 +2,7 @@
   <div ref="container">
     <a-modal
       :title="title"
-      :width="1200"
+      :width="900"
       :visible="visible"
       :confirmLoading="confirmLoading"
       :getContainer="() => $refs.container"
@@ -39,6 +39,25 @@
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
+                label="仓管模式"
+              >
+                <a-select
+                  v-decorator="['packageType', validatorRules.packageType]"
+                  placeholder="选择托管类型"
+                  :dropdownMatchSelectWidth="false"
+                  showSearch
+                  allowClear
+                  optionFilterProp="children"
+                >
+                  <a-select-option :value="1"> 全托 </a-select-option>
+                  <a-select-option :value="2"> 半托 </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
                 label="联系人"
               >
                 <a-input
@@ -47,8 +66,6 @@
                 />
               </a-form-item>
             </a-col>
-          </a-row>
-          <a-row class="form-row" :gutter="24">
             <a-col :span="24 / 2">
               <a-form-item
                 :labelCol="labelCol"
@@ -61,109 +78,6 @@
                 />
               </a-form-item>
             </a-col>
-            <!-- <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="联系电话"
-              >
-                <a-input
-                  placeholder="请输入联系电话"
-                  v-decorator.trim="['phoneNum']"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="电子邮箱"
-              >
-                <a-input
-                  placeholder="请输入电子邮箱"
-                  v-decorator.trim="['email']"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="传真"
-              >
-                <a-input placeholder="请输入传真" v-decorator.trim="['fax']" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="期初应收"
-              >
-                <a-input
-                  placeholder="请输入期初应收"
-                  v-decorator.trim="['beginNeedGet']"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="期末应收"
-              >
-                <a-input v-decorator.trim="['allNeedGet']" :readOnly="true" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="纳税人识别号"
-              >
-                <a-input
-                  placeholder="请输入纳税人识别号"
-                  v-decorator.trim="['taxNum']"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="税率(%)"
-              >
-                <a-input-number
-                  style="width: 100%"
-                  placeholder="请输入税率"
-                  v-decorator.trim="['taxRate']"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="开户行"
-              >
-                <a-input
-                  placeholder="请输入开户行"
-                  v-decorator.trim="['bankName']"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24 / 2">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="账号"
-              >
-                <a-input
-                  placeholder="请输入账号"
-                  v-decorator.trim="['accountNumber']"
-                />
-              </a-form-item>
-            </a-col> -->
             <a-col :span="24 / 2">
               <a-form-item
                 :labelCol="labelCol"
@@ -241,6 +155,9 @@ export default {
             { validator: this.validateSupplierName },
           ],
         },
+        packageType: {
+          rules: [{ required: true, message: "请选择仓管类型!" }],
+        },
       },
     };
   },
@@ -271,7 +188,8 @@ export default {
             "accountNumber",
             "address",
             "sort",
-            "description"
+            "description",
+            "packageType"
           )
         );
         autoJumpNextInput("customerModal");
