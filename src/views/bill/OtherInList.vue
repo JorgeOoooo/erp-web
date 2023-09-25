@@ -242,12 +242,12 @@ export default {
           ellipsis: true,
         },
         { title: "单据日期", dataIndex: "createTime", width: 80 },
-        {
-          title: "仓管模式",
-          dataIndex: "packageType",
-          width: 80,
-          scopedSlots: { customRender: "customRenderType" },
-        },
+        // {
+        //   title: "仓管模式",
+        //   dataIndex: "packageType",
+        //   width: 80,
+        //   scopedSlots: { customRender: "customRenderType" },
+        // },
         { title: "车牌号", dataIndex: "carNumber", width: 80, ellipsis: true },
         { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],
