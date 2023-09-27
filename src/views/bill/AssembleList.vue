@@ -140,22 +140,12 @@
             @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record">
-              <!-- <a @click="myHandleDetail(record, 2, prefixNo)">打印</a>
-              <a-divider type="vertical" /> -->
-              <!-- <a @click="myHandleInfo(record)">详情</a>
-              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" /> -->
               <a
                 v-if="btnEnableList.indexOf(1) > -1"
                 @click="myHandleEdit(record)"
                 >编辑</a
               >
               <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" />
-              <!-- <a
-                v-if="btnEnableList.indexOf(1) > -1"
-                @click="myHandleCopyAdd(record)"
-                >复制</a
-              >
-              <a-divider v-if="btnEnableList.indexOf(1) > -1" type="vertical" /> -->
               <a-popconfirm
                 v-if="btnEnableList.indexOf(1) > -1"
                 title="确定删除吗?"
@@ -176,37 +166,23 @@
           </a-table>
         </div>
         <!-- table区域-end -->
-        <!-- 表单区域 -->
         <assemble-modal
           ref="modalForm"
           @ok="modalFormOk"
           @close="modalFormClose"
         ></assemble-modal>
+
         <import-modal
           ref="modalImportForm"
-          @ok="modalFormOk"
           :data="{ type: '3' }"
         ></import-modal>
-        <!-- <bill-detail
-          ref="modalDetail"
-          @ok="modalFormOk"
-          @close="modalFormClose"
-        ></bill-detail>
-        <assemble-info-modal
-          ref="billInfo"
-          @ok="modalFormOk"
-          @close="modalFormClose"
-        ></assemble-info-modal> -->
       </a-card>
     </a-col>
   </a-row>
 </template>
-<!--power by ji shenghua-->
 <script>
 import AssembleModal from "./modules/AssembleModal";
-import ImportModal from "@/components/tools/ImportModal";
-// import BillDetail from "./dialog/BillDetailSimple";
-// import AssembleInfoModal from "./modules/AssembleInfoModal";
+import ImportModal from "./modules/AssembleImportModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
 import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
 import JDate from "@/components/jeecg/JDate";
@@ -217,8 +193,6 @@ export default {
   components: {
     AssembleModal,
     ImportModal,
-    // AssembleInfoModal,
-    // BillDetail,
     JDate,
   },
   data() {
@@ -256,13 +230,6 @@ export default {
           ellipsis: true,
         },
         { title: "单据日期", dataIndex: "createTime", width: 80 },
-        // {
-        //   title: "仓管模式",
-        //   dataIndex: "packageType",
-        //   width: 80,
-        //   scopedSlots: { customRender: "customRenderType" },
-        // },
-        // { title: "车牌号", dataIndex: "carNumber", width: 80, ellipsis: true },
         { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],
       url: {
@@ -284,13 +251,7 @@ export default {
   methods: {
     handleImportXls() {
       let importExcelUrl = this.url.importExcelUrl;
-      let templateUrl = "";
-      let templateName = "";
-      this.$refs.modalImportForm.initModal(
-        importExcelUrl,
-        templateUrl,
-        templateName
-      );
+      this.$refs.modalImportForm.initModal(importExcelUrl);
       this.$refs.modalImportForm.title = "库存盘点导入";
     },
     onDateChange: function (value, dateString) {

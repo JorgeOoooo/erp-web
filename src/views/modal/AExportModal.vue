@@ -121,7 +121,7 @@ export default {
 <style>
 .my-a-modal .ant-modal-body {
   height: 80vh;
-  padding: 0;
+  padding: 0 !important;
 }
 </style>
 <style scoped>
