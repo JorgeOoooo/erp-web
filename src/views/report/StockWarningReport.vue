@@ -36,9 +36,9 @@
               </div>
               <div class="input-item">
                 <a-button type="primary" @click="changeValue">查询</a-button>
-                <!-- <a-button @click="exportView" style="margin-left: 12px"
+                <a-button @click="exportView" style="margin-left: 12px"
                   >导出预览</a-button
-                > -->
+                >
               </div>
             </div>
           </div>
@@ -47,7 +47,7 @@
               size="middle"
               bordered
               :columns="columns"
-              :listTable="listTable"
+              :dataSource="dataSource"
               :pagination="false"
             >
               <template slot="index" slot-scope="text, record, index">
@@ -64,14 +64,25 @@
         </a-card>
       </a-spin>
     </a-col>
+    <b-export-modal
+      ref="exportRef"
+      :columns="columns"
+      :dataSource="dataSource"
+      :supplierName="supplierName"
+      :time="moment(dateTime).format(dateFormat)"
+    />
   </a-row>
 </template>
 <script>
 import moment from "moment";
 import { httpAction, getAction } from "@/api/manage";
 import { findBySelectSup } from "@/api/api";
+import BExportModal from "../modal/BExportModal.vue";
 export default {
   name: "ouputTable",
+  components: {
+    BExportModal,
+  },
   data() {
     return {
       loading: false,
@@ -184,7 +195,13 @@ export default {
           this.loading = false;
         });
     },
-    exportView() {},
+    exportView() {
+      if (!this.supplierId || !this.dateTime) {
+        this.$message.warning("请选择客户和时间！");
+        return;
+      }
+      this.$refs.exportRef.show();
+    },
   },
   created() {
     this.dateTime = moment(moment().format(this.dateFormat), this.dateFormat);

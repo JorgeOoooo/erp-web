@@ -28,18 +28,26 @@
             </template>
           </a-table>
         </div> -->
-        <div class="title">萨达沃仓储服务中心</div>
-        <div class="key-value">
-          <span>
-            {{ "客户：" + (supplierName || "-") }}
-          </span>
-          <span>
-            {{ packageTypeName }}
-          </span>
-        </div>
         <div class="table">
           <table>
             <thead>
+              <tr>
+                <th :colspan="5" style="text-align: center">
+                  萨达沃仓储服务中心
+                </th>
+              </tr>
+              <tr>
+                <th :colspan="3" style="text-align: center">
+                  {{ "客户：" + (supplierName || "-") }}
+                </th>
+                <th :colspan="2" style="text-align: center">（结余明细）</th>
+              </tr>
+              <tr>
+                <th :colspan="3" style="text-align: center">
+                  {{ "日期：" + time }}
+                </th>
+                <th :colspan="2"></th>
+              </tr>
               <tr>
                 <th
                   v-for="col in columns"
@@ -69,55 +77,45 @@
             </tbody>
           </table>
         </div>
-        <div class="table" style="width: 60%">
-          <table>
-            <thead>
-              <tr>
-                <th
-                  v-for="col in columns2"
-                  :key="col.dataIndex"
-                  style="text-align: center"
-                >
-                  {{ col.title }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(data, index) in dataSource2" :key="index">
-                <td
-                  v-for="(col, i) in columns2"
-                  :key="i"
-                  style="text-align: center"
-                >
-                  {{
-                    col.dataIndex == "index"
-                      ? data?.index
-                        ? data?.index
-                        : index + 1
-                      : data?.[col.dataIndex]
-                  }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   </a-modal>
 </template>
 <script>
 export default {
-  props: [
-    "columns",
-    "dataSource",
-    "columns2",
-    "dataSource2",
-    "supplierName",
-    "packageTypeName",
-  ],
+  props: ["dataSource", "supplierName", "time"],
   data() {
     return {
       visible: false,
+      columns: [
+        {
+          title: "序号",
+          width: 60,
+          dataIndex: "index",
+          align: "center",
+          scopedSlots: { customRender: "index" },
+        },
+        {
+          title: "款号",
+          align: "center",
+          dataIndex: "model",
+        },
+        {
+          title: "件数",
+          align: "center",
+          dataIndex: "currentNumber",
+        },
+        {
+          title: "规格",
+          align: "center",
+          dataIndex: "volumn",
+        },
+        {
+          title: "体积",
+          align: "center",
+          dataIndex: "totalVolumn",
+        },
+      ],
     };
   },
   methods: {
