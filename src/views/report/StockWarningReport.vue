@@ -184,6 +184,11 @@ export default {
         .then(({ code, data }) => {
           if (code == 200) {
             this.listTable = data?.materialStockReportUnitList || [];
+            this.listTable.push({
+              index: "总计",
+              currentNumber: data.totalVal,
+              totalVolumn: data?.totalVolumn,
+            });
             this.supplierName = data?.supplier;
           }
         })
