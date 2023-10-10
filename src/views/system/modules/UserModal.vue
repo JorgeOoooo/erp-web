@@ -65,26 +65,22 @@
             </a-select>
             <a-col v-if="model.roleName == '租户'"><a-row>租户</a-row></a-col>
           </a-form-item>
-          <!-- <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="机构">
-            <a-tree-select style="width:100%" :dropdownStyle="{maxHeight:'200px',overflow:'auto'}" allow-clear
-               :treeData="orgaTree" v-decorator="[ 'orgaId' ]" placeholder="请选择机构">
-            </a-tree-select>
-          </a-form-item>
-          <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="职位">
-            <a-input placeholder="请输入职位" v-decorator.trim="[ 'position' ]" />
-          </a-form-item>
-          <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="是否经理">
-            <a-select placeholder="请选择是否经理" v-decorator="[ 'leaderFlag' ]">
-              <a-select-option value="1">是</a-select-option>
-              <a-select-option value="0">否</a-select-option>
+          <a-form-item
+            :labelCol="labelCol"
+            :wrapperCol="wrapperCol"
+            label="部门"
+          >
+            <a-select
+              v-decorator="['tenantId', validatorRules.tenantId]"
+              placeholder="选择部门"
+              :dropdownMatchSelectWidth="false"
+              showSearch
+              optionFilterProp="children"
+            >
+              <a-select-option :value="1"> 全托部门 </a-select-option>
+              <a-select-option :value="2"> 半托部门 </a-select-option>
             </a-select>
           </a-form-item>
-          <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="电话号码">
-            <a-input placeholder="请输入电话号码" v-decorator.trim="[ 'phonenum' ]" />
-          </a-form-item>
-          <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="电子邮箱">
-            <a-input placeholder="请输入电子邮箱" v-decorator.trim="[ 'email' ]" />
-          </a-form-item> -->
           <a-form-item
             :labelCol="labelCol"
             :wrapperCol="wrapperCol"
@@ -171,6 +167,9 @@ export default {
             },
           ],
         },
+        tenantId: {
+          rules: [{ required: true, message: "请选择部门!" }],
+        },
       },
       model: {},
       labelCol: {
@@ -215,7 +214,8 @@ export default {
             "phonenum",
             "email",
             "userBlngOrgaDsplSeq",
-            "description"
+            "description",
+            "tenantId"
           )
         );
         autoJumpNextInput("userModal");

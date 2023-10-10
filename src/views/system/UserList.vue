@@ -141,6 +141,10 @@
                 <a>重置密码</a>
               </a-popconfirm>
             </span>
+            <template slot="customRenderTenant" slot-scope="tenantId">
+              <span v-if="tenantId == '1'">全托部门</span>
+              <span v-if="tenantId == '2'">半托部门</span>
+            </template>
             <!-- 状态渲染模板 -->
             <template slot="customRenderFlag" slot-scope="status">
               <a-tag v-if="status === 0" color="green">启用</a-tag>
@@ -217,11 +221,14 @@ export default {
           align: "left",
         },
         { title: "用户姓名", dataIndex: "username", width: 100, align: "left" },
-        // { title: '用户类型', dataIndex: 'userType', width: 80, align: "left" },
+        {
+          title: "部门",
+          dataIndex: "tenantId",
+          width: 100,
+          align: "left",
+          scopedSlots: { customRender: "customRenderTenant" },
+        },
         { title: "角色", dataIndex: "roleName", width: 100, align: "left" },
-        // { title: '机构', dataIndex: 'orgAbr', width: 100, align: "left"},
-        // { title: '是否经理', dataIndex: 'leaderFlagStr', width: 60, align: "left"},
-        // { title: '电话号码', dataIndex: 'phonenum', width: 80, align: "left"},
         {
           title: "排序",
           dataIndex: "userBlngOrgaDsplSeq",

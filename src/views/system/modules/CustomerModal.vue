@@ -43,14 +43,36 @@
               >
                 <a-select
                   v-decorator="['packageType', validatorRules.packageType]"
-                  placeholder="选择托管类型"
+                  placeholder="选择仓管模式"
                   :dropdownMatchSelectWidth="false"
                   showSearch
-                  allowClear
                   optionFilterProp="children"
+                  @change="(e) => (showType = e == 1)"
                 >
                   <a-select-option :value="1"> 全托 </a-select-option>
                   <a-select-option :value="2"> 半托 </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="showType">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="全托类型"
+              >
+                <a-select
+                  v-decorator="[
+                    'fullyManagedType',
+                    validatorRules.fullyManagedType,
+                  ]"
+                  placeholder="选择全托类型"
+                  :dropdownMatchSelectWidth="false"
+                  showSearch
+                  optionFilterProp="children"
+                >
+                  <a-select-option :value="1">立方+立方</a-select-option>
+                  <a-select-option :value="2">包+立方</a-select-option>
+                  <a-select-option :value="3">长存</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -134,11 +156,11 @@ export default {
       isReadOnly: false,
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 4 },
+        sm: { span: 6 },
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 20 },
+        sm: { span: 18 },
       },
       confirmLoading: false,
       form: this.$form.createForm(this),
@@ -156,9 +178,13 @@ export default {
           ],
         },
         packageType: {
-          rules: [{ required: true, message: "请选择仓管类型!" }],
+          rules: [{ required: true, message: "请选择仓管模式!" }],
+        },
+        fullyManagedType: {
+          rules: [{ required: true, message: "请选择全托类型!" }],
         },
       },
+      showType: false,
     };
   },
   created() {},
@@ -170,6 +196,7 @@ export default {
       this.form.resetFields();
       this.model = Object.assign({}, record);
       this.visible = true;
+      this.showType = this.model?.packageType == 1;
       this.$nextTick(() => {
         this.form.setFieldsValue(
           pick(
@@ -189,7 +216,8 @@ export default {
             "address",
             "sort",
             "description",
-            "packageType"
+            "packageType",
+            "fullyManagedType"
           )
         );
         autoJumpNextInput("customerModal");
@@ -212,6 +240,7 @@ export default {
             return;
           }
           formData.type = "客户";
+          if (formData.packageType == 2) formData.fullyManagedType = "";
           let obj;
           if (!this.model.id) {
             obj = addSupplier(formData);

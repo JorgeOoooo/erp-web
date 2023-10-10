@@ -140,9 +140,14 @@
                 <a>删除</a>
               </a-popconfirm>
             </span>
-            <template slot="customRenderType" slot-scope="packageType">
+            <template slot="customRenderPackageType" slot-scope="packageType">
               <span v-if="packageType == '1'">全托</span>
               <span v-if="packageType == '2'">半托</span>
+            </template>
+            <template slot="customRenderType" slot-scope="fullyManagedType">
+              <span v-if="fullyManagedType == '1'">立方+立方</span>
+              <span v-if="fullyManagedType == '2'">包+立方</span>
+              <span v-if="fullyManagedType == '3'">长存</span>
             </template>
             <!-- 状态渲染模板 -->
             <template slot="customRenderFlag" slot-scope="enabled">
@@ -217,6 +222,12 @@ export default {
         {
           title: "仓管模式",
           dataIndex: "packageType",
+          width: 80,
+          scopedSlots: { customRender: "customRenderPackageType" },
+        },
+        {
+          title: "全托类型",
+          dataIndex: "fullyManagedType",
           width: 80,
           scopedSlots: { customRender: "customRenderType" },
         },
