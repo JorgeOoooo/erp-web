@@ -31,18 +31,6 @@
                   <a-button @click="editToggleChecked" style="margin-left: 8px">
                     {{ !editChecked ? "全选-编辑" : "全取消-编辑" }}
                   </a-button>
-                  <a-button
-                    @click="auditToggleChecked"
-                    style="margin-left: 8px"
-                  >
-                    {{ !auditChecked ? "全选-审核" : "全取消-审核" }}
-                  </a-button>
-                  <a-button
-                    @click="unAuditToggleChecked"
-                    style="margin-left: 8px"
-                  >
-                    {{ !unAuditChecked ? "全选-反审核" : "全取消-反审核" }}
-                  </a-button>
                 </a-col>
               </span>
             </a-row>
@@ -69,20 +57,6 @@
                 >编辑</a-checkbox
               >
               <a-checkbox
-                v-if="record.pushBtn.indexOf(2) > -1"
-                value="2"
-                :checked="record.btnStr ? record.btnStr.indexOf(2) > -1 : false"
-                @change="onChange(record, '2')"
-                >审核</a-checkbox
-              >
-              <a-checkbox
-                v-if="record.pushBtn.indexOf(7) > -1"
-                value="7"
-                :checked="record.btnStr ? record.btnStr.indexOf(7) > -1 : false"
-                @change="onChange(record, '7')"
-                >反审核</a-checkbox
-              >
-              <a-checkbox
                 v-if="record.pushBtn.indexOf(3) > -1"
                 value="3"
                 :checked="record.btnStr ? record.btnStr.indexOf(3) > -1 : false"
@@ -102,13 +76,6 @@
                 :checked="record.btnStr ? record.btnStr.indexOf(5) > -1 : false"
                 @change="onChange(record, '5')"
                 >打印</a-checkbox
-              >
-              <a-checkbox
-                v-if="record.pushBtn.indexOf(6) > -1"
-                value="6"
-                :checked="record.btnStr ? record.btnStr.indexOf(6) > -1 : false"
-                @change="onChange(record, '6')"
-                >作废</a-checkbox
               >
             </span>
           </a-table>

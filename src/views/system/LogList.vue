@@ -30,7 +30,7 @@
                   ></a-input>
                 </a-form-item>
               </a-col>
-              <a-col :md="6" :sm="24">
+              <!-- <a-col :md="6" :sm="24">
                 <a-form-item
                   label="创建时间"
                   :labelCol="labelCol"
@@ -45,7 +45,7 @@
                     @ok="onDateOk"
                   />
                 </a-form-item>
-              </a-col>
+              </a-col> -->
               <a-col :md="6" :sm="24">
                 <span
                   style="float: left; overflow: hidden"
@@ -153,7 +153,7 @@ export default {
       queryParam: {
         operation: "",
         content: "",
-        createTimeRange: [],
+        // createTimeRange: [],
         userInfo: "",
         clientIp: "",
         status: "",
