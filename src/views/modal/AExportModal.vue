@@ -69,37 +69,77 @@
             </tbody>
           </table>
         </div>
-        <div class="table" style="width: 60%">
-          <table>
-            <thead>
-              <tr>
-                <th
-                  v-for="col in columns2"
-                  :key="col.dataIndex"
-                  style="text-align: center"
-                >
-                  {{ col.title }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(data, index) in dataSource2" :key="index">
-                <td
-                  v-for="(col, i) in columns2"
-                  :key="i"
-                  style="text-align: center"
-                >
-                  {{
-                    col.dataIndex == "index"
-                      ? data?.index
+        <div class="table">
+          <div
+            v-if="
+              (packageTypeName == '全托' && fullyManagedType == 2) ||
+              packageTypeName == '半托'
+            "
+            class="inner-table"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    v-for="col in columns2"
+                    :key="col.dataIndex"
+                    style="text-align: center"
+                  >
+                    {{ col.title }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(data, index) in dataSource2" :key="index">
+                  <td
+                    v-for="(col, i) in columns2"
+                    :key="i"
+                    style="text-align: center"
+                  >
+                    {{
+                      col.dataIndex == "index"
                         ? data?.index
-                        : index + 1
-                      : data?.[col.dataIndex]
-                  }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                          ? data?.index
+                          : index + 1
+                        : data?.[col.dataIndex]
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-if="packageTypeName == '全托'" class="inner-table">
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    v-for="col in columns2"
+                    :key="col.dataIndex"
+                    style="text-align: center"
+                  >
+                    {{ col.title }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(data, index) in dataSource3" :key="index">
+                  <td
+                    v-for="(col, i) in columns2"
+                    :key="i"
+                    style="text-align: center"
+                  >
+                    {{
+                      col.dataIndex == "index"
+                        ? data?.index
+                          ? data?.index
+                          : index + 1
+                        : data?.[col.dataIndex]
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -112,8 +152,10 @@ export default {
     "dataSource",
     "columns2",
     "dataSource2",
+    "dataSource3",
     "supplierName",
     "packageTypeName",
+    "fullyManagedType",
   ],
   data() {
     return {
@@ -181,6 +223,15 @@ td {
 }
 .table + .table {
   margin-top: 24px;
+
+  .inner-table {
+    width: 40%;
+    display: inline-block;
+
+    & + .inner-table {
+      margin-left: 20px;
+    }
+  }
 }
 
 @page {

@@ -61,22 +61,48 @@
             </a-table>
           </div>
           <div class="total-table">
-            <a-table
-              align="center"
-              size="middle"
-              bordered
-              :columns="columns3"
-              :dataSource="totalTable"
-              :pagination="false"
-              :scroll="{
-                x: false,
-                y: false,
-              }"
+            <div
+              v-if="
+                (packageTypeName == '全托' && fullyManagedType == 2) ||
+                packageTypeName == '半托'
+              "
+              class="inner-table"
             >
-              <template slot="index" slot-scope="text, record, index">
-                {{ text ? text : index + 1 }}
-              </template>
-            </a-table>
+              <a-table
+                align="center"
+                size="middle"
+                bordered
+                :columns="columns3"
+                :dataSource="totalTable"
+                :pagination="false"
+                :scroll="{
+                  x: false,
+                  y: false,
+                }"
+              >
+                <template slot="index" slot-scope="text, record, index">
+                  {{ text ? text : index + 1 }}
+                </template>
+              </a-table>
+            </div>
+            <div v-if="packageTypeName == '全托'" class="inner-table">
+              <a-table
+                align="center"
+                size="middle"
+                bordered
+                :columns="columns3"
+                :dataSource="packageTable"
+                :pagination="false"
+                :scroll="{
+                  x: false,
+                  y: false,
+                }"
+              >
+                <template slot="index" slot-scope="text, record, index">
+                  {{ text ? text : index + 1 }}
+                </template>
+              </a-table>
+            </div>
           </div>
         </a-card>
       </a-spin>
@@ -87,8 +113,10 @@
       :dataSource="dataSource"
       :columns2="columns3"
       :dataSource2="totalTable"
+      :dataSource3="packageTable"
       :supplierName="supplierName"
       :packageTypeName="packageTypeName"
+      :fullyManagedType="fullyManagedType"
     />
   </a-row>
 </template>
@@ -108,6 +136,7 @@ export default {
       supList: [],
       supplierId: undefined,
       packageTypeName: undefined,
+      fullyManagedType: undefined,
 
       supplierName: undefined,
 
@@ -116,6 +145,7 @@ export default {
 
       listTable: [],
       totalTable: [],
+      packageTable: [],
       columns1: [
         {
           title: "序号",
@@ -284,28 +314,42 @@ export default {
             this.data = data;
             this.listTable = data?.documentReportUnitList || [];
             this.packageTypeName = data?.packageName;
+            this.fullyManagedType = data?.fullyManagedType;
             this.supplierName = data?.supplier;
             this.totalTable = [
               {
-                name:
-                  this.packageTypeName == "全托"
-                    ? "上月结余立方数"
-                    : "上月结余包数",
+                name: "上月结余立方数",
                 value: data?.documentReportBalance?.lastTotal,
               },
               {
-                name:
-                  this.packageTypeName == "全托" ? "入货立方数" : "入货包数",
+                name: "入货立方数",
                 value: data?.documentReportBalance?.inTotalValue,
               },
               {
-                name:
-                  this.packageTypeName == "全托" ? "出货立方数" : "出货包数",
+                name: "出货立方数",
                 value: data?.documentReportBalance?.outTotalValue,
               },
               {
                 name: "本月结余",
                 value: data?.documentReportBalance?.curTotal,
+              },
+            ];
+            this.packageTable = [
+              {
+                name: "上月结余包数",
+                value: data?.documentReportBalance?.lastNumberTotal,
+              },
+              {
+                name: "入货包数",
+                value: data?.documentReportBalance?.inNumberTotal,
+              },
+              {
+                name: "出货包数",
+                value: data?.documentReportBalance?.outNumberTotal,
+              },
+              {
+                name: "本月结余",
+                value: data?.documentReportBalance?.curNumberTotal,
               },
             ];
           }
@@ -367,6 +411,13 @@ export default {
   margin-bottom: 12px;
 }
 .total-table {
-  width: 425px;
+  .inner-table {
+    display: inline-block;
+    width: 425px;
+
+    & + .inner-table {
+      margin-left: 20px;
+    }
+  }
 }
 </style>
