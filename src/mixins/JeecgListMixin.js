@@ -245,13 +245,18 @@ export const JeecgListMixin = {
         return;
       }
       var that = this;
-      deleteAction(that.url.delete, { id: id }).then((res) => {
-        if (res.code === 200) {
-          that.loadData();
-        } else {
-          that.$message.warning(res.data.message);
-        }
-      });
+      this.loading = true;
+      deleteAction(that.url.delete, { id: id })
+        .then((res) => {
+          if (res.code === 200) {
+            that.loadData();
+          } else {
+            that.$message.warning(res.data.message);
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     handleEdit: function (record) {
       this.$refs.modalForm.title = "编辑";
