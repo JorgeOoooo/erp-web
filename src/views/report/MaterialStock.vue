@@ -236,6 +236,8 @@ export default {
       }
       let params = this.getQueryParams(); //查询条件
       if (!params?.supplierId) {
+        this.dataSource = [];
+        this.ipagination.total = 0;
         return;
       }
       this.loading = true;
