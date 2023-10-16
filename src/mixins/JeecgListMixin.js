@@ -347,16 +347,25 @@ export const JeecgListMixin = {
           // this.$message.success(`${info.file.name} 文件上传成功`);
           if (info.file.response.code === 200) {
             this.$message.success(
-              info.file.response.data || `${info.file.name} 文件上传成功`
+              info.file.response.data?.message ||
+                info.file.response.data ||
+                `${info.file.name} 文件上传成功`
             );
           } else {
-            this.$message.warning(info.file.response.data, 8);
+            this.$message.warning(
+              info.file.response.data?.message || info.file.response.data,
+              8
+            );
           }
           this.confirmLoading = false;
           this.visible = false;
           this.$emit("ok");
         } else {
-          this.$message.error(`${info.file.name} ${info.file.response.data}.`);
+          this.$message.error(
+            `${info.file.name} ${
+              info.file.response.data?.message || info.file.response.data
+            }.`
+          );
           this.confirmLoading = false;
         }
       } else if (info.file.status === "error") {
