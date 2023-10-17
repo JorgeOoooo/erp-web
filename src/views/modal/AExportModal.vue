@@ -70,13 +70,7 @@
           </table>
         </div>
         <div class="table">
-          <div
-            v-if="
-              (packageTypeName == '全托' && fullyManagedType == 2) ||
-              packageTypeName == '半托'
-            "
-            class="inner-table"
-          >
+          <div v-if="packageTypeName == '全托'" class="inner-table">
             <table>
               <thead>
                 <tr>
@@ -108,7 +102,13 @@
               </tbody>
             </table>
           </div>
-          <div v-if="packageTypeName == '全托'" class="inner-table">
+          <div
+            v-if="
+              (packageTypeName == '全托' && fullyManagedType == 2) ||
+              packageTypeName == '半托'
+            "
+            class="inner-table"
+          >
             <table>
               <thead>
                 <tr>
