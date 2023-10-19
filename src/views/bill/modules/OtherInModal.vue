@@ -195,7 +195,7 @@ import { findBySelectSup } from "@/api/api";
 import { BillModalMixin } from "../mixins/BillModalMixin";
 import JDate from "@/components/jeecg/JDate";
 import EditableTable from "@/components/jeecg/EditableTable";
-import { httpAction, getAction } from "@/api/manage";
+import { httpAction, getAction, postAction } from "@/api/manage";
 import { FormTypes } from "@/utils/JEditableTableUtil";
 import moment from "dayjs";
 import { round } from "lodash";
@@ -468,10 +468,19 @@ export default {
         this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
       } else {
         this.$set(record, "SHOW_STATUS_" + col.dataIndex, "loading");
-        getAction("/material/check/user/model", {
-          model: value,
-          supplierId,
-        })
+        (col.dataIndex == "depotName"
+          ? postAction(
+              "/depot/name",
+              {},
+              {
+                name: value,
+              }
+            )
+          : getAction("/material/check/user/model", {
+              model: value,
+              supplierId,
+            })
+        )
           .then((res) => {
             if (res.code == 200) {
               if (res.data) {
