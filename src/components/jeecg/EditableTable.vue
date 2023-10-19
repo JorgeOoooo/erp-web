@@ -1,6 +1,6 @@
 <template>
   <div class="JEditLineTable">
-    <a-form-model ref="formRef" :model="form">
+    <a-form-model ref="formRef" :model="form" :validateOnRuleChange="true">
       <a-table
         :columns="tableColumns"
         :data-source="form.dataSource"
@@ -9,6 +9,24 @@
         bordered
         :scroll="{ y: y }"
       >
+        <div slot="depotNameTitle">
+          库房号
+          <a-popover title="库房件数总计">
+            <template slot="content">
+              <a-table
+                :columns="countColumns"
+                :data-source="countDataSource"
+                :pagination="false"
+                :scroll="{ y: 160, x: 240 }"
+                :bordered="false"
+                size="small"
+              >
+                <a slot="name" slot-scope="text">{{ text }}</a>
+              </a-table>
+            </template>
+            <a-icon type="table" />
+          </a-popover>
+        </div>
         <template
           v-for="col in columns.filter(
             (item) => item.dataIndex != 'action' && item.dataIndex != ''
@@ -228,6 +246,10 @@ export default {
       type: Array,
       required: true,
     },
+    showTitle: {
+      type: Boolean,
+      default: false,
+    },
     r_loadings: {
       type: Object,
       default: () => ({}),
@@ -249,6 +271,16 @@ export default {
       options: {},
       timer: {},
       currentValue: {},
+      countColumns: [
+        {
+          title: "库房号",
+          dataIndex: "label",
+        },
+        {
+          title: "总件数",
+          dataIndex: "value",
+        },
+      ],
     };
   },
   computed: {
@@ -262,6 +294,25 @@ export default {
           scopedSlots: { customRender: "action" },
         },
       ];
+    },
+    countDataSource() {
+      if (!this.showTitle) return [];
+      let tempObj = {};
+      this.form.dataSource
+        .filter((item) => item.operNumber > 0 && !!item.depotName)
+        .forEach((item) => {
+          if (tempObj[item.depotName]) {
+            tempObj[item.depotName] += item.operNumber;
+          } else {
+            tempObj[item.depotName] = item.operNumber;
+          }
+        });
+      return Object.keys(tempObj).map((key) => {
+        return {
+          label: key,
+          value: tempObj[key],
+        };
+      });
     },
   },
   mounted() {
@@ -300,7 +351,12 @@ export default {
           }
         });
       });
-      return _.dropRight(data, 1);
+      data = data.filter((record) => {
+        let requiredCols = this.tableColumns.filter((c) => c.required);
+        let valid = requiredCols.every((c) => !!record?.[c.dataIndex]);
+        return valid;
+      });
+      return data;
     },
     initScroll() {
       let offsetHeight =

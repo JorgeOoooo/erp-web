@@ -121,6 +121,7 @@
           <editable-table
             ref="editTableRef"
             type="temp"
+            :showTitle="true"
             :columns="columns"
             style="height: calc(100% - 104px); margin: 12px 0"
           >
@@ -263,10 +264,10 @@ export default {
           scopedSlots: { customRender: "operNumber" },
         },
         {
-          title: "库房号",
           dataIndex: "depotName",
           type: FormTypes.lazyInput,
           required: true,
+          slots: { title: "depotNameTitle" },
           scopedSlots: { customRender: "depotName" },
           confirm: this.confirm,
         },
