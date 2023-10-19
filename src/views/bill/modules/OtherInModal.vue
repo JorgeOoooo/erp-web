@@ -17,6 +17,12 @@
   >
     <template slot="footer">
       <a-button @click="handleCancel">取消</a-button>
+      <a-button
+        type="primary"
+        :loading="confirmLoading"
+        @click="handleResetAndOk"
+        >清空最后一行并保存</a-button
+      >
       <a-button type="primary" :loading="confirmLoading" @click="handleOk"
         >保存</a-button
       >
@@ -416,6 +422,12 @@ export default {
             }
           });
         }
+      });
+    },
+    handleResetAndOk() {
+      this.$refs.editTableRef.resetEndLine();
+      this.$nextTick(() => {
+        this.handleOk();
       });
     },
     changePackageType(value) {

@@ -586,6 +586,12 @@ export default {
         col.confirm(col, record, this.form.dataSource);
       }
     },
+    resetEndLine() {
+      this.$set(this.form.dataSource, this.form.dataSource.length - 1, {
+        needAdd: true,
+        id: Date.now(),
+      });
+    },
   },
 };
 </script>
