@@ -452,7 +452,7 @@ export default {
               return {
                 ...item,
                 value: item.id,
-                label: item.name,
+                label: item.name + `(库存:${item.currentNumber || 0})`,
               };
             });
             this.$set(this.options, record.id + "_" + col.dataIndex, options);
