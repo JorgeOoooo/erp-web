@@ -246,9 +246,9 @@ export default {
       type: Array,
       required: true,
     },
-    showTitle: {
-      type: Boolean,
-      default: false,
+    from: {
+      type: String,
+      default: "",
     },
     r_loadings: {
       type: Object,
@@ -296,7 +296,7 @@ export default {
       ];
     },
     countDataSource() {
-      if (!this.showTitle) return [];
+      if (this.from != "in") return [];
       let tempObj = {};
       this.form.dataSource
         .filter((item) => item.operNumber > 0 && !!item.depotName)
@@ -371,7 +371,7 @@ export default {
       this.form.dataSource = data;
       this.addLine();
     },
-    addLine() {
+    addLine(o = {}) {
       let obj = {
         needAdd: true,
         id: Date.now(),
@@ -381,6 +381,10 @@ export default {
           obj[col.dataIndex] = undefined;
         }
       });
+      obj = {
+        ...obj,
+        ...o,
+      };
       this.form.dataSource.push(obj);
     },
     handleDelete(index) {
@@ -388,7 +392,18 @@ export default {
     },
     handleChange(val, col, record) {
       if (record.needAdd) {
-        this.addLine();
+        if (
+          this.from == "in" &&
+          col.dataIndex != "depotName" &&
+          record.depotName
+        ) {
+          this.addLine({
+            depotName: record.depotName,
+            SHOW_STATUS_depotName: record.SHOW_STATUS_depotName,
+          });
+        } else {
+          this.addLine();
+        }
         record.needAdd = false;
       }
 
@@ -414,6 +429,10 @@ export default {
           "SHOW_" + col.dataIndex,
           obj ? { ...obj } : undefined
         );
+      } else if (col.type == FormTypes.lazyInput) {
+        if (!record[col.dataIndex]) {
+          this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+        }
       }
 
       if (typeof col?.change == "function") {
@@ -564,7 +583,7 @@ export default {
     },
     confirmInput(col, record) {
       if (typeof col.confirm == "function") {
-        col.confirm(col, record);
+        col.confirm(col, record, this.form.dataSource);
       }
     },
   },

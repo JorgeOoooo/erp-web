@@ -121,7 +121,7 @@
           <editable-table
             ref="editTableRef"
             type="temp"
-            :showTitle="true"
+            from="in"
             :columns="columns"
             style="height: calc(100% - 104px); margin: 12px 0"
           >
@@ -461,7 +461,7 @@ export default {
       }, 1.0);
       return parseFloat((volume * operNumber).toFixed(4));
     },
-    confirm(col, record) {
+    confirm(col, record, dataSource) {
       const supplierId = this.form.getFieldValue("supplierId");
       const value = record?.[col.dataIndex];
       if (!supplierId || !value) {
@@ -483,8 +483,13 @@ export default {
         )
           .then((res) => {
             if (res.code == 200) {
+              let lastObj = dataSource[dataSource.length - 1];
+              col.dataIndex == "depotName" &&
+                this.$set(lastObj, "depotName", value);
               if (res.data) {
                 this.$set(record, "SHOW_STATUS_" + col.dataIndex, "success");
+                col.dataIndex == "depotName" &&
+                  this.$set(lastObj, "SHOW_STATUS_" + col.dataIndex, "success");
                 if (col.dataIndex == "model") {
                   this.$set(record, "SHOW_" + col.dataIndex, {
                     standard: res.data?.standard,
@@ -492,6 +497,8 @@ export default {
                 }
               } else {
                 this.$set(record, "SHOW_STATUS_" + col.dataIndex, "warning");
+                col.dataIndex == "depotName" &&
+                  this.$set(lastObj, "SHOW_STATUS_" + col.dataIndex, "warning");
               }
             } else {
               this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
