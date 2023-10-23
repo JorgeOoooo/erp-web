@@ -229,6 +229,19 @@
           >
             删除
           </a-button>
+          <a-tooltip v-if="index + 1 != form.dataSource.length" placement="top">
+            <template slot="title">
+              <span>在下方新增一行空行</span>
+            </template>
+            <a-button
+              @click="handleAddEmptyLine(index)"
+              type="link"
+              size="small"
+              :tabindex="-1"
+            >
+              新增
+            </a-button>
+          </a-tooltip>
         </template>
       </a-table>
     </a-form-model>
@@ -290,7 +303,7 @@ export default {
         {
           title: "操作",
           dataIndex: "action",
-          width: 90,
+          width: 110,
           scopedSlots: { customRender: "action" },
         },
       ];
@@ -386,6 +399,18 @@ export default {
         ...o,
       };
       this.form.dataSource.push(obj);
+    },
+    handleAddEmptyLine(index) {
+      let obj = {
+        needAdd: false,
+        id: Date.now(),
+      };
+      this.columns.forEach((col) => {
+        if (col.dataIndex) {
+          obj[col.dataIndex] = undefined;
+        }
+      });
+      this.form.dataSource.splice(index + 1, 0, obj);
     },
     handleDelete(index) {
       this.form.dataSource.splice(index, 1);
