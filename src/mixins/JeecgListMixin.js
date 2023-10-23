@@ -136,7 +136,9 @@ export const JeecgListMixin = {
         sqp["superQueryMatchType"] = this.superQueryMatchType;
       }
       let searchObj = {};
-      searchObj.search = JSON.stringify(this.queryParam);
+      let search = JSON.parse(JSON.stringify(this.queryParam));
+      delete search.createTimeRange;
+      searchObj.search = JSON.stringify(search);
       var param = Object.assign(sqp, searchObj, this.isorter, this.filters);
       param.field = this.getQueryField();
       param.currentPage = this.ipagination.current;

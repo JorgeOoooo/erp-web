@@ -43,7 +43,7 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :md="6" :sm="24">
+              <!-- <a-col :md="6" :sm="24">
                 <a-form-item
                   label="单据日期"
                   :labelCol="labelCol"
@@ -59,7 +59,7 @@
                     @ok="onDateOk"
                   />
                 </a-form-item>
-              </a-col>
+              </a-col> -->
               <span
                 style="float: left; overflow: hidden"
                 class="table-page-search-submitButtons"
