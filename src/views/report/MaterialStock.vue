@@ -21,6 +21,7 @@
                     style="width: 100%"
                     :dropdownMatchSelectWidth="false"
                     v-model="queryParam.supplierId"
+                    @change="searchQuery"
                   >
                     <a-select-option
                       v-for="(item, index) in supList"
@@ -46,6 +47,7 @@
                     style="width: 100%"
                     :dropdownMatchSelectWidth="false"
                     v-model="queryParam.depotId"
+                    @change="searchQuery"
                   >
                     <a-select-option
                       v-for="(depot, index) in depotList"
@@ -71,6 +73,7 @@
                     style="width: 100%"
                     :dropdownMatchSelectWidth="false"
                     v-model="queryParam.materialId"
+                    @change="searchQuery"
                   >
                     <a-select-option
                       v-for="(item, index) in materialList"
