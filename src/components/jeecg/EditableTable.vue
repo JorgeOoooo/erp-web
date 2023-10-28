@@ -343,10 +343,10 @@ export default {
     this.initScroll();
   },
   methods: {
-    resetOptions(name = "", options = []) {
-      if (name) {
-        this.options[name] = options;
-      }
+    resetLazySelect() {
+      this.loadings = {};
+      this.options = {};
+      this.timer = {};
     },
     validate(callback) {
       this.$refs.formRef.validate((valid) => {
@@ -490,7 +490,6 @@ export default {
       }
       this.$set(this.currentValue, col.dataIndex, val);
       function selectOptions() {
-        that.$set(that.loadings, col.dataIndex, true);
         let params = {};
         if (col.selectConfig.inputText) {
           params[col.selectConfig.inputText] = val;
@@ -501,6 +500,11 @@ export default {
             ...col.getParams(col),
           };
         }
+        if (!params.supplierId) {
+          that.$set(that.options, col.dataIndex, []);
+          return;
+        }
+        that.$set(that.loadings, col.dataIndex, true);
         getAction(col.selectConfig.url, params)
           .then((res) => {
             if (res.code === 200) {

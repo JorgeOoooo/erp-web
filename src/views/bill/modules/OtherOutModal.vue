@@ -115,7 +115,6 @@
 
           <editable-table
             ref="editTableRef"
-            type="temp"
             :columns="columns"
             :r_loadings="loadings"
             :r_options="options"
@@ -499,6 +498,8 @@ export default {
     },
     changeSupplier() {
       this.options = {};
+      this.loadings = {};
+      this.$refs.editTableRef.resetLazySelect();
       this.$refs.editTableRef.initDataSource();
     },
     changeMeterialId(val, col, record) {

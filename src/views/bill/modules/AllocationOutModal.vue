@@ -114,7 +114,6 @@
           </a-row>
           <editable-table
             ref="editTableRef"
-            type="temp"
             :columns="columns"
             :r_loadings="loadings"
             :r_options="options"

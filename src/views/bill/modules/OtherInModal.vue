@@ -133,7 +133,6 @@
 
           <editable-table
             ref="editTableRef"
-            type="temp"
             from="in"
             :columns="columns"
             style="height: calc(100% - 104px); margin: 12px 0"
