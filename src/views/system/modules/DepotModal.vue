@@ -45,6 +45,43 @@
           <a-form-item
             :labelCol="labelCol"
             :wrapperCol="wrapperCol"
+            label="平方数"
+          >
+            <a-input-number
+              placeholder="请输入平方数"
+              v-decorator.trim="['square']"
+              :min="0"
+              :step="0.0001"
+              :precision="4"
+              suffix="m^2"
+              style="width: 100%"
+            />
+          </a-form-item>
+          <a-form-item
+            :labelCol="labelCol"
+            :wrapperCol="wrapperCol"
+            label="高度"
+          >
+            <a-input-number
+              placeholder="请输入高度"
+              v-decorator.trim="['height']"
+              :min="0"
+              :step="0.0001"
+              :precision="4"
+              suffix="m"
+              style="width: 100%"
+            />
+          </a-form-item>
+          <a-form-item
+            :labelCol="labelCol"
+            :wrapperCol="wrapperCol"
+            label="体积"
+          >
+            <span>{{ getVolumn() }}</span>
+          </a-form-item>
+          <a-form-item
+            :labelCol="labelCol"
+            :wrapperCol="wrapperCol"
             label="仓储费"
           >
             <a-input
@@ -132,6 +169,7 @@ export default {
       },
       confirmLoading: false,
       form: this.$form.createForm(this),
+      volumn: undefined,
       validatorRules: {
         name: {
           rules: [
@@ -169,7 +207,9 @@ export default {
             "truckage",
             "principal",
             "sort",
-            "remark"
+            "remark",
+            "square",
+            "height"
           )
         );
         autoJumpNextInput("depotModal");
@@ -186,6 +226,7 @@ export default {
         if (!err) {
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
+          formData.volumn = this.getVolumn();
           let obj;
           if (!this.model.id) {
             obj = addDepot(formData);
@@ -233,6 +274,11 @@ export default {
           this.userList = res;
         }
       });
+    },
+    getVolumn() {
+      const values = this.form.getFieldsValue(["square", "height"]);
+      const volumn = values.square * values.height;
+      return Number.isNaN(volumn) ? "" : parseFloat(volumn.toFixed(4));
     },
   },
 };

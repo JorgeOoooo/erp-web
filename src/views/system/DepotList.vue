@@ -96,7 +96,6 @@
             :columns="columns"
             :dataSource="dataSource"
             :pagination="ipagination"
-            :scroll="scroll"
             :loading="loading"
             :rowSelection="{
               selectedRowKeys: selectedRowKeys,
@@ -185,7 +184,7 @@ export default {
           scopedSlots: { customRender: "action" },
         },
         { title: "仓库名称", dataIndex: "name", width: 200 },
-        { title: "仓库地址", dataIndex: "address", width: 200 },
+        { title: "仓库地址", dataIndex: "address" },
         { title: "仓储费", dataIndex: "warehousing", width: 80 },
         // { title: "搬运费", dataIndex: "truckage", width: 80 },
         { title: "负责人", dataIndex: "principalName", width: 80 },
