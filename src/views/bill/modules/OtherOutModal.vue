@@ -327,28 +327,35 @@ export default {
   created() {},
   methods: {
     initList() {
-      getAction(this.url.list, { headId: this.model.id }).then((res) => {
-        if (res.code === 200) {
-          let data = res.data?.map((item, index) => {
-            return {
-              ...item,
-              SHOW_materialId: {
-                label: item.model,
-                value: item.materialId,
-                standard: item.standard,
-              },
-              SHOW_depotId: {
-                label: item.depotName,
-                value: item.depotId,
-              },
-              id: Date.now() + "." + index,
-            };
-          });
+      this.confirmLoading = true;
+      getAction(this.url.list, { headId: this.model.id })
+        .then((res) => {
+          if (res.code === 200) {
+            let data = res.data?.map((item, index) => {
+              return {
+                ...item,
+                SHOW_materialId: {
+                  label: item.model,
+                  value: item.materialId,
+                  standard: item.standard,
+                },
+                SHOW_depotId: {
+                  label: item.depotName,
+                  value: item.depotId,
+                },
+                id: Date.now() + "." + index,
+              };
+            });
+            this.$nextTick(() => {
+              this.$refs.editTableRef.initDataSource(data || [], this.isView);
+            });
+          }
+        })
+        .finally(() => {
           this.$nextTick(() => {
-            this.$refs.editTableRef.initDataSource(data || [], this.isView);
+            this.confirmLoading = false;
           });
-        }
-      });
+        });
     },
     initSupplier() {
       let that = this;
