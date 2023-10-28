@@ -18,12 +18,17 @@
     <template slot="footer">
       <a-button @click="handleCancel">取消</a-button>
       <a-button
+        v-if="(!model.id || model.status == '2') && !isView"
         type="primary"
         :loading="confirmLoading"
-        @click="handleResetAndOk"
-        >清空最后一行并保存</a-button
+        @click="handleSaveAsDraft"
+        >草稿</a-button
       >
-      <a-button type="primary" :loading="confirmLoading" @click="handleOk"
+      <a-button
+        v-if="!isView"
+        type="primary"
+        :loading="confirmLoading"
+        @click="(e) => handleOk()"
         >保存</a-button
       >
     </template>
@@ -84,6 +89,7 @@
                 <j-date
                   v-decorator="['createTime', validatorRules.createTime]"
                   :show-time="false"
+                  :disabled="isView"
                   dateFormat="YYYY-MM-DD"
                   style="width: 100%"
                 />
@@ -119,6 +125,7 @@
                   placeholder="请输入车牌号"
                   v-decorator="['carNumber']"
                   allowClear
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -145,6 +152,7 @@
                   v-decorator="['handlingFee']"
                   allowClear
                   style="width: 100%"
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -159,6 +167,7 @@
                   v-decorator="['serverFee']"
                   allowClear
                   style="width: 100%"
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -173,6 +182,7 @@
                   v-decorator="['carFee']"
                   allowClear
                   style="width: 100%"
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -186,6 +196,7 @@
                   :rows="1"
                   placeholder="请输入备注"
                   v-decorator="['remark']"
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -298,6 +309,7 @@ export default {
         },
       ],
       showText: true,
+      isView: false,
     };
   },
   methods: {
@@ -307,6 +319,8 @@ export default {
           let data = res.data?.map((item) => {
             return {
               ...item,
+              SHOW_STATUS_model: "success",
+              SHOW_STATUS_depotName: "success",
               SHOW_model: {
                 label: item.model,
                 value: item.materialId,
@@ -315,7 +329,7 @@ export default {
             };
           });
           this.$nextTick(() => {
-            this.$refs.editTableRef.initDataSource(data || []);
+            this.$refs.editTableRef.initDataSource(data || [], this.isView);
           });
         }
       });
@@ -328,12 +342,17 @@ export default {
         }
       });
     },
+    /** 当点击详情按钮时调用此方法 */
+    openView(record) {
+      this.edit(record, true);
+    },
     /** 当点击新增按钮时调用此方法 */
     add() {
       this.edit({ createTime: moment(new Date()).format("YYYY-MM-DD") });
     },
     /** 当点击了编辑（修改）按钮时调用此方法 */
-    edit(record) {
+    edit(record, isView = false) {
+      this.isView = isView;
       this.visible = true;
       this.form.resetFields();
       this.model = Object.assign({}, record);
@@ -359,10 +378,12 @@ export default {
       // this.getDepotData();
 
       if (this.model.id) {
-        this.title = "编辑-入库单";
+        this.title = this.isView
+          ? `入库单（${this.model.number}）-详情`
+          : `入库单（${this.model.number}）-编辑`;
         this.initList();
       } else {
-        this.title = "新增-入库单";
+        this.title = "入库单-新增";
         this.$nextTick(() => {
           this.$refs.editTableRef.initDataSource();
         });
@@ -378,13 +399,14 @@ export default {
       this.close();
     },
     /** 确认提交 */
-    handleOk() {
+    handleOk(status = 1) {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$refs.editTableRef.validate((valid) => {
             if (valid) {
               let formData = {
                 type: 2,
+                status,
                 packageType: values?.packageType,
                 supplierId: values?.supplierId,
                 carNumber: values?.carNumber,
@@ -422,12 +444,6 @@ export default {
             }
           });
         }
-      });
-    },
-    handleResetAndOk() {
-      this.$refs.editTableRef.resetEndLine();
-      this.$nextTick(() => {
-        this.handleOk();
       });
     },
     changePackageType(value) {
@@ -520,6 +536,9 @@ export default {
             this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
           });
       }
+    },
+    handleSaveAsDraft() {
+      this.handleOk(2);
     },
   },
 };

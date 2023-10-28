@@ -17,7 +17,18 @@
   >
     <template slot="footer">
       <a-button @click="handleCancel">取消</a-button>
-      <a-button type="primary" :loading="confirmLoading" @click="handleOk"
+      <a-button
+        v-if="(!model.id || model.status == '2') && !isView"
+        type="primary"
+        :loading="confirmLoading"
+        @click="handleSaveAsDraft"
+        >草稿</a-button
+      >
+      <a-button
+        v-if="!isView"
+        type="primary"
+        :loading="confirmLoading"
+        @click="(e) => handleOk()"
         >保存</a-button
       >
     </template>
@@ -79,6 +90,7 @@
                   :show-time="false"
                   dateFormat="YYYY-MM-DD"
                   style="width: 100%"
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -92,6 +104,7 @@
                   :rows="1"
                   placeholder="请输入备注"
                   v-decorator="['remark']"
+                  :disabled="isView"
                 />
               </a-form-item>
             </a-col>
@@ -224,6 +237,7 @@ export default {
           scopedSlots: { customRender: "remark" },
         },
       ],
+      isView: false,
     };
   },
   created() {},
@@ -242,7 +256,7 @@ export default {
             };
           });
           this.$nextTick(() => {
-            this.$refs.editTableRef.initDataSource(data || []);
+            this.$refs.editTableRef.initDataSource(data || [], this.isView);
           });
         }
       });
@@ -255,12 +269,17 @@ export default {
         }
       });
     },
+    /** 当点击详情按钮时调用此方法 */
+    openView(record) {
+      this.edit(record, true);
+    },
     /** 当点击新增按钮时调用此方法 */
     add() {
       this.edit({ createTime: moment(new Date()).format("YYYY-MM-DD") });
     },
     /** 当点击了编辑（修改）按钮时调用此方法 */
-    edit(record) {
+    edit(record, isView = false) {
+      this.isView = isView;
       this.visible = true;
       this.form.resetFields();
       this.model = Object.assign({}, record);
@@ -283,10 +302,12 @@ export default {
       this.getDepotData();
 
       if (this.model.id) {
-        this.title = "编辑-库存盘点单";
+        this.title = this.isView
+          ? `库存盘点单（${this.model.number}）-详情`
+          : `库存盘点单（${this.model.number}）-编辑`;
         this.initList();
       } else {
-        this.title = "新增-库存盘点单";
+        this.title = "库存盘点单-新增";
         this.$nextTick(() => {
           this.$refs.editTableRef.initDataSource();
         });
@@ -302,13 +323,14 @@ export default {
       this.close();
     },
     /** 确认提交 */
-    handleOk() {
+    handleOk(status = 1) {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$refs.editTableRef.validate((valid) => {
             if (valid) {
               let formData = {
                 type: 3,
+                status,
                 packageType: values?.packageType,
                 supplierId: values?.supplierId,
                 carNumber: values?.carNumber,
@@ -364,6 +386,9 @@ export default {
           this.$message.info(res.data);
         }
       });
+    },
+    handleSaveAsDraft() {
+      this.handleOk(2);
     },
   },
 };

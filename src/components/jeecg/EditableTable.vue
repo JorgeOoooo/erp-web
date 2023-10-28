@@ -55,6 +55,7 @@
               :getPopupContainer="getPopupContainer"
               :tabIndex="getTabIndex(col, index)"
               :open="getOpen(col, record)"
+              :disabled="isView"
               showSearch
               allowClear
               style="width: 100%"
@@ -91,6 +92,7 @@
                   : '暂无数据，请修改查询条件或新增'
               "
               :getPopupContainer="getPopupContainer"
+              :disabled="isView"
               showSearch
               allowClear
               style="width: 100%"
@@ -126,6 +128,7 @@
                   : '暂无数据，请修改查询条件或新增'
               "
               :getPopupContainer="getPopupContainer"
+              :disabled="isView"
               showSearch
               allowClear
               style="width: 100%"
@@ -155,6 +158,7 @@
               style="width: 100%"
               placeholder="请输入"
               :tabindex="getTabIndex(col, index)"
+              :disabled="isView"
               @change="(val) => handleChange(val, col, record)"
             />
             <div v-else-if="col.type == FormTypes.lazyInput">
@@ -164,6 +168,7 @@
                 style="width: calc(100% - 20px)"
                 placeholder="请输入"
                 :tabindex="getTabIndex(col, index)"
+                :disabled="isView"
                 @pressEnter="confirmInput(col, record)"
                 @blur="confirmInput(col, record)"
                 @change="(val) => handleChange(val, col, record)"
@@ -210,6 +215,7 @@
               :max="col.max"
               :precision="0"
               :tab-index="getTabIndex(col, index)"
+              :disabled="isView"
               style="width: 100%"
               placeholder="请输入"
               @change="(val) => handleChange(val, col, record)"
@@ -294,18 +300,23 @@ export default {
           dataIndex: "value",
         },
       ],
+      isView: false,
     };
   },
   computed: {
     tableColumns() {
       return [
         ...this.columns,
-        {
-          title: "操作",
-          dataIndex: "action",
-          width: 110,
-          scopedSlots: { customRender: "action" },
-        },
+        ...(this.isView
+          ? []
+          : [
+              {
+                title: "操作",
+                dataIndex: "action",
+                width: 110,
+                scopedSlots: { customRender: "action" },
+              },
+            ]),
       ];
     },
     countDataSource() {
@@ -380,9 +391,12 @@ export default {
       ).style.minHeight = height + "px";
       this.y = height;
     },
-    initDataSource(data = []) {
+    initDataSource(data = [], isView = false) {
       this.form.dataSource = data;
-      this.addLine();
+      this.isView = isView;
+      if (!this.isView) {
+        this.addLine();
+      }
     },
     addLine(o = {}) {
       let obj = {
@@ -553,7 +567,7 @@ export default {
         let requiredCols = this.tableColumns.filter((c) => c.required);
         let hasInput = requiredCols.some((c) => !!record?.[c.dataIndex]);
 
-        if (hasInput) {
+        if (hasInput && !record.needAdd) {
           rules.push({
             required: true,
             message: "必填",
@@ -610,12 +624,6 @@ export default {
       if (typeof col.confirm == "function") {
         col.confirm(col, record, this.form.dataSource);
       }
-    },
-    resetEndLine() {
-      this.$set(this.form.dataSource, this.form.dataSource.length - 1, {
-        needAdd: true,
-        id: Date.now(),
-      });
     },
   },
 };

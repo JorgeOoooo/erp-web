@@ -114,7 +114,6 @@
             :dataSource="dataSource"
             :components="handleDrag(columns)"
             :pagination="ipagination"
-            :scroll="scroll"
             :loading="loading"
             @change="handleTableChange"
           >
@@ -153,6 +152,7 @@ export default {
   },
   data() {
     return {
+      disableMixinCreated: true,
       labelCol: {
         span: 5,
       },
@@ -181,6 +181,11 @@ export default {
     this.getDepotData();
     this.getSupplierData();
     this.getMaterialData();
+
+    //初始化字典配置 在自己页面定义
+    this.initDictConfig();
+    //初始化按钮权限
+    this.initActiveBtnStr();
   },
   mounted() {
     this.scroll.x = 1000;
@@ -238,11 +243,6 @@ export default {
         this.ipagination.current = 1;
       }
       let params = this.getQueryParams(); //查询条件
-      if (!params?.supplierId) {
-        this.dataSource = [];
-        this.ipagination.total = 0;
-        return;
-      }
       this.loading = true;
       getAction(this.url.list, params)
         .then((res) => {
