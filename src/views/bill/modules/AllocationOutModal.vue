@@ -245,7 +245,7 @@ export default {
       getAction(this.url.list, { headId: this.model.id })
         .then((res) => {
           if (res.code === 200) {
-            let data = res.data?.map((item) => {
+            let data = res.data?.map((item, index) => {
               return {
                 ...item,
                 SHOW_materialId: {

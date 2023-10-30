@@ -55,6 +55,7 @@
                   allowClear
                   :disabled="!!model.id"
                   optionFilterProp="children"
+                  @change="changeSupplierId"
                 >
                   <div slot="dropdownRender" slot-scope="menu">
                     <v-nodes :vnodes="menu" />
@@ -189,6 +190,8 @@ export default {
           required: true,
           scopedSlots: { customRender: "materialId" },
           ellipsis: true,
+          change: this.changeMeterialId,
+          getParams: this.getSupplierId,
         },
         {
           title: "件数",
@@ -392,6 +395,20 @@ export default {
           this.$message.info(res.data);
         }
       });
+    },
+    changeSupplierId() {
+      this.options = {};
+      this.$refs.editTableRef.initDataSource();
+    },
+    changeMeterialId(val, col, record) {
+      this.$set(record, "depotId", undefined);
+      this.$set(record, "SHOW_depotId", undefined);
+      this.$set(this.options, record.id + "_depotId", []);
+    },
+    getSupplierId() {
+      return {
+        supplierId: this.form.getFieldValue("supplierId"),
+      };
     },
     handleSaveAsDraft() {
       this.handleOk(2);
