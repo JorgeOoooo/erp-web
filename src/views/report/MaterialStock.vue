@@ -4,7 +4,7 @@
     <a-col :md="24">
       <a-card :style="cardStyle" :bordered="false">
         <!-- 查询区域 -->
-        <div v-if="!model?.supplierId" class="table-page-search-wrapper">
+        <div class="table-page-search-wrapper">
           <a-form layout="inline" @keyup.enter.native="searchQuery">
             <a-row :gutter="24">
               <a-col :md="6" :sm="24">
@@ -150,7 +150,7 @@ export default {
       if (!supplierId)
         return [
           ...this.columns,
-          { title: "使用立方", dataIndex: "usedVolumn", align: "center" },
+          // { title: "使用立方", dataIndex: "usedVolumn", align: "center" },
         ];
       const supplier = this.supList.find((item) => item.id == supplierId);
 
@@ -211,9 +211,15 @@ export default {
     showMaterialInOutList(record) {
       console.log(record);
       const params = this.getQueryParams();
+      const supplier = this.supList.find(
+        (item) => item.id == params.supplierId
+      );
       this.$refs.materialInOutList?.show({
         depotId: record.depotId,
-        ...(params.supplierId ? { supplierId: params.supplierId } : {}),
+        depotName: record?.name,
+        ...(params.supplierId
+          ? { supplierId: params.supplierId, supplier: supplier?.supplier }
+          : {}),
       });
     },
   },

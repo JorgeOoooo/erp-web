@@ -2,7 +2,7 @@
   <div ref="container">
     <a-modal
       :title="title"
-      :width="1200"
+      :width="800"
       :visible="visible"
       :getContainer="() => $refs.container"
       :maskStyle="{ top: '93px', left: '154px' }"
@@ -18,7 +18,16 @@
       <div class="table-page-search-wrapper">
         <!-- 搜索区域 -->
         <a-form layout="inline" @keyup.enter.native="searchQuery">
-          <a-row :gutter="24">
+          <a-row v-if="!model?.supplierId" :gutter="24">
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                label="当前仓库"
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+              >
+                {{ model.depotName }}
+              </a-form-item>
+            </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item
                 label="客户"
@@ -52,6 +61,26 @@
               >
             </a-col>
           </a-row>
+          <a-row v-else :gutter="24">
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                label="当前仓库"
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+              >
+                {{ model.depotName }}
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                label="当前客户"
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+              >
+                {{ model.supplier }}
+              </a-form-item>
+            </a-col>
+          </a-row>
         </a-form>
       </div>
       <!-- table区域-begin -->
@@ -60,7 +89,7 @@
         ref="table"
         size="middle"
         rowKey="id"
-        :columns="columns"
+        :columns="getColumns()"
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
@@ -98,11 +127,6 @@ export default {
       queryParam: {},
       // 表头
       columns: [
-        {
-          title: "客户",
-          dataIndex: "name",
-          align: "center",
-        },
         { title: "款号", dataIndex: "model", align: "center" },
         { title: "件数", dataIndex: "countNumber", align: "center" },
       ],
@@ -114,6 +138,20 @@ export default {
   },
   created() {},
   methods: {
+    getColumns() {
+      if (this.model?.supplierId) {
+        return [...this.columns];
+      } else {
+        return [
+          {
+            title: "客户",
+            dataIndex: "name",
+            align: "center",
+          },
+          ...this.columns,
+        ];
+      }
+    },
     show(model) {
       this.model = Object.assign({}, model);
       this.visible = true;
