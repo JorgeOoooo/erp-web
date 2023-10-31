@@ -6,15 +6,13 @@
       :visible="visible"
       :getContainer="() => $refs.container"
       :maskStyle="{ top: '93px', left: '154px' }"
-      :wrapClassName="wrapClassNameInfo()"
-      :mask="isDesktop()"
       :maskClosable="false"
       @cancel="handleCancel"
       cancelText="关闭"
       style="top: 20px; height: 95%"
     >
       <template slot="footer">
-        <a-button key="back" @click="handleCancel">取消</a-button>
+        <a-button key="back" @click="handleCancel">关闭</a-button>
       </template>
       <!-- 查询区域 -->
       <div class="table-page-search-wrapper">
@@ -23,42 +21,34 @@
           <a-row :gutter="24">
             <a-col :md="8" :sm="24">
               <a-form-item
-                label="单据编号"
+                label="客户"
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
               >
-                <a-input
-                  placeholder="请输入单据编号"
-                  v-model="queryParam.number"
-                ></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item
-                label="单据日期"
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-              >
-                <a-range-picker
+                <a-select
+                  placeholder="请选择客户"
+                  showSearch
+                  allowClear
+                  optionFilterProp="children"
                   style="width: 100%"
-                  v-model="queryParam.createTimeRange"
-                  format="YYYY-MM-DD"
-                  :placeholder="['开始时间', '结束时间']"
-                  @change="onDateChange"
-                  @ok="onDateOk"
-                />
+                  :dropdownMatchSelectWidth="false"
+                  v-model="queryParam.supplierId"
+                  @change="searchQuery"
+                >
+                  <a-select-option
+                    v-for="(item, index) in supList"
+                    :key="index"
+                    :value="item.id"
+                  >
+                    {{ item.supplier }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-button type="primary" @click="searchQuery">查询</a-button>
               <a-button style="margin-left: 8px" @click="searchReset"
                 >重置</a-button
-              >
-              <a-button
-                style="margin-left: 8px"
-                @click="exportExcel"
-                icon="download"
-                >导出</a-button
               >
             </a-col>
           </a-row>
@@ -76,149 +66,88 @@
         :loading="loading"
         @change="handleTableChange"
       >
-        <span slot="numberCustomRender" slot-scope="text, record">
-          <a @click="myHandleDetail(record)">{{ record.number }}</a>
-        </span>
       </a-table>
       <!-- table区域-end -->
-      <!-- 表单区域 -->
-      <bill-detail ref="billDetail"></bill-detail>
     </a-modal>
   </div>
 </template>
 <script>
-import BillDetail from "../../bill/dialog/BillDetail";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
-import JEllipsis from "@/components/jeecg/JEllipsis";
-import { findBillDetailByNumber } from "@/api/api";
-import { openDownloadDialog, sheet2blob } from "@/utils/util";
-import { mixinDevice } from "@/utils/mixin";
+import { getAction, httpAction } from "@/api/manage";
+import { findBySelectSup } from "@/api/api";
+import moment from "moment";
 
 export default {
   name: "MaterialInOutList",
-  mixins: [JeecgListMixin, mixinDevice],
-  components: {
-    BillDetail,
-    JEllipsis,
-  },
+  mixins: [JeecgListMixin],
+  components: {},
+  props: ["supList"],
   data() {
     return {
-      title: "操作",
-      visible: false,
-      disableMixinCreated: false,
-      toFromType: "",
-      currentMaterialId: "",
+      title: "实时库存 - 仓库明细",
+      disableMixinCreated: true,
+      labelCol: {
+        span: 5,
+      },
+      wrapperCol: {
+        span: 18,
+        offset: 1,
+      },
+      model: {},
       // 查询条件
-      queryParam: {
-        depotIds: "",
-        materialId: "",
-        number: "",
-        beginTime: "",
-        endTime: "",
-      },
-      ipagination: {
-        pageSizeOptions: ["10", "20", "30", "100", "200"],
-      },
-      tabKey: "1",
+      queryParam: {},
       // 表头
       columns: [
         {
-          title: "#",
-          dataIndex: "",
-          key: "rowIndex",
-          width: 40,
+          title: "客户",
+          dataIndex: "name",
           align: "center",
-          customRender: function (t, r, index) {
-            return parseInt(index) + 1;
-          },
         },
-        {
-          title: "单据编号",
-          dataIndex: "number",
-          width: 100,
-          scopedSlots: { customRender: "numberCustomRender" },
-        },
-        { title: "类型", dataIndex: "type", width: 100 },
-        { title: "条码", dataIndex: "barCode", width: 100 },
-        { title: "名称", dataIndex: "materialName", width: 200 },
-        { title: "仓库名称", dataIndex: "depotName", width: 80 },
-        { title: "数量", dataIndex: "basicNumber", width: 70 },
-        { title: "日期", dataIndex: "operTime", width: 110 },
+        { title: "款号", dataIndex: "model", align: "center" },
+        { title: "件数", dataIndex: "countNumber", align: "center" },
       ],
-      labelCol: {
-        xs: { span: 1 },
-        sm: { span: 2 },
-      },
-      wrapperCol: {
-        xs: { span: 10 },
-        sm: { span: 16 },
-      },
       url: {
-        list: "/depotItem/findDetailByDepotIdsAndMaterialId",
+        list: "/depot/supplier/depot",
       },
+      visible: false,
     };
   },
   created() {},
   methods: {
-    getQueryParams() {
-      let param = Object.assign({}, this.queryParam, this.isorter);
-      param.field = this.getQueryField();
-      param.materialId = this.currentMaterialId;
-      param.currentPage = this.ipagination.current;
-      param.pageSize = this.ipagination.pageSize;
-      return param;
-    },
-    show(record, depotIds) {
-      this.model = Object.assign({}, record);
-      this.currentMaterialId = record.id;
+    show(model) {
+      this.model = Object.assign({}, model);
       this.visible = true;
-      this.queryParam.depotIds = depotIds;
-      this.queryParam.materialId = record.id;
+      this.queryParam = {};
       this.loadData(1);
     },
-    close() {
-      this.$emit("close");
-      this.visible = false;
+    getQueryParams() {
+      let param = Object.assign({}, this.queryParam, this.model);
+      param.current = this.ipagination.current;
+      param.size = this.ipagination.pageSize;
+      return param;
+    },
+    loadData(arg) {
+      //加载数据 若传入参数1则加载第一页的内容
+      if (arg === 1) {
+        this.ipagination.current = 1;
+      }
+      let params = this.getQueryParams(); //查询条件
+      this.loading = true;
+      getAction(this.url.list, params)
+        .then((res) => {
+          if (res.code === 200) {
+            this.dataSource = res.data?.records || [];
+            this.ipagination.total = res.data?.total || 0;
+          } else {
+            this.$message.warning(res.data);
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
     handleCancel() {
-      this.close();
-    },
-    onDateChange: function (value, dateString) {
-      this.queryParam.beginTime = dateString[0];
-      this.queryParam.endTime = dateString[1];
-    },
-    onDateOk(value) {
-      console.log(value);
-    },
-    myHandleDetail(record) {
-      let that = this;
-      this.toFromType = record.fromType;
-      findBillDetailByNumber({ number: record.number }).then((res) => {
-        if (res && res.code === 200) {
-          this.$refs.billDetail.isCanBackCheck = false;
-          that.$refs.billDetail.show(res.data, record.type);
-          that.$refs.billDetail.title = "详情";
-        }
-      });
-    },
-    exportExcel() {
-      let aoa = [
-        ["单据编号", "类型", "条码", "名称", "仓库名称", "数量", "日期"],
-      ];
-      for (let i = 0; i < this.dataSource.length; i++) {
-        let ds = this.dataSource[i];
-        let item = [
-          ds.number,
-          ds.type,
-          ds.barCode,
-          ds.materialName,
-          ds.depotName,
-          ds.basicNumber,
-          ds.operTime,
-        ];
-        aoa.push(item);
-      }
-      openDownloadDialog(sheet2blob(aoa), "商品库存流水");
+      this.visible = false;
     },
   },
 };
