@@ -171,7 +171,7 @@
         <!-- 表单区域 -->
         <other-in-modal
           ref="modalForm"
-          :billType="2"
+          :billType="7"
           @ok="modalFormOk"
           @close="modalFormClose"
         ></other-in-modal>
@@ -213,7 +213,7 @@ export default {
       queryParam: {
         number: "",
         supplierId: undefined,
-        type: "2",
+        type: "7",
         subType: "其它",
         roleType: Vue.ls.get("roleType"),
       },
