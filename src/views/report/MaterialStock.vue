@@ -56,22 +56,44 @@
           bordered
           ref="table"
           size="middle"
-          rowKey="depotId"
+          rowKey="id"
           :columns="getColumns()"
-          :dataSource="getDataSource()"
-          :pagination="ipagination"
+          :dataSource="dataSource"
+          :pagination="false"
           :loading="loading"
-          @change="handleTableChange"
         >
           <template slot="name" slot-scope="text, record, index">
             <a
-              v-if="index != getDataSource()?.length - 1"
+              v-if="index != dataSource?.length - 1"
               @click="showMaterialInOutList(record)"
               >{{ record.name }}</a
             >
             <span v-else>{{ record.name }}</span>
           </template>
         </a-table>
+        <a-pagination
+          style="float: right; margin: 16px 0"
+          @change="
+            (current, pageSize) =>
+              handleTableChange({ ...ipagination, current, pageSize }, null, {})
+          "
+          @showSizeChange="
+            (current, pageSize) =>
+              handleTableChange({ ...ipagination, current, pageSize }, null, {})
+          "
+          size="small"
+          show-size-changer
+          :showQuickJumper="true"
+          :current="ipagination.current"
+          :page-size="ipagination.pageSize"
+          :page-size-options="ipagination.pageSizeOptions"
+          :total="ipagination.total"
+          :show-total="(total, range) => `${range[0]}-${range[1]} 共${total}条`"
+        >
+          <template slot="buildOptionText" slot-scope="props">
+            <span>{{ props.value }}条/页</span>
+          </template>
+        </a-pagination>
       </a-card>
     </a-col>
     <MaterialInOutList ref="materialInOutList" :supList="supList" />
@@ -130,21 +152,6 @@ export default {
   },
   methods: {
     moment,
-    getDataSource() {
-      if (this.dataSource?.length) {
-        return [
-          ...this.dataSource,
-          {
-            name: "总计",
-            depotCountNumber: this.totalCountNumber,
-            volumn: this.countTotablVol,
-            usedVolumn: this.countVol,
-          },
-        ];
-      } else {
-        return [];
-      }
-    },
     getColumns() {
       const supplierId = this.getQueryParams()?.supplierId;
       if (!supplierId)
@@ -196,10 +203,22 @@ export default {
         .then((res) => {
           if (res.code === 200) {
             this.dataSource =
-              res.data?.depotCurMaterialNodeVOPage?.records || [];
+              res.data?.depotCurMaterialNodeVOPage?.records?.map((v, i) => ({
+                ...v,
+                id: Date.now() + "." + i,
+              })) || [];
             this.ipagination.total =
               res.data?.depotCurMaterialNodeVOPage?.total || 0;
             this.totalCountNumber = res.data?.totalCountNumber;
+            if (this.dataSource?.length) {
+              this.dataSource.push({
+                name: "总计",
+                depotCountNumber: this.totalCountNumber,
+                volumn: this.countTotablVol,
+                usedVolumn: this.countVol,
+                id: Date.now() + "",
+              });
+            }
           } else {
             this.$message.warning(res.data);
           }

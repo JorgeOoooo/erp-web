@@ -231,6 +231,7 @@ import moment from "dayjs";
 export default {
   name: "OtherInModal",
   mixins: [BillModalMixin],
+  props: ["billType"],
   components: {
     EditableTable,
     JDate,
@@ -321,6 +322,15 @@ export default {
       loadings: {},
       options: {},
       isView: false,
+      typeEnum: {
+        1: "出库单",
+        2: "入库单",
+        3: "库存盘点单",
+        4: "退货入库",
+        5: "库存调拨",
+        6: "报损单",
+        7: "报溢单",
+      },
     };
   },
   created() {},
@@ -399,11 +409,11 @@ export default {
 
       if (this.model.id) {
         this.title = this.isView
-          ? `出库单（${this.model.number}）-详情`
-          : `出库单（${this.model.number}）-编辑`;
+          ? `${this.typeEnum[this.billType]}（${this.model.number}）-详情`
+          : `${this.typeEnum[this.billType]}（${this.model.number}）-编辑`;
         this.initList();
       } else {
-        this.title = "出库单-新增";
+        this.title = `${this.typeEnum[this.billType]}-新增`;
         this.$nextTick(() => {
           this.$refs.editTableRef.initDataSource();
         });
@@ -425,7 +435,7 @@ export default {
           this.$refs.editTableRef.validate((valid) => {
             if (valid) {
               let formData = {
-                type: 1,
+                type: this.billType,
                 status,
                 // packageType: values?.packageType,
                 supplierId: values?.supplierId,

@@ -101,9 +101,9 @@
             </a-menu>
             <a-button> 批量操作 <a-icon type="down" /> </a-button>
           </a-dropdown>
-          <a-tooltip
+          <!-- <a-tooltip
             placement="left"
-            title="全托需要箱柜和体积；半托全部按包计算，不需要箱柜和体积。"
+            title="可以进行库存初始化，生产管理模块的成品入库。"
             slot="action"
           >
             <a-icon
@@ -111,7 +111,7 @@
               type="question-circle"
               style="font-size: 20px; float: right"
             />
-          </a-tooltip>
+          </a-tooltip> -->
         </div>
         <!-- table区域-begin -->
         <div>
@@ -124,6 +124,7 @@
             :dataSource="dataSource"
             :components="handleDrag(columns)"
             :pagination="ipagination"
+            :scroll="scroll"
             :loading="loading"
             :rowSelection="{
               selectedRowKeys: selectedRowKeys,
@@ -169,31 +170,31 @@
         </div>
         <!-- table区域-end -->
         <!-- 表单区域 -->
-        <other-in-modal
+        <other-out-modal
           ref="modalForm"
           :billType="7"
           @ok="modalFormOk"
           @close="modalFormClose"
-        ></other-in-modal>
+        ></other-out-modal>
         <!-- <bill-detail
           ref="modalDetail"
           @ok="modalFormOk"
           @close="modalFormClose"
         ></bill-detail> -->
-        <!-- <bill-info-modal
+        <!-- <bill-out-info-modal
           ref="billInfo"
           @ok="modalFormOk"
           @close="modalFormClose"
-        ></bill-info-modal> -->
+        ></bill-out-info-modal> -->
       </a-card>
     </a-col>
   </a-row>
 </template>
 <!--power by ji shenghua-->
 <script>
-import OtherInModal from "./modules/OtherInModal";
+import OtherOutModal from "./modules/OtherOutModal";
 // import BillDetail from "./dialog/BillDetailSimple";
-// import BillInfoModal from "./modules/BillInfoModal";
+// import BillOutInfoModal from "./modules/BillOutInfoModal";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
 import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
 import JDate from "@/components/jeecg/JDate";
@@ -202,8 +203,8 @@ export default {
   name: "OtherInList",
   mixins: [JeecgListMixin, BillListMixinSimple],
   components: {
-    OtherInModal,
-    // BillInfoModal,
+    OtherOutModal,
+    // BillOutInfoModal,
     // BillDetail,
     JDate,
   },
@@ -242,6 +243,12 @@ export default {
           ellipsis: true,
         },
         { title: "单据日期", dataIndex: "createTime", width: 80 },
+        // {
+        //   title: "仓管模式",
+        //   dataIndex: "packageType",
+        //   width: 80,
+        //   scopedSlots: { customRender: "customRenderType" },
+        // },
         { title: "车牌号", dataIndex: "carNumber", width: 80, ellipsis: true },
         { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],

@@ -90,6 +90,8 @@
                     <a-select-option value="1"> 出库单 </a-select-option>
                     <a-select-option value="5"> 调拨单 </a-select-option>
                     <a-select-option value="3"> 库存盘点单 </a-select-option>
+                    <a-select-option value="6"> 报损单 </a-select-option>
+                    <a-select-option value="7"> 报溢单 </a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -192,6 +194,7 @@
         ></other-in-modal>
         <other-out-modal
           ref="otherOutModal"
+          :billType="billType"
           @close="handleCloseView"
         ></other-out-modal>
         <allocation-out-modal
@@ -283,6 +286,7 @@ export default {
       },
       materialList: [],
       dateFormat: "YYYY-MM-DD",
+      billType: "1",
     };
   },
   computed: {},
@@ -321,6 +325,9 @@ export default {
           this.$refs.otherInModal.openView(record);
           break;
         case 1:
+        case 6:
+        case 7:
+          this.billType = record.type;
           this.$refs.otherOutModal.openView(record);
           break;
         case 5:
