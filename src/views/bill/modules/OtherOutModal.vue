@@ -97,7 +97,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :lg="6" :md="6" :sm="12">
+            <a-col v-if="billType == 1" :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -118,11 +118,13 @@
             :columns="columns"
             :r_loadings="loadings"
             :r_options="options"
-            style="height: calc(100% - 144px); margin: 12px 0"
+            :style="`height: calc(100% - ${
+              billType == 1 ? 144 : 64
+            }px); margin: 12px 0`"
           >
           </editable-table>
 
-          <a-row class="form-row" :gutter="24">
+          <a-row v-if="billType == 1" class="form-row" :gutter="24">
             <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
@@ -169,7 +171,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-row class="form-row" :gutter="24">
+          <a-row v-if="billType == 1" class="form-row" :gutter="24">
             <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"

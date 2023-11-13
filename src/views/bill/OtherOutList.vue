@@ -172,6 +172,7 @@
         <!-- 表单区域 -->
         <other-out-modal
           ref="modalForm"
+          :billType="1"
           @ok="modalFormOk"
           @close="modalFormClose"
         ></other-out-modal>
