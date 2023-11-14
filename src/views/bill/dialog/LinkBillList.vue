@@ -5,7 +5,6 @@
       :width="1250"
       :visible="visible"
       :getContainer="() => $refs.container"
-      :maskStyle="{ top: '93px', left: '154px' }"
       :wrapClassName="wrapClassNameInfo()"
       :mask="isDesktop()"
       :maskClosable="false"

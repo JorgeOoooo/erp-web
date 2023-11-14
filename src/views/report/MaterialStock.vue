@@ -21,7 +21,7 @@
                     style="width: 100%"
                     :dropdownMatchSelectWidth="false"
                     v-model="queryParam.supplierId"
-                    @change="searchQuery"
+                    @change="changeSupplierId"
                   >
                     <a-select-option
                       v-for="(item, index) in supList"
@@ -29,6 +29,32 @@
                       :value="item.id"
                     >
                       {{ item.supplier }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="24">
+                <a-form-item
+                  label="仓库"
+                  :labelCol="labelCol"
+                  :wrapperCol="wrapperCol"
+                >
+                  <a-select
+                    placeholder="请选择仓库"
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    style="width: 100%"
+                    :dropdownMatchSelectWidth="false"
+                    v-model="queryParam.depotId"
+                    @change="searchQuery"
+                  >
+                    <a-select-option
+                      v-for="(item, index) in depotList"
+                      :key="index"
+                      :value="item.id"
+                    >
+                      {{ item.name }}
                     </a-select-option>
                   </a-select>
                 </a-form-item>
@@ -124,6 +150,7 @@ export default {
       // 查询条件
       queryParam: {},
       supList: [],
+      depotList: [],
       // 表头
       columns: [
         {
@@ -183,6 +210,30 @@ export default {
           that.supList = res;
         }
       });
+    },
+    getDepotData(supplierId) {
+      if (!supplierId) {
+        this.depotList = [];
+        return;
+      }
+      getAction("/depot/supplier/base", { supplierId }).then((res) => {
+        if (res.code === 200) {
+          this.depotList = res.data?.map((item) => {
+            return {
+              ...item,
+              value: item.id,
+              label: item.name,
+            };
+          });
+        } else {
+          this.$message.info(res.data);
+        }
+      });
+    },
+    changeSupplierId() {
+      this.queryParam.depotId = undefined;
+      this.getDepotData(this.getQueryParams()?.supplierId);
+      this.searchQuery();
     },
     searchQuery() {
       this.loadData(1);

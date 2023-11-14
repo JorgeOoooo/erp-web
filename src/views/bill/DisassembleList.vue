@@ -97,7 +97,7 @@
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item
-                  label="单据类型"
+                  label="单据日期"
                   :labelCol="labelCol"
                   :wrapperCol="wrapperCol"
                 >

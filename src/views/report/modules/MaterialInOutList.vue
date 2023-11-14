@@ -5,7 +5,6 @@
       :width="800"
       :visible="visible"
       :getContainer="() => $refs.container"
-      :maskStyle="{ top: '93px', left: '154px' }"
       :maskClosable="false"
       @cancel="handleCancel"
       cancelText="关闭"
@@ -18,67 +17,95 @@
       <div class="table-page-search-wrapper">
         <!-- 搜索区域 -->
         <a-form layout="inline" @keyup.enter.native="searchQuery">
-          <a-row v-if="!model?.supplierId" :gutter="24">
-            <a-col :md="8" :sm="24">
+          <a-row :gutter="24">
+            <template v-if="!model?.supplierId">
+              <a-col :md="6" :sm="24">
+                <a-form-item
+                  label="当前仓库"
+                  :labelCol="labelCol"
+                  :wrapperCol="wrapperCol"
+                >
+                  {{ model.depotName }}
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="24">
+                <a-form-item
+                  label="客户"
+                  :labelCol="labelCol"
+                  :wrapperCol="wrapperCol"
+                >
+                  <a-select
+                    placeholder="请选择客户"
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    style="width: 100%"
+                    :dropdownMatchSelectWidth="false"
+                    v-model="queryParam.supplierId"
+                    @change="changeSupplierId"
+                  >
+                    <a-select-option
+                      v-for="(item, index) in supList"
+                      :key="index"
+                      :value="item.id"
+                    >
+                      {{ item.supplier }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </template>
+            <template v-else>
+              <a-col :md="6" :sm="12">
+                <a-form-item
+                  label="当前仓库"
+                  :labelCol="labelCol"
+                  :wrapperCol="wrapperCol"
+                >
+                  {{ model.depotName }}
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="12">
+                <a-form-item
+                  label="当前客户"
+                  :labelCol="labelCol"
+                  :wrapperCol="wrapperCol"
+                >
+                  {{ model.supplier }}
+                </a-form-item>
+              </a-col>
+            </template>
+            <a-col :md="6" :sm="24">
               <a-form-item
-                label="当前仓库"
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-              >
-                {{ model.depotName }}
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item
-                label="客户"
+                label="款号"
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
               >
                 <a-select
-                  placeholder="请选择客户"
+                  placeholder="请选择款号"
                   showSearch
                   allowClear
                   optionFilterProp="children"
                   style="width: 100%"
                   :dropdownMatchSelectWidth="false"
-                  v-model="queryParam.supplierId"
+                  v-model="queryParam.materialId"
                   @change="searchQuery"
                 >
                   <a-select-option
-                    v-for="(item, index) in supList"
+                    v-for="(item, index) in materialList"
                     :key="index"
-                    :value="item.id"
+                    :value="item.value"
                   >
-                    {{ item.supplier }}
+                    {{ item.label }}
                   </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col :md="6" :sm="24">
               <a-button type="primary" @click="searchQuery">查询</a-button>
               <a-button style="margin-left: 8px" @click="searchReset"
                 >重置</a-button
               >
-            </a-col>
-          </a-row>
-          <a-row v-else :gutter="24">
-            <a-col :md="8" :sm="24">
-              <a-form-item
-                label="当前仓库"
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-              >
-                {{ model.depotName }}
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item
-                label="当前客户"
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-              >
-                {{ model.supplier }}
-              </a-form-item>
             </a-col>
           </a-row>
         </a-form>
@@ -134,6 +161,7 @@ export default {
         list: "/depot/supplier/depot",
       },
       visible: false,
+      materialList: [],
     };
   },
   created() {},
@@ -157,6 +185,9 @@ export default {
       this.visible = true;
       this.queryParam = {};
       this.loadData(1);
+      if (this.model?.supplierId) {
+        this.getMaterialData(this.model.supplierId);
+      }
     },
     getQueryParams() {
       let param = Object.assign({}, this.queryParam, this.model);
@@ -186,6 +217,30 @@ export default {
     },
     handleCancel() {
       this.visible = false;
+    },
+    changeSupplierId() {
+      this.queryParam.materialId = undefined;
+      this.getMaterialData(this.getQueryParams()?.supplierId);
+      this.searchQuery();
+    },
+    getMaterialData(supplierId) {
+      if (!supplierId) {
+        this.materialList = [];
+        return;
+      }
+      getAction("/material/model", { supplierId }).then((res) => {
+        if (res.code === 200) {
+          this.materialList = res.data?.map((item) => {
+            return {
+              ...item,
+              value: item.id,
+              label: item.model,
+            };
+          });
+        } else {
+          this.$message.info(res.data);
+        }
+      });
     },
   },
 };
