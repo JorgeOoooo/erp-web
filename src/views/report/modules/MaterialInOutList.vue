@@ -185,6 +185,7 @@ export default {
       this.visible = true;
       this.queryParam = {};
       this.loadData(1);
+      this.materialList = [];
       if (this.model?.supplierId) {
         this.getMaterialData(this.model.supplierId);
       }
@@ -228,7 +229,10 @@ export default {
         this.materialList = [];
         return;
       }
-      getAction("/material/model", { supplierId }).then((res) => {
+      getAction("/material/model", {
+        supplierId,
+        depotId: this.model?.depotId,
+      }).then((res) => {
         if (res.code === 200) {
           this.materialList = res.data?.map((item) => {
             return {
