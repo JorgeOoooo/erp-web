@@ -32,7 +32,7 @@
                     allowClear
                     optionFilterProp="children"
                     v-model="queryParam.supplierId"
-                    @change="searchQuery"
+                    @change="changeSupplierId"
                   >
                     <a-select-option
                       v-for="(item, index) in supList"
@@ -216,7 +216,7 @@ import OtherInModal from "./modules/OtherInModal";
 import OtherOutModal from "./modules/OtherOutModal";
 import AllocationOutModal from "./modules/AllocationOutModal";
 import AssembleModal from "./modules/AssembleModal";
-import { httpAction } from "@/api/manage";
+import { getAction, httpAction } from "@/api/manage";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
 import { BillListMixinSimple } from "./mixins/BillListMixinSimple";
 import JDate from "@/components/jeecg/JDate";
@@ -295,7 +295,6 @@ export default {
     this.initSupplier();
     this.getDepotData();
     this.initUser();
-    this.getMaterialData();
   },
   methods: {
     changeDateTime(val) {
@@ -304,8 +303,17 @@ export default {
         : undefined;
       this.searchQuery();
     },
-    getMaterialData() {
-      httpAction("/material/model", {}, "get").then((res) => {
+    changeSupplierId() {
+      this.queryParam.materialId = undefined;
+      this.getMaterialData(this.queryParam.supplierId);
+      this.searchQuery();
+    },
+    getMaterialData(supplierId) {
+      if (!supplierId) {
+        this.materialList = [];
+        return;
+      }
+      getAction("/material/model", { supplierId }).then((res) => {
         if (res.code === 200) {
           this.materialList = res.data?.map((item) => {
             return {

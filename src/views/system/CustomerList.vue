@@ -145,9 +145,11 @@
               <span v-if="packageType == '2'">半托</span>
             </template>
             <template slot="customRenderType" slot-scope="fullyManagedType">
-              <span v-if="fullyManagedType == '1'">立方+立方</span>
-              <span v-if="fullyManagedType == '2'">包+立方</span>
-              <span v-if="fullyManagedType == '3'">长存</span>
+              <span v-if="fullyManagedType == '1'">立方结算</span>
+              <span v-if="fullyManagedType == '2'">立方+包结算</span>
+              <span v-if="fullyManagedType == '3'">立方+长存结算</span>
+              <span v-if="fullyManagedType == '4'">包+长存结算</span>
+              <span v-if="fullyManagedType == '5'">包结算</span>
             </template>
             <!-- 状态渲染模板 -->
             <template slot="customRenderFlag" slot-scope="enabled">

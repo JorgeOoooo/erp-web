@@ -69,9 +69,11 @@
                   showSearch
                   optionFilterProp="children"
                 >
-                  <a-select-option :value="1">立方+立方</a-select-option>
-                  <a-select-option :value="2">包+立方</a-select-option>
-                  <a-select-option :value="3">长存</a-select-option>
+                  <a-select-option :value="1">立方结算</a-select-option>
+                  <a-select-option :value="2">立方+包结算</a-select-option>
+                  <a-select-option :value="3">立方+长存结算</a-select-option>
+                  <a-select-option :value="4">包+长存结算</a-select-option>
+                  <a-select-option :value="5">包结算</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
