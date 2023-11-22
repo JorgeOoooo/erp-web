@@ -178,8 +178,13 @@
             }"
             @change="handleTableChange"
           >
-            <span slot="action" slot-scope="text, record">
-              <a @click="handleView(record)">详情</a>
+            <span slot="action" slot-scope="text, record, index">
+              <a
+                v-if="index != dataSource?.length - 1"
+                @click="handleView(record)"
+                >详情</a
+              >
+              <span v-else>{{ record.name }}</span>
             </span>
             <span slot="type" slot-scope="text">
               {{ renderTypeText(text) }}
@@ -297,6 +302,39 @@ export default {
     this.initUser();
   },
   methods: {
+    loadData(arg) {
+      if (!this.url.list) {
+        this.$message.error("请设置url.list属性!");
+        return;
+      }
+      //加载数据 若传入参数1则加载第一页的内容
+      if (arg === 1) {
+        this.ipagination.current = 1;
+      }
+      var params = this.getQueryParams(); //查询条件
+      this.loading = true;
+      Promise.all([
+        getAction(this.url.list, params),
+        getAction("/documentHead/sum", this.queryParam),
+      ]).then(([res, sum]) => {
+        if (res.code === 200) {
+          this.dataSource = res.data?.rows || res.data?.records || [];
+          this.ipagination.total = res.data?.total || 0;
+          // this.tableAddTotalRow(this.columns, this.dataSource);
+          if (this.dataSource?.length) {
+            this.dataSource.push({
+              name: "总计",
+              countNumber: sum.data,
+              id: Date.now() + "",
+            });
+          }
+        }
+        if (res.code === 510) {
+          this.$message.warning(res.data);
+        }
+        this.loading = false;
+      });
+    },
     changeDateTime(val) {
       this.queryParam.createTime = val
         ? moment(val).format(this.dateFormat)
