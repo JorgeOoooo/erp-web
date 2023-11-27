@@ -165,6 +165,11 @@ export default {
           dataIndex: "model",
         },
         {
+          title: "出货件数",
+          align: "center",
+          dataIndex: "outValue",
+        },
+        {
           title: "入货件数",
           align: "center",
           dataIndex: "inValue",
@@ -254,10 +259,14 @@ export default {
           const totalIn = this.listTable.reduce((pre, item) => {
             return pre + (item?.inValue || 0);
           }, 0);
+          const totalOut = this.listTable.reduce((pre, item) => {
+            return pre + (item?.outValue || 0);
+          }, 0);
           return [
             ...this.listTable,
             {
               index: "合计：",
+              outValue: totalOut,
               inValue: totalIn,
             },
           ];
