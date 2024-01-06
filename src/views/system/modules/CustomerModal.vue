@@ -53,7 +53,19 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :span="24 / 2" v-if="showType">
+            <!-- 仓管模式为半拖时，展示半拖类型：包结算 -->
+            <a-col :span="24 / 2" v-if="packageType == 2">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="半托类型"
+              >
+                <a-select :value="1" placeholder="选择半托类型" disabled>
+                  <a-select-option :value="1">包结算</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="packageType == 1">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -78,7 +90,10 @@
               </a-form-item>
             </a-col>
 
-            <a-col :span="24 / 2" v-if="[2, 4, 5].includes(fullyManagedType)">
+            <a-col
+              :span="24 / 2"
+              v-if="[2, 4, 5].includes(fullyManagedType) || packageType == 2"
+            >
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -92,7 +107,10 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24 / 2" v-if="[2, 4, 5].includes(fullyManagedType)">
+            <a-col
+              :span="24 / 2"
+              v-if="[2, 4, 5].includes(fullyManagedType) || packageType == 2"
+            >
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -285,7 +303,7 @@ export default {
           rules: [{ required: true, message: "请选择全托类型!" }],
         },
       },
-      showType: false,
+      packageType: undefined,
       fullyManagedType: undefined,
     };
   },
@@ -297,7 +315,7 @@ export default {
       this.form.resetFields();
       this.model = Object.assign({}, record);
       this.visible = true;
-      this.showType = this.model?.packageType == 1;
+      this.packageType = this.model?.packageType;
       this.fullyManagedType = this.model?.fullyManagedType;
       this.$nextTick(() => {
         this.form.setFieldsValue(
@@ -393,7 +411,7 @@ export default {
       });
     },
     onChangePackageType(e) {
-      this.showType = e == 1;
+      this.packageType = e;
       this.fullyManagedType = undefined;
       this.$nextTick(() => {
         this.form.setFieldsValue({

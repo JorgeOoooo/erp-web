@@ -28,14 +28,14 @@
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
-              label="名称"
+              label="款号"
               data-step="1"
-              data-title="名称"
-              data-intro="名称必填，可以重复"
+              data-title="款号"
+              data-intro="款号是比箱规更小的属性，比如：RX-01"
             >
               <a-input
-                placeholder="请输入名称"
-                v-decorator.trim="['name', validatorRules.name]"
+                placeholder="请输入款号"
+                v-decorator.trim="['model', validatorRules.model]"
               />
             </a-form-item>
           </a-col>
@@ -58,23 +58,8 @@
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
-              label="款号"
-              data-step="3"
-              data-title="款号"
-              data-intro="款号是比箱规更小的属性，比如：RX-01"
-            >
-              <a-input
-                placeholder="请输入款号"
-                v-decorator.trim="['model', validatorRules.model]"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :md="12" :sm="24">
-            <a-form-item
-              :labelCol="labelCol"
-              :wrapperCol="wrapperCol"
               label="客户"
-              data-step="4"
+              data-step="3"
               data-title="客户"
               data-intro="客户必填，商品的所属客户"
             >
@@ -101,7 +86,7 @@
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
               label="计价类型"
-              data-step="8"
+              data-step="4"
               data-title="计价类型"
               data-intro="计价类型分为：包、立方、长存。"
             >
@@ -124,7 +109,7 @@
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
               label="类别"
-              data-step="8"
+              data-step="5"
               data-title="类别"
               data-intro="类别需要在【商品类别】页面进行录入，录入之后在此处进行调用"
             >

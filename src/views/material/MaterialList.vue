@@ -320,12 +320,6 @@ export default {
           width: 120,
           scopedSlots: { customRender: "pricingType" },
         },
-        {
-          title: "名称",
-          dataIndex: "name",
-          width: 160,
-          scopedSlots: { customRender: "customName" },
-        },
         { title: "箱规", dataIndex: "standard", width: 120 },
         {
           title: "类别",
