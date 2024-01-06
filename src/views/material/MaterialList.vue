@@ -290,7 +290,6 @@ export default {
         "color",
         "categoryName",
         "materialOther",
-        "unit",
         "stock",
         "purchaseDecimal",
         "commodityDecimal",
@@ -326,22 +325,6 @@ export default {
           dataIndex: "categoryName",
           width: 100,
           ellipsis: true,
-        },
-        {
-          title: "单位",
-          dataIndex: "unit",
-          width: 100,
-          ellipsis: true,
-          customRender: function (t, r, index) {
-            if (r) {
-              let name = t ? t : r.unitName;
-              if (r.sku) {
-                return name + "[SKU]";
-              } else {
-                return name;
-              }
-            }
-          },
         },
       ],
       url: {
