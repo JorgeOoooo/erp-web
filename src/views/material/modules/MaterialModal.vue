@@ -100,6 +100,29 @@
             <a-form-item
               :labelCol="labelCol"
               :wrapperCol="wrapperCol"
+              label="计价类型"
+              data-step="8"
+              data-title="计价类型"
+              data-intro="计价类型分为：包、立方、长存。"
+            >
+              <a-select
+                placeholder="请选择计价类型"
+                v-decorator="['pricingType', validatorRules.pricingType]"
+                :dropdownMatchSelectWidth="false"
+                showSearch
+                allowClear
+                optionFilterProp="children"
+              >
+                <a-select-option :value="1"> 包 </a-select-option>
+                <a-select-option :value="2"> 立方 </a-select-option>
+                <a-select-option :value="3"> 长存 </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :md="12" :sm="24">
+            <a-form-item
+              :labelCol="labelCol"
+              :wrapperCol="wrapperCol"
               label="类别"
               data-step="8"
               data-title="类别"
@@ -238,6 +261,9 @@ export default {
         supplierId: {
           rules: [{ required: true, message: "请选择客户!" }],
         },
+        pricingType: {
+          rules: [{ required: true, message: "请选择计价类型!" }],
+        },
         // unitId: {
         //   rules: [{ required: true, message: "请输入单位!" }],
         // },
@@ -299,7 +325,8 @@ export default {
             "otherField1",
             "otherField2",
             "otherField3",
-            "supplierId"
+            "supplierId",
+            "pricingType"
           )
         );
       });

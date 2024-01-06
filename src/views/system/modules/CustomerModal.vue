@@ -46,7 +46,7 @@
                   :dropdownMatchSelectWidth="false"
                   showSearch
                   optionFilterProp="children"
-                  @change="(e) => (showType = e == 1)"
+                  @change="onChangePackageType"
                 >
                   <a-select-option :value="1"> 全托 </a-select-option>
                   <a-select-option :value="2"> 半托 </a-select-option>
@@ -67,7 +67,7 @@
                   placeholder="选择全托类型"
                   :dropdownMatchSelectWidth="false"
                   showSearch
-                  optionFilterProp="children"
+                  @change="onChangeFullPackageType"
                 >
                   <a-select-option :value="1">立方结算</a-select-option>
                   <a-select-option :value="2">立方+包结算</a-select-option>
@@ -77,6 +77,106 @@
                 </a-select>
               </a-form-item>
             </a-col>
+
+            <a-col :span="24 / 2" v-if="[2, 4, 5].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="配送费（/包）"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入配送费（/包）"
+                  v-decorator.trim="['packageDeliverFee']"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="[2, 4, 5].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="库房费（/包）"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入库房费（/包）"
+                  v-decorator.trim="['packageWarehouseFee']"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="[1, 2, 3].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="配送费（/立方）"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入配送费（/立方）"
+                  v-decorator.trim="['cubeDeliverFee']"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="[1, 2, 3].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="库房费（/立方）"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入库房费（/立方）"
+                  v-decorator.trim="['cubeWarehouseFee']"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="[3].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="长存库房费（/立方）"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入长存库房费（/立方）"
+                  v-decorator.trim="['lsCubeWarehouseFee']"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="[4].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="长存库房费（/包）"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入长存库房费（/包）"
+                  v-decorator.trim="['lsPackageWarehouseFee']"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24 / 2" v-if="[3, 4].includes(fullyManagedType)">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="二次分拣费"
+              >
+                <a-input-number
+                  :min="0"
+                  style="width: 100%"
+                  placeholder="请输入二次分拣费"
+                  v-decorator.trim="['secondSortFee']"
+                />
+              </a-form-item>
+            </a-col>
+
             <a-col :span="24 / 2">
               <a-form-item
                 :labelCol="labelCol"
@@ -157,11 +257,11 @@ export default {
       isReadOnly: false,
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 6 },
+        sm: { span: 8 },
       },
       wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 18 },
+        sm: { span: 16 },
       },
       confirmLoading: false,
       form: this.$form.createForm(this),
@@ -186,9 +286,9 @@ export default {
         },
       },
       showType: false,
+      fullyManagedType: undefined,
     };
   },
-  created() {},
   methods: {
     add() {
       this.edit({});
@@ -198,6 +298,7 @@ export default {
       this.model = Object.assign({}, record);
       this.visible = true;
       this.showType = this.model?.packageType == 1;
+      this.fullyManagedType = this.model?.fullyManagedType;
       this.$nextTick(() => {
         this.form.setFieldsValue(
           pick(
@@ -218,7 +319,14 @@ export default {
             "sort",
             "description",
             "packageType",
-            "fullyManagedType"
+            "fullyManagedType",
+            "packageDeliverFee",
+            "packageWarehouseFee",
+            "cubeDeliverFee",
+            "cubeWarehouseFee",
+            "lsCubeWarehouseFee",
+            "lsPackageWarehouseFee",
+            "secondSortFee"
           )
         );
         autoJumpNextInput("customerModal");
@@ -282,6 +390,30 @@ export default {
         } else {
           callback(res.data);
         }
+      });
+    },
+    onChangePackageType(e) {
+      this.showType = e == 1;
+      this.fullyManagedType = undefined;
+      this.$nextTick(() => {
+        this.form.setFieldsValue({
+          fullyManagedType: undefined,
+        });
+      });
+      this.onChangeFullPackageType();
+    },
+    onChangeFullPackageType(e) {
+      this.fullyManagedType = e;
+      this.$nextTick(() => {
+        this.form.setFieldsValue({
+          packageDeliverFee: 0,
+          packageWarehouseFee: 0,
+          cubeDeliverFee: 0,
+          cubeWarehouseFee: 0,
+          lsCubeWarehouseFee: 0,
+          lsPackageWarehouseFee: 0,
+          secondSortFee: 0,
+        });
       });
     },
   },

@@ -208,6 +208,11 @@
               <a-tag v-if="enabled" color="green">启用</a-tag>
               <a-tag v-if="!enabled" color="orange">禁用</a-tag>
             </template>
+            <template slot="pricingType" slot-scope="text">
+              {{
+                text == 1 ? "包" : text == 2 ? "立方" : text == 3 ? "长存" : ""
+              }}
+            </template>
           </a-table>
         </div>
         <!-- table区域-end -->
@@ -296,6 +301,7 @@ export default {
         "enableBatchNumber",
         "action",
         "supplier",
+        "pricingType",
       ],
       // 默认的列
       defColumns: [
@@ -308,6 +314,12 @@ export default {
         },
         { title: "款号", dataIndex: "model", width: 120 },
         { title: "所属客户", dataIndex: "supplier", width: 120 },
+        {
+          title: "计价类型",
+          dataIndex: "pricingType",
+          width: 120,
+          scopedSlots: { customRender: "pricingType" },
+        },
         {
           title: "名称",
           dataIndex: "name",
