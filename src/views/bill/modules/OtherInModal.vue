@@ -95,26 +95,6 @@
                 />
               </a-form-item>
             </a-col>
-            <!-- <a-col :lg="6" :md="6" :sm="12">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="仓管模式"
-              >
-                <a-select
-                  v-decorator="['packageType']"
-                  placeholder="选择托管类型"
-                  :dropdownMatchSelectWidth="false"
-                  showSearch
-                  allowClear
-                  @change="changePackageType"
-                  optionFilterProp="children"
-                >
-                  <a-select-option :value="1"> 全托 </a-select-option>
-                  <a-select-option :value="2"> 半托 </a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col> -->
             <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
@@ -135,6 +115,7 @@
             ref="editTableRef"
             from="in"
             :columns="columns"
+            :supplierId="supplierId"
             style="height: calc(100% - 104px); margin: 12px 0"
           >
           </editable-table>
@@ -144,14 +125,15 @@
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                label="巴恰费"
+                label="配送费"
               >
                 <a-input-number
-                  placeholder="请输入巴恰费"
-                  v-decorator="['handlingFee']"
+                  :min="0"
+                  placeholder="请输入配送费"
+                  v-model="deliverFlagComputed"
                   allowClear
                   style="width: 100%"
-                  :disabled="isView"
+                  :disabled="isView || correctFlag"
                 />
               </a-form-item>
             </a-col>
@@ -159,26 +141,23 @@
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                label="服务费"
+                label="是否矫正"
               >
-                <a-input-number
-                  placeholder="请输入服务费"
-                  v-decorator="['serverFee']"
-                  allowClear
-                  style="width: 100%"
-                  :disabled="isView"
-                />
+                <a-radio-group v-model="correctFlag" :disabled="isView">
+                  <a-radio :value="true">是</a-radio>
+                  <a-radio :value="false">否</a-radio>
+                </a-radio-group>
               </a-form-item>
             </a-col>
             <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                label="车费"
+                label="额外费用"
               >
                 <a-input-number
-                  placeholder="请输入车费"
-                  v-decorator="['carFee']"
+                  placeholder="请输入额外费用"
+                  v-decorator="['extraFee']"
                   allowClear
                   style="width: 100%"
                   :disabled="isView"
@@ -210,11 +189,10 @@ import pick from "lodash.pick";
 import { findBySelectSup } from "@/api/api";
 import { BillModalMixin } from "../mixins/BillModalMixin";
 import JDate from "@/components/jeecg/JDate";
-import EditableTable from "@/components/jeecg/EditableTable";
+import EditableTable from "./components/InEditableTable";
 import { httpAction, getAction, postAction } from "@/api/manage";
 import { FormTypes } from "@/utils/JEditableTableUtil";
 import moment from "dayjs";
-import { round } from "lodash";
 export default {
   name: "OtherInModal",
   mixins: [BillModalMixin],
@@ -291,8 +269,17 @@ export default {
         {
           title: "箱规",
           dataIndex: "standard",
+          type: 1,
           scopedSlots: { customRender: "standard" },
           renderText: this.renderStandard,
+        },
+        {
+          title: "计价类型",
+          dataIndex: "pricingType",
+          type: 1,
+          required: true,
+          scopedSlots: { customRender: "pricingType" },
+          renderText: this.renderPricingType,
         },
         {
           title: "体积",
@@ -319,7 +306,25 @@ export default {
         6: "报损单",
         7: "报溢单",
       },
+      correctFlag: false,
+      deliverFlag: 0,
+      supplierId: null,
     };
+  },
+  computed: {
+    deliverFlagComputed: {
+      get() {
+        if (this.correctFlag) {
+          return this.deliverFlag;
+        } else {
+          const data = this.editTableRef?.form?.dataSource;
+          return 0;
+        }
+      },
+      set(value) {
+        this.deliverFlag = value || 0;
+      },
+    },
   },
   methods: {
     initList() {
@@ -336,6 +341,7 @@ export default {
                   label: item.model,
                   value: item.materialId,
                   standard: item.standard,
+                  pricingType: item.pricingType,
                 },
               };
             });
@@ -350,11 +356,15 @@ export default {
           });
         });
     },
-    initSupplier() {
+    initSupplier(supplierId) {
       let that = this;
       findBySelectSup({}).then((res) => {
         if (res) {
           that.supList = res;
+          if (supplierId) {
+            const supplier = that.supList.find((item) => item.id == supplierId);
+            this.changePackageType(supplier?.packageTypeName);
+          }
         }
       });
     },
@@ -372,8 +382,8 @@ export default {
       this.visible = true;
       this.form.resetFields();
       this.model = Object.assign({}, record);
-
-      this.changePackageType(this.model.packageType);
+      this.correctFlag = this.model.correctFlag;
+      this.deliverFlag = this.model.deliverFlag;
 
       this.$nextTick(() => {
         this.form.setFieldsValue(
@@ -390,7 +400,7 @@ export default {
           )
         );
       });
-      this.initSupplier();
+      this.initSupplier(this.model.supplierId);
       // this.getDepotData();
 
       if (this.model.id) {
@@ -431,8 +441,11 @@ export default {
                 handlingFee: values?.handlingFee,
                 serverFee: values?.serverFee,
                 carFee: values?.carFee,
+
                 documentItemAddUnitDtos:
                   this.$refs.editTableRef.getDataSource() || [],
+                deliverFlag: this.deliverFlag,
+                correctFlag: this.correctFlag,
               };
               formData = Object.assign(this.model, formData);
 
@@ -466,6 +479,7 @@ export default {
       this.showText = value == 1;
     },
     changeSupplier(value) {
+      this.supplierId = value;
       const supplier = this.supList.find((item) => item.id == value);
       if (supplier) {
         this.changePackageType(supplier.packageTypeName == "半托" ? 2 : 1);
@@ -494,14 +508,34 @@ export default {
       let standard = record?.SHOW_model?.standard || "";
       return standard;
     },
+    renderPricingType(record) {
+      const text = record?.SHOW_model?.pricingType;
+      return text == 1 ? "包" : text == 2 ? "立方" : text == 3 ? "长存" : "";
+    },
     renderVolume(record) {
       if (!this.showText) return "";
-      let standard = record?.SHOW_model?.standard || "";
-      let operNumber = record?.operNumber || "";
+      if (record?.SHOW_STATUS_model == "success") {
+        let standard = record?.SHOW_model?.standard || "";
+        let operNumber = record?.operNumber || "";
+        return this.computeVolume(standard, operNumber);
+      } else {
+        let standard = record?.standard || "";
+        let operNumber = record?.operNumber || "";
+        let arr = standard.split("*");
+        if (
+          arr.length == 3 &&
+          arr.every((v) => v != "" && typeof Number(v) == "number")
+        ) {
+          return this.computeVolume(standard, operNumber);
+        }
+        return "";
+      }
+    },
+    computeVolume(standard, operNumber) {
       if (standard == null || standard == "" || operNumber == "") return "";
       let arr = standard.split("*");
       let volume = arr.reduce((prev, cur) => {
-        return prev * cur;
+        return prev * Number(cur);
       }, 1.0);
       return parseFloat((volume * operNumber).toFixed(4));
     },
@@ -537,7 +571,10 @@ export default {
                 if (col.dataIndex == "model") {
                   this.$set(record, "SHOW_" + col.dataIndex, {
                     standard: res.data?.standard,
+                    pricingType: res.data?.pricingType,
                   });
+                  this.$set(record, "standard", res.data?.standard);
+                  this.$set(record, "pricingType", res.data?.pricingType);
                 }
               } else {
                 this.$set(record, "SHOW_STATUS_" + col.dataIndex, "warning");

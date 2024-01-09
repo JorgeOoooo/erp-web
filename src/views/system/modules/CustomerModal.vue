@@ -47,6 +47,7 @@
                   showSearch
                   optionFilterProp="children"
                   @change="onChangePackageType"
+                  disabled
                 >
                   <a-select-option :value="1"> 全托 </a-select-option>
                   <a-select-option :value="2"> 半托 </a-select-option>
@@ -264,6 +265,8 @@ import pick from "lodash.pick";
 import { addSupplier, editSupplier, checkSupplier } from "@/api/api";
 import { autoJumpNextInput } from "@/utils/util";
 import { mixinDevice } from "@/utils/mixin";
+import Vue from "vue";
+import { USER_INFO } from "@/store/mutation-types";
 export default {
   name: "CustomerModal",
   mixins: [mixinDevice],
@@ -309,7 +312,8 @@ export default {
   },
   methods: {
     add() {
-      this.edit({});
+      let userInfo = Vue.ls.get(USER_INFO);
+      this.edit({ packageType: userInfo.tenantId });
     },
     edit(record) {
       this.form.resetFields();
