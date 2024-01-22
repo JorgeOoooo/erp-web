@@ -27,6 +27,24 @@
             <a-icon type="table" />
           </a-popover>
         </div>
+        <div slot="pricingTypeTitle">
+          计价类型
+          <a-popover title="计价类型总计">
+            <template slot="content">
+              <a-table
+                :columns="typeColumns"
+                :data-source="typeDataSource"
+                :pagination="false"
+                :scroll="{ y: 160, x: 240 }"
+                :bordered="false"
+                size="small"
+              >
+                <a slot="name" slot-scope="text">{{ text }}</a>
+              </a-table>
+            </template>
+            <a-icon type="table" />
+          </a-popover>
+        </div>
         <template
           v-for="col in columns.filter(
             (item) => item.dataIndex != 'action' && item.dataIndex != ''
@@ -342,6 +360,14 @@ export default {
       type: [String, Number],
     },
   },
+  watch: {
+    "form.dataSource": {
+      handler() {
+        this.$emit("updateFlag", new Date());
+      },
+      deep: true,
+    },
+  },
   data() {
     return {
       y: 168,
@@ -361,6 +387,16 @@ export default {
         },
         {
           title: "总件数",
+          dataIndex: "value",
+        },
+      ],
+      typeColumns: [
+        {
+          title: "计价类型",
+          dataIndex: "label",
+        },
+        {
+          title: "合计数量",
           dataIndex: "value",
         },
       ],
@@ -398,6 +434,27 @@ export default {
       return Object.keys(tempObj).map((key) => {
         return {
           label: key,
+          value: tempObj[key],
+        };
+      });
+    },
+    typeDataSource() {
+      if (this.from != "in") return [];
+      let tempObj = {};
+      this.form.dataSource
+        .filter((item) => item.operNumber > 0 && !!item.pricingType)
+        .forEach((item) => {
+          if (tempObj[item.pricingType]) {
+            tempObj[item.pricingType] += item.operNumber;
+          } else {
+            tempObj[item.pricingType] = item.operNumber;
+          }
+        });
+      return Object.keys(tempObj).map((key) => {
+        const label =
+          key == 1 ? "包" : key == 2 ? "立方" : key == 3 ? "长存" : key;
+        return {
+          label: label,
           value: tempObj[key],
         };
       });

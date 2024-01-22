@@ -116,6 +116,7 @@
             from="in"
             :columns="columns"
             :supplierId="supplierId"
+            @updateFlag="updateFlag"
             style="height: calc(100% - 104px); margin: 12px 0"
           >
           </editable-table>
@@ -133,7 +134,7 @@
                   v-model="deliverFlagComputed"
                   allowClear
                   style="width: 100%"
-                  :disabled="isView || correctFlag"
+                  :disabled="isView || !correctFlag"
                 />
               </a-form-item>
             </a-col>
@@ -274,10 +275,10 @@ export default {
           renderText: this.renderStandard,
         },
         {
-          title: "计价类型",
           dataIndex: "pricingType",
           type: 1,
           required: true,
+          slots: { title: "pricingTypeTitle" },
           scopedSlots: { customRender: "pricingType" },
           renderText: this.renderPricingType,
         },
@@ -309,6 +310,7 @@ export default {
       correctFlag: false,
       deliverFlag: 0,
       supplierId: null,
+      updateFlagValue: "",
     };
   },
   computed: {
@@ -316,9 +318,28 @@ export default {
       get() {
         if (this.correctFlag) {
           return this.deliverFlag;
-        } else {
-          const data = this.editTableRef?.form?.dataSource;
-          return 0;
+        } else if (this.supplierId) {
+          const data = this.$refs?.editTableRef?.form?.dataSource || [];
+          const supplier = this.supList.find(
+            (item) => item.id == this.supplierId
+          );
+          console.log(data, supplier);
+          let sum = 0;
+          if (data && data.length > 0) {
+            data
+              .filter((v) => !!v.pricingType && v.operNumber)
+              .forEach((v) => {
+                if (v.pricingType == 1) {
+                  // 包结算
+                  sum += v.operNumber * (supplier.packageDeliverFee || 0);
+                } else if (v.pricingType == 2) {
+                  // 立方结算
+                  sum += v.operNumber * (supplier.cubeDeliverFee || 0);
+                }
+              });
+          }
+          this.deliverFlag = sum;
+          return sum;
         }
       },
       set(value) {
@@ -327,6 +348,9 @@ export default {
     },
   },
   methods: {
+    updateFlag(val) {
+      this.updateFlagValue = val;
+    },
     initList() {
       this.confirmLoading = true;
       getAction(this.url.list, { headId: this.model.id })
@@ -374,7 +398,11 @@ export default {
     },
     /** 当点击新增按钮时调用此方法 */
     add() {
-      this.edit({ createTime: moment(new Date()).format("YYYY-MM-DD") });
+      this.edit({
+        createTime: moment(new Date()).format("YYYY-MM-DD"),
+        correctFlag: false,
+        deliverFlag: 0,
+      });
     },
     /** 当点击了编辑（修改）按钮时调用此方法 */
     edit(record, isView = false) {
