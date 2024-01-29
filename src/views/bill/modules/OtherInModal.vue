@@ -538,7 +538,13 @@ export default {
     },
     renderPricingType(record) {
       const text = record?.SHOW_model?.pricingType;
-      return text == 1 ? "包" : text == 2 ? "立方" : text == 3 ? "长存" : "";
+      const map = {
+        1: "包",
+        2: "立方",
+        3: "长存-包",
+        4: "长存-立方",
+      };
+      return map?.[text] || "包";
     },
     renderVolume(record) {
       if (!this.showText) return "";

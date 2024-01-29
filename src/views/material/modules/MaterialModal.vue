@@ -100,7 +100,8 @@
               >
                 <a-select-option :value="1"> 包 </a-select-option>
                 <a-select-option :value="2"> 立方 </a-select-option>
-                <a-select-option :value="3"> 长存 </a-select-option>
+                <a-select-option :value="3"> 长存-包 </a-select-option>
+                <a-select-option :value="4"> 长存-立方 </a-select-option>
               </a-select>
             </a-form-item>
           </a-col>

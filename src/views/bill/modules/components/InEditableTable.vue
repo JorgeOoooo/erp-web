@@ -94,7 +94,8 @@
               >
                 <a-select-option :value="1"> 包 </a-select-option>
                 <a-select-option :value="2"> 立方 </a-select-option>
-                <a-select-option :value="3"> 长存 </a-select-option>
+                <a-select-option :value="3"> 长存-包 </a-select-option>
+                <a-select-option :value="3"> 长存-立方 </a-select-option>
               </a-select>
               <span v-else>
                 {{ renderText(col, record, text) }}
@@ -450,9 +451,14 @@ export default {
             tempObj[item.pricingType] = item.operNumber;
           }
         });
+      const map = {
+        1: "包",
+        2: "立方",
+        3: "长存-包",
+        4: "长存-立方",
+      };
       return Object.keys(tempObj).map((key) => {
-        const label =
-          key == 1 ? "包" : key == 2 ? "立方" : key == 3 ? "长存" : key;
+        const label = map?.[key] || "包";
         return {
           label: label,
           value: tempObj[key],

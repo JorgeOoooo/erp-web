@@ -210,7 +210,15 @@
             </template>
             <template slot="pricingType" slot-scope="text">
               {{
-                text == 1 ? "包" : text == 2 ? "立方" : text == 3 ? "长存" : ""
+                text == 1
+                  ? "包"
+                  : text == 2
+                  ? "立方"
+                  : text == 3
+                  ? "长存-包"
+                  : text == 4
+                  ? "长存-立方"
+                  : ""
               }}
             </template>
           </a-table>
