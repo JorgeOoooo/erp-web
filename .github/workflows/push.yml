@@ -30,7 +30,7 @@ jobs:
       - name: 配置node环境
         uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 20
 
       - name: 拉取依赖
         run: rm -rf node_modules/ package-lock.json yarn.lock && yarn cache clean && yarn install --registry https://registry.npm.taobao.org
