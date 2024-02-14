@@ -49,6 +49,7 @@
               :columns="columns"
               :dataSource="dataSource"
               :pagination="false"
+              :scroll="{ x: 1500 }"
             >
               <!-- <template slot="index" slot-scope="text, record, index">
                 {{ text ? text : index + 1 }}
