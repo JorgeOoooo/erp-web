@@ -699,13 +699,13 @@ export default {
         let hasInput = requiredCols.some((c) => !!record?.[c.dataIndex]);
 
         if (hasInput && !record.needAdd) {
-          if (col.dataIndex != "pricingType") {
-            rules.push({
-              required: true,
-              message: "必填",
-              trigger: ["change", "blur"],
-            });
-          }
+          // if (col.dataIndex != "pricingType") {
+          rules.push({
+            required: true,
+            message: "必填",
+            trigger: ["change", "blur"],
+          });
+          // }
         }
       }
       return rules;
