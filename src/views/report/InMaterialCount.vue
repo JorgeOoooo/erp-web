@@ -36,9 +36,9 @@
               </div>
               <div class="input-item">
                 <a-button type="primary" @click="changeValue">查询</a-button>
-                <!-- <a-button @click="exportView" style="margin-left: 12px"
+                <a-button @click="exportView" style="margin-left: 12px"
                   >导出预览</a-button
-                > -->
+                >
               </div>
             </div>
           </div>
@@ -51,29 +51,32 @@
               :pagination="false"
               :scroll="{ x: 1500 }"
             >
-              <!-- <template slot="index" slot-scope="text, record, index">
-                {{ text ? text : index + 1 }}
-              </template>
-              <template slot="supplier">
-                {{ "客户：" + (supplierName || "-") }}
-              </template>
-              <template slot="time">
-                {{ "日期：" + moment(dateTime).format(dateFormat) }}
-              </template> -->
             </a-table>
           </div>
         </a-card>
       </a-spin>
     </a-col>
+    <c-export-modal
+      ref="exportRef"
+      :columns="columns"
+      :col_left="col_left"
+      :col_right_1="col_right_1"
+      :col_right_2="col_right_2"
+      :dataSource="dataSource"
+      :exportTitle="exportTitle"
+    />
   </a-row>
 </template>
 <script>
 import moment from "moment";
 import { httpAction, getAction } from "@/api/manage";
 import { findBySelectSup } from "@/api/api";
+import CExportModal from "../modal/CExportModal.vue";
 export default {
   name: "ouputTable",
-  components: {},
+  components: {
+    CExportModal,
+  },
   data() {
     return {
       loading: false,
@@ -84,6 +87,12 @@ export default {
       dateTime: [],
 
       listTable: [],
+
+      col_left: [],
+      col_right_1: [],
+      col_right_2: [],
+
+      exportTitle: null,
     };
   },
   computed: {
@@ -117,30 +126,31 @@ export default {
       const supplier = this.supList.find((v) => v.id == this.supplierId);
       if (!supplier) return [];
       const { packageTypeName, fullyManagedType } = supplier;
-      let col_left = [];
-      let col_right = [];
+      this.col_left = [];
+      this.col_right_1 = [];
+      this.col_right_2 = [];
       if (packageTypeName == "全托" && [1, 2, 3].includes(fullyManagedType)) {
-        col_left.push({
+        this.col_left.push({
           title: supplier?.cubeDeliverFee + "/配送",
           align: "center",
           dataIndex: "cubeDeliverFee",
           width: 80,
         });
-        col_left.push({
+        this.col_left.push({
           title: supplier?.cubeWarehouseFee + "/库房",
           align: "center",
           dataIndex: "cubeWarehouseFee",
           width: 80,
         });
 
-        col_right.push({
+        this.col_right_1.push({
           title: "入库数量",
           align: "center",
           dataIndex: "inCubeNumber",
           width: 80,
           customRender: renderContent2,
         });
-        col_right.push({
+        this.col_right_1.push({
           title: "出库数量",
           align: "center",
           dataIndex: "outCubeNumber",
@@ -148,14 +158,14 @@ export default {
           customRender: renderContent,
         });
 
-        col_right.push({
+        this.col_right_1.push({
           title: "入库立方",
           align: "center",
           dataIndex: "inCube",
           width: 80,
           customRender: renderContent2,
         });
-        col_right.push({
+        this.col_right_1.push({
           title: "出库立方",
           align: "center",
           dataIndex: "outCube",
@@ -167,20 +177,20 @@ export default {
         packageTypeName == "半托" ||
         (packageTypeName == "全托" && [2, 4].includes(fullyManagedType))
       ) {
-        col_left.push({
+        this.col_left.push({
           title: supplier?.packageDeliverFee + "/配送",
           align: "center",
           dataIndex: "packageDeliverFee",
           width: 80,
         });
-        col_left.push({
+        this.col_left.push({
           title: supplier?.packageWarehouseFee + "/库房",
           align: "center",
           dataIndex: "packageWarehouseFee",
           width: 80,
         });
 
-        col_right.push({
+        this.col_right_2.push({
           title: "750/包结",
           children: [
             {
@@ -200,6 +210,18 @@ export default {
           ],
         });
       }
+      this.col_left.push({
+        title: "费用合计",
+        align: "center",
+        dataIndex: "totalFee",
+        width: 80,
+      });
+      this.col_left.push({
+        title: "天数",
+        align: "center",
+        dataIndex: "days",
+        width: 60,
+      });
       return [
         {
           title: "日期",
@@ -231,21 +253,7 @@ export default {
         },
         {
           title: "摘要",
-          children: [
-            ...col_left,
-            {
-              title: "费用合计",
-              align: "center",
-              dataIndex: "totalFee",
-              width: 80,
-            },
-            {
-              title: "天数",
-              align: "center",
-              dataIndex: "days",
-              width: 60,
-            },
-          ],
+          children: [...this.col_left],
         },
         {
           title: "余额",
@@ -253,7 +261,8 @@ export default {
           dataIndex: "balance",
           width: 80,
         },
-        ...col_right,
+        ...this.col_right_1,
+        ...this.col_right_2,
       ];
     },
   },
@@ -283,6 +292,7 @@ export default {
       })
         .then(({ code, data }) => {
           if (code == 200) {
+            this.exportTitle = data?.title;
             let balance = 0;
             this.listTable =
               data?.financeReportUnits.map((v) => {

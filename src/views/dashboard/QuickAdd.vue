@@ -13,12 +13,12 @@
             <span class="text"> 出库单</span>
           </div>
         </div>
-        <div class="quick-line" @click="handleOpenAdd('AssembleModal')">
+        <div class="quick-line" @click="handleOpenAdd('AllocationOutModal')">
           <div class="quick-item">
             <span class="icon iconfont">&#xe612;</span>
             <span class="text"> 调拨单</span>
           </div>
-          <div class="quick-item" @click="handleOpenAdd('AllocationOutModal')">
+          <div class="quick-item" @click="handleOpenAdd('AssembleModal')">
             <span class="icon iconfont">&#xe618;</span>
             <span class="text"> 库存盘点单</span>
           </div>
@@ -26,8 +26,8 @@
       </div>
     </div>
 
-    <other-in-modal ref="OtherInModal"></other-in-modal>
-    <other-out-modal ref="OtherOutModal"></other-out-modal>
+    <other-in-modal :billType="2" ref="OtherInModal"></other-in-modal>
+    <other-out-modal :billType="1" ref="OtherOutModal"></other-out-modal>
     <assemble-modal ref="AssembleModal"></assemble-modal>
     <allocation-out-modal ref="AllocationOutModal"></allocation-out-modal>
   </div>
