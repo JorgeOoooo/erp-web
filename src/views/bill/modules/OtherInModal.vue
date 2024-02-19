@@ -117,7 +117,7 @@
             :columns="columns"
             :supplierId="supplierId"
             @updateFlag="updateFlag"
-            style="height: calc(100% - 104px); margin: 12px 0"
+            style="height: calc(100% - 184px); margin: 12px 0"
           >
           </editable-table>
 
@@ -131,7 +131,7 @@
                 <a-input-number
                   :min="0"
                   placeholder="请输入配送费"
-                  v-model="deliverFlagComputed"
+                  v-model="deliverFeeComputed"
                   allowClear
                   style="width: 100%"
                   :disabled="isView || !correctFlag"
@@ -154,13 +154,33 @@
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                label="额外费用"
+                label="备注"
               >
-                <a-input-number
-                  placeholder="请输入额外费用"
-                  v-decorator="['extraFee']"
-                  allowClear
-                  style="width: 100%"
+                <a-textarea
+                  :rows="1"
+                  placeholder="请输入备注"
+                  v-decorator="['remark']"
+                  :disabled="isView"
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col :lg="6" :md="6" :sm="12">
+              <div class="extraFees_title">额外费用</div>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="24">
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="二次分拣费"
+              >
+                <a-textarea
+                  :rows="1"
+                  placeholder="请输入二次分拣费"
+                  v-decorator="['extraFees_1']"
                   :disabled="isView"
                 />
               </a-form-item>
@@ -169,12 +189,26 @@
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
-                label="备注"
+                label="垫付"
               >
                 <a-textarea
                   :rows="1"
-                  placeholder="请输入备注"
-                  v-decorator="['remark']"
+                  placeholder="请输入垫付"
+                  v-decorator="['extraFees_2']"
+                  :disabled="isView"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
+                label="其他"
+              >
+                <a-textarea
+                  :rows="1"
+                  placeholder="请输入其他"
+                  v-decorator="['extraFees_3']"
                   :disabled="isView"
                 />
               </a-form-item>
@@ -308,16 +342,16 @@ export default {
         7: "报溢单",
       },
       correctFlag: false,
-      deliverFlag: 0,
+      deliverFee: 0,
       supplierId: null,
       updateFlagValue: "",
     };
   },
   computed: {
-    deliverFlagComputed: {
+    deliverFeeComputed: {
       get() {
         if (this.correctFlag) {
-          return this.deliverFlag;
+          return this.deliverFee;
         } else if (this.supplierId) {
           const data = this.$refs?.editTableRef?.form?.dataSource || [];
           const supplier = this.supList.find(
@@ -327,23 +361,30 @@ export default {
           let sum = 0;
           if (data && data.length > 0) {
             data
-              .filter((v) => !!v.pricingType && v.operNumber)
+              .filter(
+                (v) =>
+                  (v.pricingType == 1 && v.operNumber) ||
+                  (v.pricingType == 2 && this.renderVolume(v))
+              )
               .forEach((v) => {
                 if (v.pricingType == 1) {
                   // 包结算
-                  sum += v.operNumber * (supplier.packageDeliverFee || 0);
+                  sum +=
+                    (v.operNumber || 0) * (supplier.packageDeliverFee || 0);
                 } else if (v.pricingType == 2) {
                   // 立方结算
-                  sum += v.operNumber * (supplier.cubeDeliverFee || 0);
+                  sum +=
+                    (this.renderVolume(v) || 0) *
+                    (supplier.cubeDeliverFee || 0);
                 }
               });
           }
-          this.deliverFlag = sum;
+          this.deliverFee = sum;
           return sum;
         }
       },
       set(value) {
-        this.deliverFlag = value || 0;
+        this.deliverFee = value || 0;
       },
     },
   },
@@ -401,7 +442,7 @@ export default {
       this.edit({
         createTime: moment(new Date()).format("YYYY-MM-DD"),
         correctFlag: false,
-        deliverFlag: 0,
+        deliverFee: 0,
       });
     },
     /** 当点击了编辑（修改）按钮时调用此方法 */
@@ -410,21 +451,26 @@ export default {
       this.visible = true;
       this.form.resetFields();
       this.model = Object.assign({}, record);
-      this.correctFlag = this.model.correctFlag;
-      this.deliverFlag = this.model.deliverFlag;
+      this.model?.extraFees?.map((v) => {
+        this.$set(this.model, "extraFee_" + v.type, v.fee);
+      });
+      this.correctFlag = this.model.correctFlag || false;
+      this.deliverFee = this.model.deliverFee;
 
       this.$nextTick(() => {
         this.form.setFieldsValue(
           pick(
             this.model,
-            "packageType",
             "supplierId",
             "carNumber",
             "createTime",
+
+            "deliverFee",
             "remark",
-            "handlingFee",
-            "serverFee",
-            "carFee"
+
+            "extraFee_1",
+            "extraFee_2",
+            "extraFee_3"
           )
         );
       });
@@ -461,19 +507,43 @@ export default {
               let formData = {
                 type: this.billType,
                 status,
-                packageType: values?.packageType,
                 supplierId: values?.supplierId,
                 carNumber: values?.carNumber,
                 createTime: values?.createTime,
-                remark: values?.remark,
-                handlingFee: values?.handlingFee,
-                serverFee: values?.serverFee,
-                carFee: values?.carFee,
 
                 documentItemAddUnitDtos:
                   this.$refs.editTableRef.getDataSource() || [],
-                deliverFlag: this.deliverFlag,
+
+                deliverFee: this.deliverFeeComputed,
                 correctFlag: this.correctFlag,
+                remark: values?.remark,
+
+                extraFees: [
+                  ...(values?.extraFees_1
+                    ? [
+                        {
+                          type: 1,
+                          fee: values?.extraFees_1,
+                        },
+                      ]
+                    : []),
+                  ...(values?.extraFees_2
+                    ? [
+                        {
+                          type: 2,
+                          fee: values?.extraFees_2,
+                        },
+                      ]
+                    : []),
+                  ...(values?.extraFees_3
+                    ? [
+                        {
+                          type: 3,
+                          fee: values?.extraFees_3,
+                        },
+                      ]
+                    : []),
+                ],
               };
               formData = Object.assign(this.model, formData);
 
@@ -643,6 +713,24 @@ export default {
     .ant-form-explain {
       display: none;
     }
+  }
+}
+.extraFees_title {
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: #226ee7;
+    margin-right: 16px;
   }
 }
 </style>
