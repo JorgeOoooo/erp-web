@@ -39,7 +39,7 @@
               <div class="input-item">
                 <a-button type="primary" @click="changeValue">查询</a-button>
                 <a-button @click="exportView" style="margin-left: 12px"
-                  >导出预览</a-button
+                  >打印预览</a-button
                 >
               </div>
             </div>

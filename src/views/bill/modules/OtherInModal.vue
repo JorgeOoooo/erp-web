@@ -117,7 +117,9 @@
             :columns="columns"
             :supplierId="supplierId"
             @updateFlag="updateFlag"
-            style="height: calc(100% - 184px); margin: 12px 0"
+            :style="`height: calc(100% - ${
+              144 + (extraFeeFormList?.length ? 40 : 0)
+            }px); margin: 12px 0`"
           >
           </editable-table>
 
@@ -166,49 +168,62 @@
             </a-col>
           </a-row>
           <a-row class="form-row" :gutter="24">
-            <a-col :lg="6" :md="6" :sm="12">
-              <div class="extraFees_title">额外费用</div>
+            <a-col :span="12">
+              <div class="extraFees_title">
+                额外费用
+                <a-dropdown>
+                  <a-icon
+                    @click="(e) => e.preventDefault()"
+                    class="extraFees_title_action"
+                    type="plus"
+                    style="margin-left: 16px"
+                  />
+                  <a-menu slot="overlay" @click="handleAddExtraFee">
+                    <a-menu-item
+                      v-for="item in extraFeeList"
+                      :key="item.value"
+                      :disabled="
+                        extraFeeFormList.findIndex(
+                          (v) => v.type == item.value
+                        ) != -1
+                      "
+                    >
+                      {{ item.name }}
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+              </div>
             </a-col>
           </a-row>
-          <a-row class="form-row" :gutter="24">
-            <a-col :lg="6" :md="6" :sm="12">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="二次分拣费"
-              >
-                <a-textarea
-                  :rows="1"
-                  placeholder="请输入二次分拣费"
-                  v-decorator="['extraFees_1']"
-                  :disabled="isView"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :lg="6" :md="6" :sm="12">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="垫付"
-              >
-                <a-textarea
-                  :rows="1"
-                  placeholder="请输入垫付"
-                  v-decorator="['extraFees_2']"
-                  :disabled="isView"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :lg="6" :md="6" :sm="12">
-              <a-form-item
-                :labelCol="labelCol"
-                :wrapperCol="wrapperCol"
-                label="其他"
-              >
-                <a-textarea
-                  :rows="1"
-                  placeholder="请输入其他"
-                  v-decorator="['extraFees_3']"
+          <a-row v-if="extraFeeFormList?.length" class="form-row" :gutter="24">
+            <a-col
+              v-for="(item, index) in extraFeeFormList"
+              :key="item.type"
+              :lg="6"
+              :md="6"
+              :sm="12"
+            >
+              <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol">
+                <template #label>
+                  <span class="extraFeeLable"
+                    >{{
+                      extraFeeList?.find((v) => v.value == item.type)?.name
+                    }}
+                    <a-icon
+                      @click="handleDeleteExtraFee(index)"
+                      class="extraFeeDelete"
+                      type="close-circle"
+                      theme="filled"
+                  /></span>
+                </template>
+                <a-input-number
+                  :min="0"
+                  :placeholder="`请输入${
+                    extraFeeList?.find((v) => v.value == item.type)?.name
+                  }`"
+                  v-model="item.fee"
+                  allowClear
+                  style="width: 100%"
                   :disabled="isView"
                 />
               </a-form-item>
@@ -274,6 +289,7 @@ export default {
         edit: "/documentHead/update",
         detailList: "/documentHead/getDetailList",
         list: "/documentItem/head",
+        extraFeeList: "",
       },
       columns: [
         {
@@ -345,6 +361,8 @@ export default {
       deliverFee: 0,
       supplierId: null,
       updateFlagValue: "",
+      extraFeeList: [], // 所有可选的额外费用
+      extraFeeFormList: [], // 已选的额外费用
     };
   },
   computed: {
@@ -388,7 +406,41 @@ export default {
       },
     },
   },
+  created() {
+    this.getExtraFeeList();
+  },
   methods: {
+    getExtraFeeList() {
+      // getAction(this.url.extraFeeList).then(res => {
+      //   if(res.code === 200){
+      //     this.extraFeeList = res.data
+      //   }
+      // })
+      this.extraFeeList = [
+        {
+          value: 1,
+          name: "二次分拣费",
+        },
+        {
+          value: 2,
+          name: "垫付",
+        },
+        {
+          value: 3,
+          name: "其他",
+        },
+      ];
+    },
+    handleAddExtraFee({ key }) {
+      this.extraFeeFormList.push({
+        type: key,
+        fee: undefined,
+      });
+    },
+    handleDeleteExtraFee(index) {
+      this.extraFeeFormList.splice(index, 1);
+    },
+
     updateFlag(val) {
       this.updateFlagValue = val;
     },
@@ -451,11 +503,10 @@ export default {
       this.visible = true;
       this.form.resetFields();
       this.model = Object.assign({}, record);
-      this.model?.extraFees?.map((v) => {
-        this.$set(this.model, "extraFee_" + v.type, v.fee);
-      });
       this.correctFlag = this.model.correctFlag || false;
       this.deliverFee = this.model.deliverFee;
+
+      this.extraFeeFormList = this.model?.extraFeeList || [];
 
       this.$nextTick(() => {
         this.form.setFieldsValue(
@@ -466,11 +517,7 @@ export default {
             "createTime",
 
             "deliverFee",
-            "remark",
-
-            "extraFee_1",
-            "extraFee_2",
-            "extraFee_3"
+            "remark"
           )
         );
       });
@@ -518,32 +565,7 @@ export default {
                 correctFlag: this.correctFlag,
                 remark: values?.remark,
 
-                extraFees: [
-                  ...(values?.extraFees_1
-                    ? [
-                        {
-                          type: 1,
-                          fee: values?.extraFees_1,
-                        },
-                      ]
-                    : []),
-                  ...(values?.extraFees_2
-                    ? [
-                        {
-                          type: 2,
-                          fee: values?.extraFees_2,
-                        },
-                      ]
-                    : []),
-                  ...(values?.extraFees_3
-                    ? [
-                        {
-                          type: 3,
-                          fee: values?.extraFees_3,
-                        },
-                      ]
-                    : []),
-                ],
+                extraFees: this.extraFeeFormList || [],
               };
               formData = Object.assign(this.model, formData);
 
@@ -614,7 +636,7 @@ export default {
         3: "长存-包",
         4: "长存-立方",
       };
-      return map?.[text] || "包";
+      return map?.[text] || "-";
     },
     renderVolume(record) {
       if (!this.showText) return "";
@@ -724,6 +746,10 @@ export default {
   display: flex;
   align-items: center;
 
+  .extraFees_title_action {
+    cursor: pointer;
+  }
+
   &::before {
     content: "";
     display: inline-block;
@@ -731,6 +757,22 @@ export default {
     height: 16px;
     background: #226ee7;
     margin-right: 16px;
+  }
+}
+.extraFeeLable {
+  .extraFeeDelete {
+    display: none;
+  }
+  &:hover {
+    .extraFeeDelete {
+      display: inline-block;
+      position: absolute;
+      top: -7px;
+      right: 8px;
+      font-size: 12px;
+      color: #f5222d;
+      cursor: pointer;
+    }
   }
 }
 </style>
