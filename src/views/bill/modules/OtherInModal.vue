@@ -117,14 +117,12 @@
             :columns="columns"
             :supplierId="supplierId"
             @updateFlag="updateFlag"
-            :style="`height: calc(100% - ${
-              144 + (extraFeeFormList?.length ? 40 : 0)
-            }px); margin: 12px 0`"
+            :style="`height: calc(100% - 144px); margin: 12px 0`"
           >
           </editable-table>
 
           <a-row class="form-row" :gutter="24">
-            <a-col :lg="6" :md="6" :sm="12">
+            <!-- <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -151,7 +149,7 @@
                   <a-radio :value="false">否</a-radio>
                 </a-radio-group>
               </a-form-item>
-            </a-col>
+            </a-col> -->
             <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
@@ -168,7 +166,7 @@
             </a-col>
           </a-row>
           <a-row class="form-row" :gutter="24">
-            <a-col :span="12">
+            <a-col :lg="6" :md="6" :sm="12">
               <div class="extraFees_title">
                 额外费用
                 <a-dropdown>
@@ -194,8 +192,6 @@
                 </a-dropdown>
               </div>
             </a-col>
-          </a-row>
-          <a-row v-if="extraFeeFormList?.length" class="form-row" :gutter="24">
             <a-col
               v-for="(item, index) in extraFeeFormList"
               :key="item.type"
@@ -289,7 +285,7 @@ export default {
         edit: "/documentHead/update",
         detailList: "/documentHead/getDetailList",
         list: "/documentItem/head",
-        extraFeeList: "",
+        extraFeeList: "/dictionarys",
       },
       columns: [
         {
@@ -381,15 +377,15 @@ export default {
             data
               .filter(
                 (v) =>
-                  (v.pricingType == 1 && v.operNumber) ||
-                  (v.pricingType == 2 && this.renderVolume(v))
+                  ([1, 3].includes(v.pricingType) && v.operNumber) ||
+                  ([2, 4].includes(v.pricingType) && this.renderVolume(v))
               )
               .forEach((v) => {
-                if (v.pricingType == 1) {
+                if ([1, 3].includes(v.pricingType)) {
                   // 包结算
                   sum +=
                     (v.operNumber || 0) * (supplier.packageDeliverFee || 0);
-                } else if (v.pricingType == 2) {
+                } else if ([2, 4].includes(v.pricingType)) {
                   // 立方结算
                   sum +=
                     (this.renderVolume(v) || 0) *
@@ -411,25 +407,25 @@ export default {
   },
   methods: {
     getExtraFeeList() {
-      // getAction(this.url.extraFeeList).then(res => {
-      //   if(res.code === 200){
-      //     this.extraFeeList = res.data
-      //   }
-      // })
-      this.extraFeeList = [
-        {
-          value: 1,
-          name: "二次分拣费",
-        },
-        {
-          value: 2,
-          name: "垫付",
-        },
-        {
-          value: 3,
-          name: "其他",
-        },
-      ];
+      getAction(this.url.extraFeeList + `?code=extra_fee`).then((res) => {
+        if (res.code === 200) {
+          this.extraFeeList = res.data;
+        }
+      });
+      // this.extraFeeList = [
+      //   {
+      //     value: 1,
+      //     name: "二次分拣费",
+      //   },
+      //   {
+      //     value: 2,
+      //     name: "垫付",
+      //   },
+      //   {
+      //     value: 3,
+      //     name: "其他",
+      //   },
+      // ];
     },
     handleAddExtraFee({ key }) {
       this.extraFeeFormList.push({
