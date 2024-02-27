@@ -124,7 +124,6 @@
             :dataSource="dataSource"
             :components="handleDrag(columns)"
             :pagination="ipagination"
-            :scroll="scroll"
             :loading="loading"
             :rowSelection="{
               selectedRowKeys: selectedRowKeys,
@@ -262,6 +261,7 @@ export default {
   },
   computed: {},
   created() {
+    this.otherField = ["sender", "receiver"];
     this.initSystemConfig();
     this.initSupplier();
     this.getDepotData();

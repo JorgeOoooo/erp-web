@@ -10,6 +10,29 @@
             <a-row :gutter="24">
               <a-col :md="6" :sm="24">
                 <a-form-item
+                  label="客户"
+                  :labelCol="labelCol"
+                  :wrapperCol="wrapperCol"
+                >
+                  <a-select
+                    placeholder="请选择客户"
+                    showSearch
+                    allowClear
+                    optionFilterProp="children"
+                    v-model="queryParam.supplierId"
+                  >
+                    <a-select-option
+                      v-for="(item, index) in supList"
+                      :key="index"
+                      :value="item.id"
+                    >
+                      {{ item.supplier }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <!-- <a-col :md="6" :sm="24">
+                <a-form-item
                   label="类别"
                   :labelCol="labelCol"
                   :wrapperCol="wrapperCol"
@@ -24,7 +47,7 @@
                   >
                   </a-tree-select>
                 </a-form-item>
-              </a-col>
+              </a-col> -->
               <a-col :md="6" :sm="24">
                 <a-form-item
                   label="关键词"
@@ -245,11 +268,12 @@ import { getMpListShort } from "@/utils/util";
 import { JeecgListMixin } from "@/mixins/JeecgListMixin";
 import JEllipsis from "@/components/jeecg/JEllipsis";
 import JDate from "@/components/jeecg/JDate";
+import { BillListMixinSimple } from "../bill/mixins/BillListMixinSimple";
 import Vue from "vue";
 
 export default {
   name: "MaterialList",
-  mixins: [JeecgListMixin],
+  mixins: [JeecgListMixin, BillListMixinSimple],
   components: {
     MaterialModal,
     ImportModal,
@@ -271,18 +295,19 @@ export default {
       },
       // 查询条件
       queryParam: {
+        supplierId: undefined,
         categoryId: "",
         materialParam: "",
-        color: "",
-        materialOther: "",
-        weight: "",
-        expiryNum: "",
-        enabled: "",
-        enableSerialNumber: "",
-        enableBatchNumber: "",
-        position: "",
-        remark: "",
-        mpList: getMpListShort(Vue.ls.get("materialPropertyList")), //扩展属性
+        // color: "",
+        // materialOther: "",
+        // weight: "",
+        // expiryNum: "",
+        // enabled: "",
+        // enableSerialNumber: "",
+        // enableBatchNumber: "",
+        // position: "",
+        // remark: "",
+        // mpList: getMpListShort(Vue.ls.get("materialPropertyList")), //扩展属性
       },
       ipagination: {
         pageSizeOptions: ["10", "20", "30", "50", "100", "200"],
@@ -351,6 +376,7 @@ export default {
     this.model = Object.assign({}, {});
     this.initColumnsSetting();
     this.loadTreeData();
+    this.initSupplier();
   },
   computed: {
     importExcelUrl: function () {

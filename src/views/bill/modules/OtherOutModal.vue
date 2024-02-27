@@ -129,6 +129,22 @@
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
+                label="配送费"
+              >
+                <a-input-number
+                  :min="0"
+                  placeholder="请输入配送费"
+                  v-model="deliverFeeComputed"
+                  allowClear
+                  style="width: 100%"
+                  disabled
+                />
+              </a-form-item>
+            </a-col>
+            <!-- <a-col :lg="6" :md="6" :sm="12">
+              <a-form-item
+                :labelCol="labelCol"
+                :wrapperCol="wrapperCol"
                 label="巴恰费"
               >
                 <a-input-number
@@ -169,7 +185,7 @@
                   :disabled="isView"
                 />
               </a-form-item>
-            </a-col>
+            </a-col> -->
           </a-row>
           <a-row v-if="billType == 1" class="form-row" :gutter="24">
             <a-col :lg="6" :md="6" :sm="12">
@@ -333,7 +349,49 @@ export default {
         6: "报损单",
         7: "报溢单",
       },
+      supplierId: null,
     };
+  },
+  computed: {
+    deliverFeeComputed: {
+      get() {
+        if (this.supplierId) {
+          const data = this.$refs?.editTableRef?.form?.dataSource || [];
+          const supplier = this.supList.find(
+            (item) => item.id == this.supplierId
+          );
+          console.log(data, supplier);
+          let sum = 0;
+          if (data && data.length > 0) {
+            data
+              .filter(
+                (v) =>
+                  ([1, 3].includes(v?.SHOW_materialId?.pricingType) &&
+                    v.operNumber) ||
+                  ([2, 4].includes(v?.SHOW_materialId?.pricingType) &&
+                    this.renderVolume(v))
+              )
+              .forEach((v) => {
+                if ([1, 3].includes(v?.SHOW_materialId?.pricingType)) {
+                  // 包结算
+                  sum +=
+                    (v.operNumber || 0) * (supplier.packageDeliverFee || 0);
+                } else if ([2, 4].includes(v?.SHOW_materialId?.pricingType)) {
+                  // 立方结算
+                  sum +=
+                    (this.renderVolume(v) || 0) *
+                    (supplier.cubeDeliverFee || 0);
+                }
+              });
+          }
+          // this.deliverFee = sum;
+          return sum;
+        }
+      },
+      set(value) {
+        // this.deliverFee = value || 0;
+      },
+    },
   },
   created() {},
   methods: {
@@ -349,6 +407,7 @@ export default {
                   label: item.model,
                   value: item.materialId,
                   standard: item.standard,
+                  pricingType: item.pricingType,
                 },
                 SHOW_depotId: {
                   label: item.depotName,
@@ -399,15 +458,13 @@ export default {
             "carNumber",
             "createTime",
             "remark",
-            "handlingFee",
-            "serverFee",
-            "carFee",
             "sender",
             "receiver"
           )
         );
       });
       this.initSupplier();
+      this.supplierId = this.model.supplierId;
 
       if (this.model.id) {
         this.title = this.isView
@@ -444,9 +501,12 @@ export default {
                 carNumber: values?.carNumber,
                 createTime: values?.createTime,
                 remark: values?.remark,
-                handlingFee: values?.handlingFee,
-                serverFee: values?.serverFee,
-                carFee: values?.carFee,
+
+                deliverFee: this.deliverFeeComputed,
+                // handlingFee: values?.handlingFee,
+                // serverFee: values?.serverFee,
+                // carFee: values?.carFee,
+
                 sender: values?.sender,
                 receiver: values?.receiver,
                 documentItemAddUnitDtos:
@@ -508,11 +568,12 @@ export default {
           this.$set(this.loadings, record.id + "_" + col.dataIndex, false);
         });
     },
-    changeSupplier() {
+    changeSupplier(value) {
       this.options = {};
       this.loadings = {};
       this.$refs.editTableRef.resetLazySelect();
       this.$refs.editTableRef.initDataSource();
+      this.supplierId = value;
     },
     changeMeterialId(val, col, record) {
       this.$set(record, "depotId", undefined);
@@ -526,6 +587,19 @@ export default {
     },
     handleSaveAsDraft() {
       this.handleOk(2);
+    },
+    renderVolume(record) {
+      let standard = record?.SHOW_materialId?.standard || "";
+      let operNumber = record?.operNumber || "";
+      return this.computeVolume(standard, operNumber);
+    },
+    computeVolume(standard, operNumber) {
+      if (standard == null || standard == "" || operNumber == "") return "";
+      let arr = standard.split("*");
+      let volume = arr.reduce((prev, cur) => {
+        return prev * Number(cur);
+      }, 1.0);
+      return parseFloat((volume * operNumber).toFixed(4));
     },
   },
 };

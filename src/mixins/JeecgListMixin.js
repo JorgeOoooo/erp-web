@@ -70,6 +70,7 @@ export const JeecgListMixin = {
       disableMixinCreated: false,
       /* 按钮权限 */
       btnEnableList: "",
+      otherField: [],
     };
   },
   created() {
@@ -150,6 +151,9 @@ export const JeecgListMixin = {
       this.columns.forEach(function (value) {
         str += "," + value.dataIndex;
       });
+      if (this.otherField?.length) {
+        str += "," + this.otherField.join(",");
+      }
       return str;
     },
 
