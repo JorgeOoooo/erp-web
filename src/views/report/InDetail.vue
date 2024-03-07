@@ -26,14 +26,14 @@
                 </a-select>
               </div>
               <div class="input-item">
-                <span class="label">时间范围：</span>
-                <a-range-picker
-                  v-if="dateRange?.length"
-                  :default-value="dateRange"
+                <span class="label">月份：</span>
+                <a-month-picker
+                  v-if="dateTime"
+                  :default-value="dateTime"
                   :format="dateFormat"
                   :allowClear="false"
-                  @change="changeDateRange"
-                  style="width: 240px"
+                  @change="changeDateTime"
+                  style="width: 140px"
                 />
               </div>
               <div class="input-item">
@@ -41,6 +41,14 @@
                 <a-button @click="exportView" style="margin-left: 12px"
                   >打印预览</a-button
                 >
+              </div>
+              <div class="input-item">
+                {{
+                  moment(dateTime).format(dateFormat) +
+                  "-26  -  " +
+                  moment(dateTime).add(1, "months").format(dateFormat) +
+                  "-25"
+                }}
               </div>
             </div>
             <div>
@@ -140,8 +148,8 @@ export default {
 
       supplierName: undefined,
 
-      dateFormat: "YYYY-MM-DD",
-      dateRange: [],
+      dateFormat: "YYYY-MM",
+      dateTime: [],
 
       listTable: [],
       totalTable: [],
@@ -165,19 +173,24 @@ export default {
           dataIndex: "model",
         },
         {
-          title: "出货件数",
-          align: "center",
-          dataIndex: "outValue",
-        },
-        {
           title: "入货件数",
           align: "center",
           dataIndex: "inValue",
         },
         {
-          title: "立方数",
+          title: "出货件数",
           align: "center",
-          dataIndex: "totalVolumn",
+          dataIndex: "outValue",
+        },
+        {
+          title: "入库立方数",
+          align: "center",
+          dataIndex: "inTotalVolumn",
+        },
+        {
+          title: "出库立方数",
+          align: "center",
+          dataIndex: "outTotalVolumn",
         },
         {
           title: "总立方数/天",
@@ -262,12 +275,20 @@ export default {
           const totalOut = this.listTable.reduce((pre, item) => {
             return pre + (item?.outValue || 0);
           }, 0);
+          const totalInV = this.listTable.reduce((pre, item) => {
+            return pre + (item?.inTotalVolumn || 0);
+          }, 0);
+          const totalOutV = this.listTable.reduce((pre, item) => {
+            return pre + (item?.outTotalVolumn || 0);
+          }, 0);
           return [
             ...this.listTable,
             {
               index: "合计：",
               outValue: totalOut,
               inValue: totalIn,
+              inTotalVolumn: totalInV.toFixed(6),
+              outTotalVolumn: totalOutV.toFixed(6),
             },
           ];
         } else {
@@ -298,6 +319,7 @@ export default {
     },
   },
   methods: {
+    moment,
     initSupplier() {
       let that = this;
       findBySelectSup({}).then((res) => {
@@ -306,17 +328,19 @@ export default {
         }
       });
     },
-    changeDateRange(val) {
-      this.dateRange = val;
+    changeDateTime(val) {
+      this.dateTime = val;
       this.changeValue();
     },
     changeValue() {
-      if (!this.supplierId || !this.dateRange?.length) return;
+      if (!this.supplierId || !this.dateTime) return;
       this.loading = true;
       getAction("/material/report/supplier/range/date", {
         supplierId: this.supplierId,
-        startDate: moment(this.dateRange[0]).format(this.dateFormat),
-        endDate: moment(this.dateRange[1]).format(this.dateFormat),
+        startDate: moment(this.dateTime).format(this.dateFormat) + "-26",
+        endDate:
+          moment(this.dateTime).add(1, "months").format(this.dateFormat) +
+          "-25",
       })
         .then(({ code, data }) => {
           if (code == 200) {
@@ -375,21 +399,15 @@ export default {
         });
     },
     exportView() {
-      if (!this.supplierId || !this.dateRange?.length) {
-        this.$message.warning("请选择客户和时间范围！");
+      if (!this.supplierId || !this.dateTime) {
+        this.$message.warning("请选择客户和月份！");
         return;
       }
       this.$refs.exportRef.show();
     },
   },
   created() {
-    this.dateRange = [
-      moment(
-        moment().subtract(30, "days").format(this.dateFormat),
-        this.dateFormat
-      ),
-      moment(moment().format(this.dateFormat), this.dateFormat),
-    ];
+    this.dateTime = moment(moment().format(this.dateFormat), this.dateFormat);
     this.initSupplier();
   },
 };

@@ -393,6 +393,7 @@ export default {
                 }
               });
           }
+          sum = sum.toFixed(4);
           this.deliverFee = sum;
           return sum;
         }

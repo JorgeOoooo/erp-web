@@ -40,6 +40,14 @@
                   >打印预览</a-button
                 >
               </div>
+              <div class="input-item">
+                {{
+                  moment(dateTime).format(dateFormat) +
+                  "-26  -  " +
+                  moment(dateTime).add(1, "months").format(dateFormat) +
+                  "-25"
+                }}
+              </div>
             </div>
           </div>
           <div class="table" v-if="columns?.length">

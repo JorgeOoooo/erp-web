@@ -294,22 +294,30 @@ export default {
         list: "/documentItem/head",
       },
       columns: [
+        // {
+        //   title: "商品款号",
+        //   dataIndex: "materialId",
+        //   type: FormTypes.lazySelect,
+        //   selectConfig: {
+        //     url: "/material/model",
+        //     inputText: "model",
+        //     labelKey: "model",
+        //     valueKey: "id",
+        //   },
+        //   allowSearch: true,
+        //   required: true,
+        //   scopedSlots: { customRender: "materialId" },
+        //   ellipsis: true,
+        //   change: this.changeMeterialId,
+        //   getParams: this.getSupplierId,
+        // },
         {
           title: "商品款号",
-          dataIndex: "materialId",
-          type: FormTypes.lazySelect,
-          selectConfig: {
-            url: "/material/model",
-            inputText: "model",
-            labelKey: "model",
-            valueKey: "id",
-          },
-          allowSearch: true,
+          dataIndex: "model",
+          type: FormTypes.lazyInput,
           required: true,
-          scopedSlots: { customRender: "materialId" },
-          ellipsis: true,
-          change: this.changeMeterialId,
-          getParams: this.getSupplierId,
+          scopedSlots: { customRender: "model" },
+          confirm: this.confirm,
         },
         {
           title: "件数",
@@ -384,6 +392,7 @@ export default {
                 }
               });
           }
+          sum = sum.toFixed(4);
           // this.deliverFee = sum;
           return sum;
         }
@@ -409,6 +418,7 @@ export default {
                   standard: item.standard,
                   pricingType: item.pricingType,
                 },
+                SHOW_STATUS_model: "success",
                 SHOW_depotId: {
                   label: item.depotName,
                   value: item.depotId,
@@ -541,6 +551,7 @@ export default {
       });
     },
     getDepotData(col, record) {
+      console.log(record);
       let supplierId = this.form.getFieldValue("supplierId");
       let materialId = record.materialId;
       if (!materialId || !supplierId) {
@@ -600,6 +611,58 @@ export default {
         return prev * Number(cur);
       }, 1.0);
       return parseFloat((volume * operNumber).toFixed(4));
+    },
+    confirm(col, record, dataSource) {
+      const supplierId = this.form.getFieldValue("supplierId");
+      const value = record?.[col.dataIndex];
+      if (!supplierId || !value) {
+        this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+      } else {
+        this.$set(record, "SHOW_STATUS_" + col.dataIndex, "loading");
+        (col.dataIndex == "depotName"
+          ? postAction(
+              "/depot/name",
+              {},
+              {
+                name: value,
+              }
+            )
+          : getAction("/material/check/user/model", {
+              model: value,
+              supplierId,
+            })
+        )
+          .then((res) => {
+            if (res.code == 200) {
+              let lastObj = dataSource[dataSource.length - 1];
+              col.dataIndex == "depotName" &&
+                this.$set(lastObj, "depotName", value);
+              if (res.data) {
+                this.$set(record, "SHOW_STATUS_" + col.dataIndex, "success");
+                col.dataIndex == "depotName" &&
+                  this.$set(lastObj, "SHOW_STATUS_" + col.dataIndex, "success");
+                if (col.dataIndex == "model") {
+                  this.$set(record, "SHOW_" + col.dataIndex, {
+                    standard: res.data?.standard,
+                    pricingType: res.data?.pricingType,
+                  });
+                  this.$set(record, "standard", res.data?.standard);
+                  this.$set(record, "pricingType", res.data?.pricingType);
+                  this.$set(record, "materialId", res.data?.id);
+                }
+              } else {
+                this.$set(record, "SHOW_STATUS_" + col.dataIndex, "warning");
+                col.dataIndex == "depotName" &&
+                  this.$set(lastObj, "SHOW_STATUS_" + col.dataIndex, "warning");
+              }
+            } else {
+              this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+            }
+          })
+          .catch(() => {
+            this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
+          });
+      }
     },
   },
 };

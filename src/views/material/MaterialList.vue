@@ -296,7 +296,7 @@ export default {
       // 查询条件
       queryParam: {
         supplierId: undefined,
-        categoryId: "",
+        // categoryId: "",
         materialParam: "",
         // color: "",
         // materialOther: "",
