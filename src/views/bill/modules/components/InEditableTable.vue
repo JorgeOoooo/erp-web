@@ -541,6 +541,7 @@ export default {
       obj = {
         ...obj,
         ...o,
+        operNumber: 1,
       };
       this.form.dataSource.push(obj);
     },
@@ -602,6 +603,10 @@ export default {
         if (!record[col.dataIndex]) {
           this.$set(record, "SHOW_STATUS_" + col.dataIndex, "info");
         }
+      }
+
+      if (col.dataIndex == "standard") {
+        this.$set(record, "pricingType", 2);
       }
 
       if (typeof col?.change == "function") {

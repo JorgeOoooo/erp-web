@@ -392,7 +392,7 @@ export default {
       let volume = arr.reduce((prev, cur) => {
         return prev * cur;
       }, 1.0);
-      return parseFloat((volume * operNumber).toFixed(4));
+      return parseFloat((volume * operNumber).toFixed(6));
     },
     filterShowText(col, record, text) {
       if (col.filterShow == true) {

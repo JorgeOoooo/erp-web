@@ -161,9 +161,8 @@
               <span v-if="packageType == '2'">半托</span>
             </template>
             <template slot="customRenderStatus" slot-scope="status">
-              <a-tag v-if="status == '0'" color="red">未审核</a-tag>
-              <a-tag v-if="status == '1'" color="green">已审核</a-tag>
-              <a-tag v-if="status == '9'" color="orange">审核中</a-tag>
+              <a-tag v-if="status == '2'" color="red">草稿</a-tag>
+              <a-tag v-else color="green">已确认</a-tag>
             </template>
           </a-table>
         </div>
@@ -234,7 +233,7 @@ export default {
           width: 100,
           scopedSlots: { customRender: "action" },
         },
-        { title: "单据编号", dataIndex: "number", width: 120 },
+        { title: "单据编号", dataIndex: "number", width: 120, ellipsis: true },
         {
           title: "客户",
           dataIndex: "supplierName",
@@ -248,6 +247,13 @@ export default {
         //   width: 80,
         //   scopedSlots: { customRender: "customRenderType" },
         // },
+        {
+          title: "状态",
+          dataIndex: "status",
+          align: "center",
+          width: 80,
+          scopedSlots: { customRender: "customRenderStatus" },
+        },
         { title: "车牌号", dataIndex: "carNumber", width: 80, ellipsis: true },
         { title: "操作员", dataIndex: "creator", width: 80, ellipsis: true },
       ],

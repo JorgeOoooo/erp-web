@@ -122,7 +122,7 @@
           </editable-table>
 
           <a-row class="form-row" :gutter="24">
-            <!-- <a-col :lg="6" :md="6" :sm="12">
+            <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -138,7 +138,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :lg="6" :md="6" :sm="12">
+            <!-- <a-col :lg="6" :md="6" :sm="12">
               <a-form-item
                 :labelCol="labelCol"
                 :wrapperCol="wrapperCol"
@@ -393,7 +393,7 @@ export default {
                 }
               });
           }
-          sum = sum.toFixed(4);
+          sum = sum.toFixed(6);
           this.deliverFee = sum;
           return sum;
         }
@@ -660,7 +660,7 @@ export default {
       let volume = arr.reduce((prev, cur) => {
         return prev * Number(cur);
       }, 1.0);
-      return parseFloat((volume * operNumber).toFixed(4));
+      return parseFloat((volume * operNumber).toFixed(6));
     },
     confirm(col, record, dataSource) {
       const supplierId = this.form.getFieldValue("supplierId");

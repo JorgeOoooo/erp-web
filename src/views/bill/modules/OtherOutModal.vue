@@ -374,17 +374,16 @@ export default {
             data
               .filter(
                 (v) =>
-                  ([1, 3].includes(v?.SHOW_materialId?.pricingType) &&
-                    v.operNumber) ||
-                  ([2, 4].includes(v?.SHOW_materialId?.pricingType) &&
-                    this.renderVolume(v))
+                  ([1, 3].includes(v?.pricingType) && v.operNumber) ||
+                  ([2, 4].includes(v?.pricingType) && this.renderVolume(v))
               )
               .forEach((v) => {
-                if ([1, 3].includes(v?.SHOW_materialId?.pricingType)) {
+                console.log(v?.pricingType, v.operNumber);
+                if ([1, 3].includes(v?.pricingType)) {
                   // 包结算
                   sum +=
                     (v.operNumber || 0) * (supplier.packageDeliverFee || 0);
-                } else if ([2, 4].includes(v?.SHOW_materialId?.pricingType)) {
+                } else if ([2, 4].includes(v?.pricingType)) {
                   // 立方结算
                   sum +=
                     (this.renderVolume(v) || 0) *
@@ -392,8 +391,9 @@ export default {
                 }
               });
           }
-          sum = sum.toFixed(4);
+          sum = sum.toFixed(6);
           // this.deliverFee = sum;
+          console.log(sum);
           return sum;
         }
       },
@@ -573,6 +573,11 @@ export default {
               };
             });
             this.$set(this.options, record.id + "_" + col.dataIndex, options);
+            if (options?.length == 1) {
+              this.$nextTick(() => {
+                this.$set(record, "depotId", options[0].value);
+              });
+            }
           }
         })
         .finally(() => {
@@ -600,7 +605,7 @@ export default {
       this.handleOk(2);
     },
     renderVolume(record) {
-      let standard = record?.SHOW_materialId?.standard || "";
+      let standard = record?.standard || "";
       let operNumber = record?.operNumber || "";
       return this.computeVolume(standard, operNumber);
     },
@@ -610,7 +615,7 @@ export default {
       let volume = arr.reduce((prev, cur) => {
         return prev * Number(cur);
       }, 1.0);
-      return parseFloat((volume * operNumber).toFixed(4));
+      return parseFloat((volume * operNumber).toFixed(6));
     },
     confirm(col, record, dataSource) {
       const supplierId = this.form.getFieldValue("supplierId");

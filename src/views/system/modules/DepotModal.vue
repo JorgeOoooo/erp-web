@@ -277,7 +277,7 @@ export default {
     getVolumn() {
       const values = this.form.getFieldsValue(["square", "height"]);
       const volumn = values.square * values.height;
-      return Number.isNaN(volumn) ? "" : parseFloat(volumn.toFixed(4));
+      return Number.isNaN(volumn) ? "" : parseFloat(volumn.toFixed(6));
     },
   },
 };

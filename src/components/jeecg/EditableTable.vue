@@ -411,6 +411,7 @@ export default {
       obj = {
         ...obj,
         ...o,
+        operNumber: 1,
       };
       this.form.dataSource.push(obj);
     },
