@@ -101,6 +101,7 @@ export default {
       col_right_2: [],
 
       exportTitle: null,
+      pricingType: [],
     };
   },
   computed: {
@@ -133,36 +134,31 @@ export default {
       if (!this.supplierId || !this.dateTime) return [];
       const supplier = this.supList.find((v) => v.id == this.supplierId);
       if (!supplier) return [];
-      const { packageTypeName, fullyManagedType } = supplier;
       this.col_left = [];
       this.col_right_1 = [];
       this.col_right_2 = [];
-      if (packageTypeName == "全托" && [1, 2, 3].includes(fullyManagedType)) {
+      if (this.pricingType.includes(2)) {
         this.col_left.push({
           title: supplier?.cubeDeliverFee + "/配送",
           align: "center",
           dataIndex: "cubeDeliverFee",
-          width: 80,
         });
         this.col_left.push({
           title: supplier?.cubeWarehouseFee + "/库房",
           align: "center",
           dataIndex: "cubeWarehouseFee",
-          width: 80,
         });
 
         this.col_right_1.push({
           title: "入库数量",
           align: "center",
           dataIndex: "inCubeNumber",
-          width: 80,
           customRender: renderContent2,
         });
         this.col_right_1.push({
           title: "出库数量",
           align: "center",
           dataIndex: "outCubeNumber",
-          width: 80,
           customRender: renderContent,
         });
 
@@ -170,32 +166,25 @@ export default {
           title: "入库立方",
           align: "center",
           dataIndex: "inCube",
-          width: 80,
           customRender: renderContent2,
         });
         this.col_right_1.push({
           title: "出库立方",
           align: "center",
           dataIndex: "outCube",
-          width: 80,
           customRender: renderContent,
         });
       }
-      if (
-        packageTypeName == "半托" ||
-        (packageTypeName == "全托" && [2, 4].includes(fullyManagedType))
-      ) {
+      if (this.pricingType.includes(1)) {
         this.col_left.push({
           title: supplier?.packageDeliverFee + "/配送",
           align: "center",
           dataIndex: "packageDeliverFee",
-          width: 80,
         });
         this.col_left.push({
           title: supplier?.packageWarehouseFee + "/库房",
           align: "center",
           dataIndex: "packageWarehouseFee",
-          width: 80,
         });
 
         this.col_right_2.push({
@@ -205,14 +194,12 @@ export default {
               title: "入库数量",
               align: "center",
               dataIndex: "inNumber",
-              width: 80,
               customRender: renderContent2,
             },
             {
               title: "出库数量",
               align: "center",
               dataIndex: "outNumber",
-              width: 80,
               customRender: renderContent,
             },
           ],
@@ -222,13 +209,11 @@ export default {
         title: "费用合计",
         align: "center",
         dataIndex: "totalFee",
-        width: 80,
       });
       this.col_left.push({
         title: "天数",
         align: "center",
         dataIndex: "days",
-        width: 60,
       });
       return [
         {
@@ -257,7 +242,6 @@ export default {
           title: "额外费用",
           align: "center",
           dataIndex: "extraFee",
-          width: 80,
         },
         {
           title: "摘要",
@@ -267,7 +251,6 @@ export default {
           title: "余额",
           align: "center",
           dataIndex: "balance",
-          width: 80,
         },
         ...this.col_right_1,
         ...this.col_right_2,
@@ -291,125 +274,134 @@ export default {
     changeValue() {
       if (!this.supplierId || !this.dateTime) return;
       this.loading = true;
-      getAction("/documentHead/report/finance/range/date", {
-        supplierId: this.supplierId,
-        startDate: moment(this.dateTime).format(this.dateFormat) + "-26",
-        endDate:
-          moment(this.dateTime).add(1, "months").format(this.dateFormat) +
-          "-25",
-      })
-        .then(({ code, data }) => {
-          if (code == 200) {
-            this.exportTitle = data?.title;
-            let balance = 0;
-            this.listTable =
-              data?.financeReportUnits.map((v) => {
-                balance -= Number(v.totalFee);
-                return {
-                  ...v,
-                  extraFee: v.extraFee == 0 ? "" : v.extraFee,
-                  cubeDeliverFee: v.cubeDeliverFee == 0 ? "" : v.cubeDeliverFee,
-                  cubeWarehouseFee:
-                    v.cubeWarehouseFee == 0 ? "" : v.cubeWarehouseFee,
-                  packageDeliverFee:
-                    v.packageDeliverFee == 0 ? "" : v.packageDeliverFee,
-                  packageWarehouseFee:
-                    v.packageWarehouseFee == 0 ? "" : v.packageWarehouseFee,
-                  totalFee: v.totalFee == 0 ? "" : v.totalFee,
-                  // days: v.days == 0 ? "" : v.days,
+      const startDate = moment(this.dateTime).format(this.dateFormat) + "-26";
+      const endDate =
+        moment(this.dateTime).add(1, "months").format(this.dateFormat) + "-25";
+      Promise.all([
+        getAction("/documentHead/report/finance/range/date", {
+          supplierId: this.supplierId,
+          startDate,
+          endDate,
+        }),
+        getAction("/material/sotck/princingType", {
+          supplierId: this.supplierId,
+        }),
+      ])
+        .then((res) => {
+          let [{ data }, { data: princingType }] = res;
 
-                  balance: balance == 0 ? "" : balance,
+          this.pricingType = princingType;
 
-                  inCubeNumber: v.inCubeNumber == 0 ? "" : v.inCubeNumber,
-                  outCubeNumber: v.outCubeNumber == 0 ? "" : v.outCubeNumber,
-                  inCube: v.inCube == 0 ? "" : v.inCube,
-                  outCube: v.outCube == 0 ? "" : v.outCube,
-                  inNumber: v.inNumber == 0 ? "" : v.inNumber,
-                  outNumber: v.outNumber == 0 ? "" : v.outNumber,
-                };
-              }) || [];
+          this.exportTitle = data?.title;
+          let balance = 0;
+          this.listTable =
+            data?.financeReportUnits.map((v) => {
+              balance -= Number(v.totalFee);
+              return {
+                ...v,
+                extraFee: v.extraFee == 0 ? "" : v.extraFee,
+                cubeDeliverFee: v.cubeDeliverFee == 0 ? "" : v.cubeDeliverFee,
+                cubeWarehouseFee:
+                  v.cubeWarehouseFee == 0 ? "" : v.cubeWarehouseFee,
+                packageDeliverFee:
+                  v.packageDeliverFee == 0 ? "" : v.packageDeliverFee,
+                packageWarehouseFee:
+                  v.packageWarehouseFee == 0 ? "" : v.packageWarehouseFee,
+                totalFee: v.totalFee == 0 ? "" : v.totalFee,
+                // days: v.days == 0 ? "" : v.days,
 
-            let sum_1 = 0;
-            let sum_2 = 0;
-            let sum_3 = 0;
-            let sum_4 = 0;
-            let sum_5 = 0;
-            let sum_6 = 0;
+                balance: balance == 0 ? "" : balance,
 
-            const days = this.listTable?.[1].days + 1;
+                inCubeNumber: v.inCubeNumber == 0 ? "" : v.inCubeNumber,
+                outCubeNumber: v.outCubeNumber == 0 ? "" : v.outCubeNumber,
+                inCube: v.inCube == 0 ? "" : v.inCube,
+                outCube: v.outCube == 0 ? "" : v.outCube,
+                inNumber: v.inNumber == 0 ? "" : v.inNumber,
+                outNumber: v.outNumber == 0 ? "" : v.outNumber,
+              };
+            }) || [];
 
-            this.listTable.forEach((v) => {
-              sum_1 += Number(v.inCubeNumber);
-              sum_2 += Number(v.outCubeNumber);
-              sum_3 += Number(v.inCube);
-              sum_4 += Number(v.outCube);
-              sum_5 += Number(v.inNumber);
-              sum_6 += Number(v.outNumber);
-              // sum_7 +=
-            });
+          let sum_1 = 0;
+          let sum_2 = 0;
+          let sum_3 = 0;
+          let sum_4 = 0;
+          let sum_5 = 0;
+          let sum_6 = 0;
 
-            const supplier = this.supList.find((v) => v.id == this.supplierId);
-            const { packageTypeName, fullyManagedType } = supplier;
+          const days = moment(endDate).diff(moment(startDate), "days") + 1;
 
-            if (
-              packageTypeName == "全托" &&
-              [1, 2, 3].includes(fullyManagedType)
-            ) {
-              // 立方
-              const totalFee =
-                (Number(sum_3) + Number(sum_4)) * 60 * Number(days);
-              balance -= Number(totalFee);
-              this.listTable.push({
-                endDate: this.listTable?.[this.listTable.length - 1]?.endDate,
-                startDate:
-                  moment(this.dateTime).add(2, "months").month() + 1 + "月",
-                remark: "库房费（立方）",
-                days: days,
-                totalFee: totalFee,
-                balance: balance,
-              });
-            }
-            if (
-              packageTypeName == "半托" ||
-              (packageTypeName == "全托" && [2, 4].includes(fullyManagedType))
-            ) {
-              // 包
-              const d =
-                packageTypeName == "全托" && fullyManagedType == 2 ? "" : days;
-              const totalFee = (Number(sum_5) + Number(sum_6)) * 750;
-              balance -= Number(totalFee);
-              this.listTable.push({
-                endDate: this.listTable?.[this.listTable.length - 1]?.endDate,
-                startDate:
-                  moment(this.dateTime).add(2, "months").month() + 1 + "月",
-                remark: "库房费（包结）",
-                days: d,
-                totalFee: totalFee,
-                balance: balance,
-              });
-            }
+          this.listTable.forEach((v) => {
+            sum_1 += Number(v.inCubeNumber);
+            sum_2 += Number(v.outCubeNumber);
+            sum_3 += Number(v.inCube);
+            sum_4 += Number(v.outCube);
+            sum_5 += Number(v.inNumber);
+            sum_6 += Number(v.outNumber);
+            // sum_7 +=
+          });
 
+          const supplier = this.supList.find((v) => v.id == this.supplierId);
+
+          if (this.pricingType.includes(2)) {
+            // 立方
+            let totalFee = (Number(sum_3) + Number(sum_4)) * 60 * Number(days);
+            totalFee = totalFee ? totalFee.toFixed(6) : totalFee;
+            balance -= Number(totalFee);
+            balance = balance ? balance.toFixed(6) : balance;
             this.listTable.push({
-              endDate: "合计",
-              totalFee: -balance,
-              inCubeNumber: sum_1,
-              outCubeNumber: sum_2,
-              inCube: sum_3,
-              outCube: sum_4,
-              inNumber: sum_5,
-              outNumber: sum_6,
-            });
-
-            this.listTable.push({
-              balance: "剩余",
-              inCubeNumber: Number(sum_1) + Number(sum_2),
-              inCube: Number(sum_3) + Number(sum_4),
-              inNumber: Number(sum_5) + Number(sum_6),
+              endDate: this.listTable?.[this.listTable.length - 1]?.endDate,
+              startDate:
+                moment(this.dateTime).add(2, "months").month() + 1 + "月",
+              remark: "库房费（立方）",
+              days: days,
+              totalFee: totalFee,
+              balance: balance,
             });
           }
+          if (this.pricingType.includes(1)) {
+            // 包
+            let totalFee = (Number(sum_5) + Number(sum_6)) * 750;
+            totalFee = totalFee ? totalFee.toFixed(6) : totalFee;
+            balance -= Number(totalFee);
+            balance = balance ? balance.toFixed(6) : balance;
+            this.listTable.push({
+              endDate: this.listTable?.[this.listTable.length - 1]?.endDate,
+              startDate:
+                moment(this.dateTime).add(2, "months").month() + 1 + "月",
+              remark: "库房费（包结）",
+              days:
+                this.pricingType.includes(1) && this.pricingType.includes(2)
+                  ? ""
+                  : days,
+              totalFee: totalFee,
+              balance: balance,
+            });
+          }
+
+          this.listTable.push({
+            endDate: "合计",
+            totalFee: -balance,
+            inCubeNumber: sum_1,
+            outCubeNumber: sum_2,
+            inCube: sum_3 ? sum_3.toFixed(6) : sum_3,
+            outCube: sum_4 ? sum_4.toFixed(6) : sum_4,
+            inNumber: sum_5,
+            outNumber: sum_6,
+          });
+
+          this.listTable.push({
+            balance: "剩余",
+            inCubeNumber: Number(sum_1) + Number(sum_2),
+            inCube:
+              Number(sum_3) + Number(sum_4)
+                ? (Number(sum_3) + Number(sum_4)).toFixed(6)
+                : Number(sum_3) + Number(sum_4),
+            inNumber: Number(sum_5) + Number(sum_6),
+          });
         })
         .catch(() => {
           this.listTable = [];
+          this.pricingType = [];
         })
         .finally(() => {
           this.loading = false;

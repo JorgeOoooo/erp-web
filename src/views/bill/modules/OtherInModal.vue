@@ -477,7 +477,12 @@ export default {
           that.supList = res;
           if (supplierId) {
             const supplier = that.supList.find((item) => item.id == supplierId);
-            this.changePackageType(supplier?.packageTypeName == "半托" ? 2 : 1);
+            if (supplier) {
+              this.supplierId = supplierId;
+              this.changePackageType(
+                supplier?.packageTypeName == "半托" ? 2 : 1
+              );
+            }
           }
         }
       });
@@ -513,7 +518,6 @@ export default {
             "carNumber",
             "createTime",
 
-            "deliverFee",
             "remark"
           )
         );
