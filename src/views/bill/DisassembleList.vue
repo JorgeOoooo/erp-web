@@ -170,13 +170,12 @@
             :columns="columns"
             :dataSource="dataSource"
             :components="handleDrag(columns)"
-            :pagination="ipagination"
+            :pagination="false"
             :loading="loading"
             :rowSelection="{
               selectedRowKeys: selectedRowKeys,
               onChange: onSelectChange,
             }"
-            @change="handleTableChange"
           >
             <span slot="action" slot-scope="text, record, index">
               <a
@@ -190,11 +189,45 @@
               {{ renderTypeText(text) }}
             </span>
           </a-table>
+          <a-pagination
+            style="float: right; margin: 16px 0"
+            @change="
+              (current, pageSize) =>
+                handleTableChange(
+                  { ...ipagination, current, pageSize },
+                  null,
+                  {}
+                )
+            "
+            @showSizeChange="
+              (current, pageSize) =>
+                handleTableChange(
+                  { ...ipagination, current, pageSize },
+                  null,
+                  {}
+                )
+            "
+            size="small"
+            show-size-changer
+            :showQuickJumper="true"
+            :current="ipagination.current"
+            :page-size="ipagination.pageSize"
+            :page-size-options="ipagination.pageSizeOptions"
+            :total="ipagination.total"
+            :show-total="
+              (total, range) => `${range[0]}-${range[1]} 共${total}条`
+            "
+          >
+            <template slot="buildOptionText" slot-scope="props">
+              <span>{{ props.value }}条/页</span>
+            </template>
+          </a-pagination>
         </div>
         <!-- table区域-end -->
         <!-- 表单区域 -->
         <other-in-modal
           ref="otherInModal"
+          :billType="2"
           @close="handleCloseView"
         ></other-in-modal>
         <other-out-modal
@@ -318,16 +351,17 @@ export default {
         getAction("/documentHead/sum", this.queryParam),
       ]).then(([res, sum]) => {
         if (res.code === 200) {
-          this.dataSource = res.data?.rows || res.data?.records || [];
+          let data = res.data?.records || [];
           this.ipagination.total = res.data?.total || 0;
-          // this.tableAddTotalRow(this.columns, this.dataSource);
-          if (this.dataSource?.length) {
-            this.dataSource.push({
+          if (data?.length) {
+            data.push({
               name: "总计",
               countNumber: sum.data,
               id: Date.now() + "",
             });
           }
+          this.dataSource = data;
+          console.log(data);
         }
         if (res.code === 510) {
           this.$message.warning(res.data);

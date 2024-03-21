@@ -108,7 +108,6 @@ export const JeecgListMixin = {
         if (res.code === 200) {
           this.dataSource = res.data?.rows || res.data?.records || [];
           this.ipagination.total = res.data?.total || 0;
-          this.tableAddTotalRow(this.columns, this.dataSource);
         }
         if (res.code === 510) {
           this.$message.warning(res.data);
@@ -491,47 +490,6 @@ export const JeecgListMixin = {
           },
         },
       };
-    },
-    /** 表格增加合计行 */
-    tableAddTotalRow(columns, dataSource) {
-      if (dataSource?.length > 0 && this.ipagination.pageSize % 10 === 1) {
-        //分页条数为11、21、31等的时候增加合计行
-        let numKey = "rowIndex";
-        let totalRow = { [numKey]: "合计" };
-        //需要合计的列
-        let parseCols =
-          "initialStock,currentStock,currentStockPrice,currentWeight,initialAmount,thisMonthAmount,currentAmount,inSum,inSumPrice," +
-          "inOutSumPrice,outSum,outSumPrice,outInSumPrice,operNumber,allPrice,numSum,priceSum,prevSum,thisSum,thisAllPrice,changeAmount," +
-          "allPrice,taxMoney,currentNumber,lowSafeStock,highSafeStock,lowCritical,highCritical,preNeed,debtMoney,backMoney,allNeed," +
-          "needDebt,realNeedDebt,finishDebt,debt";
-        columns.forEach((column) => {
-          let { key, dataIndex } = column;
-          if (![key, dataIndex].includes(numKey)) {
-            let total = 0;
-            dataSource.forEach((data) => {
-              if (parseCols.indexOf(dataIndex) > -1) {
-                if (data[dataIndex]) {
-                  total += Number.parseFloat(data[dataIndex]);
-                } else {
-                  total += 0;
-                }
-              } else {
-                total = "-";
-              }
-            });
-            if (total !== "-") {
-              total = total.toFixed(2);
-            }
-            totalRow[dataIndex] = total;
-          }
-        });
-        dataSource.push(totalRow);
-        //总数要增加合计的行数，每页都有一行合计，所以总数要加上
-        let size = Math.ceil(
-          this.ipagination.total / (this.ipagination.pageSize - 1)
-        );
-        this.ipagination.total = this.ipagination.total + size;
-      }
     },
     paginationChange(page, pageSize) {
       this.ipagination.current = page;

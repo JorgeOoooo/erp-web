@@ -67,7 +67,7 @@
                 placeholder="请输入"
                 :tabindex="getTabIndex(col, index)"
                 :disabled="isView"
-                @change="(val) => handleChange(val, col, record)"
+                @change="(val) => handleChange(val, col, record, index)"
               />
               <span v-else>
                 {{ renderText(col, record, text) }}
@@ -87,7 +87,7 @@
                 allowClear
                 style="width: 100%"
                 placeholder="请选择"
-                @change="(val) => handleChange(val, col, record)"
+                @change="(val) => handleChange(val, col, record, index)"
                 @focus="focus(col, record)"
                 @blur="blur(col, record)"
                 @select="select(col, record, index)"
@@ -122,7 +122,7 @@
               style="width: 100%"
               placeholder="请输入内容后选择"
               @search="(val) => handleSearch(val, col)"
-              @change="(val) => handleChange(val, col, record)"
+              @change="(val) => handleChange(val, col, record, index)"
               @focus="focus(col, record)"
               @blur="blur(col, record)"
               @select="select(col, record, index)"
@@ -158,7 +158,7 @@
               allowClear
               style="width: 100%"
               placeholder="请选择"
-              @change="(val) => handleChange(val, col, record)"
+              @change="(val) => handleChange(val, col, record, index)"
               @focus="focus(col, record)"
               @blur="blur(col, record)"
               @select="select(col, record, index)"
@@ -194,7 +194,7 @@
               allowClear
               style="width: 100%"
               placeholder="请选择"
-              @change="(val) => handleChange(val, col, record)"
+              @change="(val) => handleChange(val, col, record, index)"
               @focus="focus(col, record)"
               @blur="blur(col, record)"
               @select="select(col, record, index)"
@@ -220,7 +220,7 @@
               placeholder="请输入"
               :tabindex="getTabIndex(col, index)"
               :disabled="isView"
-              @change="(val) => handleChange(val, col, record)"
+              @change="(val) => handleChange(val, col, record, index)"
             />
             <div v-else-if="col.type == FormTypes.lazyInput">
               <a-input
@@ -232,7 +232,7 @@
                 :disabled="isView"
                 @pressEnter="confirmInput(col, record)"
                 @blur="confirmInput(col, record)"
-                @change="(val) => handleChange(val, col, record)"
+                @change="(val) => handleChange(val, col, record, index)"
               />
               <span class="lazyInputStatus">
                 <a-icon
@@ -279,7 +279,7 @@
               :disabled="isView"
               style="width: 100%"
               placeholder="请输入"
-              @change="(val) => handleChange(val, col, record)"
+              @change="(val) => handleChange(val, col, record, index)"
             />
           </a-form-model-item>
           <span v-else :key="col.dataIndex">
@@ -544,6 +544,10 @@ export default {
         operNumber: 1,
       };
       this.form.dataSource.push(obj);
+
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
     },
     handleAddEmptyLine(index) {
       let obj = {
@@ -555,13 +559,14 @@ export default {
           obj[col.dataIndex] = undefined;
         }
       });
+      obj.operNumber = 1;
       this.form.dataSource.splice(index + 1, 0, obj);
     },
     handleDelete(index) {
       this.form.dataSource.splice(index, 1);
     },
-    handleChange(val, col, record) {
-      if (record.needAdd) {
+    handleChange(val, col, record, index) {
+      if (record.needAdd && index == this.form.dataSource.length - 1) {
         if (
           this.from == "in" &&
           col.dataIndex != "depotName" &&
@@ -799,6 +804,15 @@ export default {
         .finally(() => {
           that.confirmLoading = false;
         });
+    },
+    scrollToBottom() {
+      const element = document.querySelector(".JEditLineTable .ant-table-body");
+
+      // 滚动到指定偏移量
+      element.scrollTo({
+        top: element.scrollHeight,
+        behavior: "smooth", // 使用平滑滚动
+      });
     },
   },
 };
